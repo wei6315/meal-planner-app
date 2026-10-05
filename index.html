@@ -186,6 +186,9 @@ button:disabled{opacity:.45}
 .it.done .in{opacity:.4}
 .it.done .nm{text-decoration:line-through}
 .k-none{--kd:#CFC9BC}
+.rm{flex:none;width:36px;height:36px;border:0;background:none;color:var(--sub);font-size:22px;font-weight:300;line-height:1;padding:0}
+.rm:active{color:var(--red)}
+#toast button{margin-left:14px;border:0;background:none;color:#fff;font:inherit;text-decoration:underline;padding:0}
 
 </style>
 </head>
@@ -326,9 +329,13 @@ let view = 'menu', weekStart = mondayOf(new Date()), monthStart = new Date(new D
 let wShifts = {}, wMeals = {}, wItems = [];
 let tab = CATS[0], cur = null, tags = [], cat = CATS[0], rate = null, entered = false, tt, pickHandler = null;
 
-function toast(msg, bad){
-  const t = $('toast'); t.textContent = msg; t.className = bad ? 'bad' : ''; t.hidden = false;
-  clearTimeout(tt); tt = setTimeout(() => t.hidden = true, 3500);
+function toast(msg, bad, action){
+  const t = $('toast'); t.textContent = msg; t.className = bad ? 'bad' : '';
+  if (action){
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = action.label;
+    b.addEventListener('click', () => { t.hidden = true; action.fn(); }); t.append(b);
+  }
+  t.hidden = false; clearTimeout(tt); tt = setTimeout(() => t.hidden = true, action ? 6000 : 3500);
 }
 
 /* ---------- 登入 ---------- */
@@ -572,18 +579,19 @@ $('days').addEventListener('click', e => {
   if (dc) dayMenu(dc.dataset.d);
 });
 function dayMenu(ds){
-  const d = parse(ds), wd = isoWd(d), m = wMeals[ds], wdType = weekdaySet[wd], type = m ? m.day_type : wdType;
-  const its = wItems.filter(x => x.meal_date === ds), sh = wShifts[ds] && wShifts[ds].shift, cfg = shiftSet[sh];
+  const d = parse(ds), wdType = weekdaySet[isoWd(d)], m = wMeals[ds], type = m ? m.day_type : wdType;
+  const its = wItems.filter(x => x.meal_date === ds), has = its.length > 0;
+  const sh = wShifts[ds] && wShifts[ds].shift, cfg = shiftSet[sh], skipped = m && m.status === '跳過';
   const info = [sh ? (sh === '休假' ? '休假' : sh + '班') : '班別未輸入',
-    type === '公休' ? '' : `${m && m.headcount ? m.headcount : (cfg ? cfg.headcount : 4)} 人 · ${type}`,
-    m && m.status === '確認' ? '已確認' : ''].filter(Boolean).join(' · ');
-  let opts;
-  if (type === '公休'){
-    const skipped = m && m.status === '跳過';
-    opts = (skipped && wdType !== '公休') ? [['unskip', '', '恢復排餐']] : [['plan', '正餐', '排正餐'], ['plan', '一鍋', '排一鍋']];
-  } else if (!its.length) opts = [['redo', '', '排餐'], ['skip', '', '不排餐']];
-  else opts = [['redo', '', '重排這天'], ['lock', '', m && m.status === '確認' ? '取消確認' : '確認這天'], ['skip', '', '不排餐']];
-  openPick(`週${WD[d.getDay()]} ${md(ds)}`, `<p class="askmsg">${esc(info)}</p>` + opts.map(([a, t, l]) => `<button data-a="${a}" data-t="${t}">${l}</button>`).join(''),
+    skipped ? '這天不排餐' : (type === '公休' ? '公休' : `${m && m.headcount ? m.headcount : (cfg ? cfg.headcount : 4)} 人 · ${type}`),
+    m && m.status === '確認' ? '已確認' : '',
+    type !== '公休' && type !== wdType ? `預設為${wdType}` : ''].filter(Boolean).join(' · ');
+  // 每天都可以選「正餐」或「一鍋」；預設的排法（週三、週日一鍋，週六公休，其餘正餐）不變
+  const opts = [['plan', '正餐'], ['plan', '一鍋']].map(([a, t]) => [a, t, (type === t && has ? '重排' : '排') + (t === '一鍋' ? '一鍋' : '正餐'), type === t && has]);
+  if (has) opts.push(['lock', '', m && m.status === '確認' ? '取消確認' : '確認這天', false]);
+  if (type !== '公休') opts.push(['skip', '', '不排餐', false]);
+  openPick(`週${WD[d.getDay()]} ${md(ds)}`, `<p class="askmsg">${esc(info)}</p>` +
+    opts.map(([a, t, l, cur]) => `<button data-a="${a}" data-t="${t}">${l}${cur ? '<small>目前</small>' : ''}</button>`).join(''),
     btn => { closePick(); dayAct(ds, btn.dataset.a, btn.dataset.t || undefined); });
 }
 async function dayAct(ds, act, t){
@@ -593,7 +601,10 @@ async function dayAct(ds, act, t){
     return generate([ds], true);
   }
   if (act === 'unskip') return generate([ds], true);
-  if (act === 'plan') return generate([ds], true, { [ds]: t });
+  if (act === 'plan'){
+    if (m && m.status === '確認' && !(await ask('重排這天？', '這天已確認，重排會覆蓋目前的菜。', '重排'))) return;
+    return generate([ds], true, { [ds]: t });
+  }
   if (act === 'lock'){
     const r = await db.from('meals').update({ status: m.status === '確認' ? '草稿' : '確認' }).eq('meal_date', ds);
     if (r.error) return toast('更新失敗：' + r.error.message, true);
@@ -881,7 +892,7 @@ function drawShop(){
     const xs = shop.filter(x => x.grp === g).sort((a, b) => a.done - b.done);
     if (!xs.length) return '';
     return `<div class="gh"><span>${g}</span><small>${xs.filter(x => !x.done).length}</small></div>` + xs.map(it =>
-      `<div class="it${it.done ? ' done' : ''} k-${shopKind(it)}"><button type="button" class="ck" data-id="${esc(it.id)}" aria-pressed="${!!it.done}" aria-label="${it.done ? '取消已買' : '標示已買'}"></button><button type="button" class="in" data-id="${esc(it.id)}"><span class="nm">${esc(it.name)}</span>${it.note ? `<small>${esc(it.note)}</small>` : ''}</button></div>`).join('');
+      `<div class="it${it.done ? ' done' : ''} k-${shopKind(it)}"><button type="button" class="ck" data-id="${esc(it.id)}" aria-pressed="${!!it.done}" aria-label="${it.done ? '取消已買' : '標示已買'}"></button><button type="button" class="in" data-id="${esc(it.id)}"><span class="nm">${esc(it.name)}</span>${it.note ? `<small>${esc(it.note)}</small>` : ''}</button><button type="button" class="rm" data-id="${esc(it.id)}" aria-label="刪除「${esc(it.name)}」">×</button></div>`).join('');
   }).join('');
 }
 async function addShop(){
@@ -906,6 +917,17 @@ async function toggleShop(id){
   const r = await db.from('shopping_items').update({ done: it.done }).eq('id', id);
   if (r.error){ it.done = !it.done; drawShop(); toast('更新失敗：' + r.error.message, true); }
 }
+async function delShop(id){
+  const it = shop.find(x => x.id === id); if (!it) return;
+  shop = shop.filter(x => x.id !== id); drawShop();
+  const r = await db.from('shopping_items').delete().eq('id', id);
+  if (r.error){ shop.push(it); drawShop(); return toast('刪除失敗：' + r.error.message, true); }
+  toast(`已刪除「${it.name}」`, false, { label: '復原', fn: async () => {
+    const w = await db.from('shopping_items').insert({ name: it.name, grp: it.grp, note: it.note, done: it.done }).select().single();
+    if (w.error) return toast('復原失敗：' + w.error.message, true);
+    shop.push(w.data); drawShop();
+  } });
+}
 function itemMenu(id){
   const it = shop.find(x => x.id === id); if (!it) return;
   openPick(it.name,
@@ -922,6 +944,7 @@ function itemMenu(id){
 }
 $('shopList').addEventListener('click', e => {
   const ck = e.target.closest('.ck'); if (ck) return toggleShop(ck.dataset.id);
+  const rm = e.target.closest('.rm'); if (rm) return delShop(rm.dataset.id);
   const n = e.target.closest('.in'); if (n) itemMenu(n.dataset.id);
 });
 
