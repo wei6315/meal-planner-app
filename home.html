@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>家</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<meta name="apple-mobile-web-app-title" content="home">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F5F4F0; --paper:#FFFEFB; --ink:#2A2826; --sub:#8A857D; --line:#DEDAD2; --line2:#E9E6DF;
+  --warn:#C8423A; --e:#F2EACB; --m:#F1D9D6; --n:#D8E2EA; --off:#FFFEFB;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){ --bg:#1B1A18; --paper:#24221F; --ink:#ECE9E3; --sub:#9E988E; --line:#3A3733; --line2:#2E2B28; --e:#4A4430; --m:#4A3533; --n:#2F3A44; --off:#24221F; }
+}
+:root[data-theme="dark"]{ --bg:#1B1A18; --paper:#24221F; --ink:#ECE9E3; --sub:#9E988E; --line:#3A3733; --line2:#2E2B28; --e:#4A4430; --m:#4A3533; --n:#2F3A44; --off:#24221F; }
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+button{background:none;border:0;padding:0;cursor:pointer;text-align:left}
+button:disabled{opacity:.35;cursor:default}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.wrap{max-width:520px;margin:0 auto;padding:0 22px calc(110px + env(safe-area-inset-bottom,0px))}
+
+.ptitle{display:flex;justify-content:space-between;align-items:center;padding:34px 0 18px}
+.ptitle h1{margin:0;font-weight:300;font-size:32px;letter-spacing:.18em}
+.cplus{width:44px;height:44px;border:1px solid var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.cplus[aria-expanded="true"]{transform:rotate(45deg)}
+.rnav{display:flex;align-items:center;justify-content:center;gap:28px;margin:4px 0 18px;font-size:18px;letter-spacing:.06em;font-weight:300}
+.rnav button{width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:21px;color:var(--sub);text-align:center}
+.center{text-align:center;margin:-10px 0 10px}
+.link{font-size:11px;color:var(--sub);text-decoration:underline;text-underline-offset:3px;min-height:32px}
+
+.utabs{display:flex;gap:24px;overflow-x:auto;margin-bottom:18px;border-bottom:1px solid var(--line2)}
+.utabs button{flex:none;min-height:46px;font-size:16px;color:var(--sub);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.utabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.utabs small{font-size:11px;margin-left:5px}
+
+.sec{margin-bottom:30px}
+.shead{display:flex;justify-content:space-between;align-items:center;min-height:44px;margin-bottom:10px}
+.shead h2{margin:0;font-size:17px;font-weight:700;letter-spacing:.06em}
+.meta{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--sub)}
+.meta b{color:var(--ink);font-size:13px}
+.sbox{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 3px;border:1.5px solid var(--ink);border-radius:3px;font-size:11px;color:var(--ink)}
+.muted{color:var(--sub);font-size:13px;margin:6px 0}
+.over{color:var(--warn)!important}
+
+.tags{display:flex;flex-wrap:wrap;gap:10px}
+.tag{display:inline-flex;align-items:center;min-height:42px;padding:0 16px 0 14px;background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:3px;font-size:14px}
+.tags.big .tag{min-height:48px;font-size:15px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin:20px 0;font-size:12px;color:var(--sub)}
+.legend span{display:flex;align-items:center;gap:8px}
+.legend span::before{content:'';width:4px;height:16px;background:var(--c);border-radius:1px}
+
+.progress{height:2px;background:var(--line2);margin-bottom:4px}
+.progress i{display:block;height:100%;background:var(--ink);transition:width .25s}
+.glabel{font-size:11px;color:var(--sub);letter-spacing:.12em;margin:18px 0 0;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.check{display:flex;align-items:center;gap:14px;width:100%;min-height:54px;border-bottom:1px solid var(--line2)}
+.box{width:22px;height:22px;border:1.5px solid var(--sub);border-radius:3px;flex:none;display:flex;align-items:center;justify-content:center}
+.box svg{opacity:0}
+.check.done .box{background:var(--ink);border-color:var(--ink)}.check.done .box svg{opacity:1}
+.label{flex:1;font-size:14px}
+.check.done .label{text-decoration:line-through;color:var(--sub)}
+.badge{font-size:11px;color:var(--sub);border:1px solid var(--line);border-radius:2px;padding:1px 6px}
+.mins{font-size:11px;color:var(--sub)}
+
+.btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:3px;font-size:14px;letter-spacing:.1em;text-align:center}
+.btn.dark{background:var(--ink);color:var(--bg);padding:0 22px}
+.btn.line{border:1px solid var(--ink)}
+.btn.ghost{color:var(--sub);padding:0 16px}
+.btn.sq{width:48px;flex:none;border:1px solid var(--ink)}
+.btn.sq.warn{border-color:var(--line);color:var(--warn)}
+.btn.grow{flex:1}
+.btnrow{display:flex;gap:10px;margin-bottom:18px}
+
+.mgrid{display:grid;grid-template-columns:64px repeat(4,minmax(0,1fr));gap:10px;align-items:center}
+.mhead{font-size:13px;color:var(--sub);letter-spacing:.1em;padding:6px 0 12px;border-bottom:1px solid var(--line);text-align:center}
+.mrow{padding:18px 0;border-bottom:1px solid var(--line);min-height:96px}
+.mrow.now .dcol b{text-decoration:underline;text-underline-offset:5px}
+.dcol b{display:block;font-size:15px}
+.dcol > span{font-size:12px;color:var(--sub)}
+.sline{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:12px}
+.cell{display:flex;flex-direction:column;gap:10px}
+.span{grid-column:2 / -1}
+.bar{display:block;padding-left:10px;border-left:4px solid var(--c);font-size:13px;line-height:1.45}
+
+.rule{border-top:1px solid var(--line)}
+.wrow{display:flex;gap:16px;width:100%;padding:16px 0;border-bottom:1px solid var(--line)}
+.wrow .dcol{width:64px;flex:none}
+.wrow .sline b,.mrow .sline b{font-weight:400}
+.wrow .sline b{color:var(--sub)}
+.wrow.now .dcol b{text-decoration:underline;text-underline-offset:5px}
+.wbody{flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center}
+.aline{display:flex;justify-content:space-between;font-size:13px;padding-left:10px;border-left:4px solid var(--line)}
+.aline em{font-style:normal;color:var(--sub);font-size:11px}
+
+.ahead{display:flex;justify-content:space-between;align-items:baseline;margin:26px 0 0;padding-bottom:8px;border-bottom:1px solid var(--line);font-size:16px;font-weight:700}
+.ahead span{font-size:11px;font-weight:400;color:var(--sub)}
+.lrow{display:flex;align-items:center;gap:10px;min-height:54px;border-bottom:1px solid var(--line2)}
+.lrow .n{flex:1;font-size:14px}
+.lrow .f{font-size:11px;color:var(--sub);text-align:right;line-height:1.5}
+.ibtn{width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:var(--sub);border-radius:3px;flex:none}
+.ibtn.arm{background:var(--warn);color:#fff}
+
+.search{display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line);margin-bottom:22px;color:var(--sub)}
+.search input{flex:1;min-height:52px;border:0;background:transparent;font-size:16px;outline:none}
+.addrow{display:flex;gap:14px;align-items:flex-end;margin-bottom:16px}
+.addrow input{flex:1;min-height:52px;border:0;border-bottom:1.5px solid var(--line);background:transparent;font-size:15px;outline:none}
+
+.form{margin:0 0 18px;padding:16px;border:1px solid var(--line);border-radius:3px;background:var(--paper);display:grid;gap:12px}
+.form label{display:grid;gap:4px;font-size:11px;color:var(--sub)}
+.form input,.form select{min-height:46px;padding:0 10px;border:1px solid var(--line);border-radius:3px;background:var(--bg);font-size:14px;width:100%}
+.form .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form .acts{display:flex;gap:10px;justify-content:flex-end}
+.form .btn{min-height:44px;font-size:13px}
+
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.ch{text-align:center;font-size:13px;color:var(--sub);padding:4px 0 8px}
+.cell2{min-height:76px;border-radius:3px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center}
+.cell2 span{font-size:13px;color:var(--sub);min-width:26px;height:26px;display:flex;align-items:center;justify-content:center}
+.cell2 span.td{background:var(--ink);color:var(--bg);border-radius:50%}
+.cell2 b{font-size:15px;font-weight:700}
+.cell2.e{background:var(--e)}.cell2.mid{background:var(--m)}.cell2.n{background:var(--n)}.cell2.off{background:var(--off)}
+.cell2.out{opacity:.45}
+
+.fsec{margin:34px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--line);font-size:14px;color:var(--sub);letter-spacing:.12em}
+.two2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.two2 label,.fl{display:grid;gap:6px;font-size:13px;color:var(--sub);margin-bottom:16px}
+.two2 input,.fl input,.fl select{min-height:52px;border:0;border-bottom:1.5px solid var(--line);background:transparent;font-size:16px;color:var(--ink);width:100%;border-radius:0}
+.btn.full{width:100%;margin-top:4px}
+.pg-today .shead h2{font-weight:700}
+.pg-today .meta b{font-weight:400}
+.pg-today .box{border-radius:50%}
+.note{font-size:12px;color:var(--sub);line-height:1.8;margin:18px 0 0}
+#tabbar{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;background:var(--bg);border-top:1px solid var(--line);padding:8px 0 calc(10px + env(safe-area-inset-bottom,0px))}
+#tabbar button{flex:1;max-width:110px;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--sub);font-size:11px;letter-spacing:.08em}
+#tabbar button[aria-current="page"]{color:var(--ink)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));font-size:12px;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:3px;max-width:calc(100% - 44px);text-align:center;z-index:5}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap"><main id="main"></main></div>
+<nav id="tabbar" aria-label="主要分頁"></nav>
+<div class="toast" id="toast" hidden></div>
+<script>
+
+/* ============ 固定設定 ============ */
+const ANCHOR = new Date(2026, 9, 5);   // 第 1 循環第 1 週的週一
+const LIMIT = 60;                      // 每日上限（分鐘）
+// 各區輪值日：wd = 星期（1 一 … 5 五），A / B = 4 週循環中的第幾週
+const SLOT = {
+  '主臥':{wd:1,A:1,B:3}, '姊姊房間':{wd:2,A:1,B:3}, '客廳':{wd:3,A:1,B:3}, '弟弟房間':{wd:4,A:1,B:3}, '玄關':{wd:5,A:1,B:3},
+  '廚房':{wd:1,A:2,B:4}, '餐廳':{wd:2,A:2,B:4}, '客衛':{wd:3,A:2,B:4}, '主臥廁所':{wd:4,A:2,B:4},
+  '前陽台':{wd:5,A:2,B:2}, '後陽台':{wd:5,A:4,B:4}
+};
+const AREAS = ['玄關','客廳','餐廳','廚房','主臥','姊姊房間','弟弟房間','主臥廁所','客衛','前陽台','後陽台'];
+const WD = ['日','一','二','三','四','五','六'];
+const WORKDAYS = [1,2,3,4,5,0];
+const FREQ = { weekly:'每週', biweekly:'隔週', monthly:'每月', quarterly:'每季', halfyear:'每半年' };
+const AFFECT = ['主臥', '主臥廁所'];   // 爸爸夜班補眠時會干擾的區域
+const SHIFTS = ['', '早', '中', '夜', '休假'];
+const MONTH_PAIRS = [[1,7],[2,8],[3,9],[4,10],[5,11],[6,12]];
+// 預設家務（雲端沒有資料時使用；之後以雲端為準）
+const DEFAULT_TASKS = [{"area": "廚房", "name": "冰箱清過期食材", "freq": "weekly", "min": 15, "wd": 0, "id": "t1"}, {"area": "廚房", "name": "地板除油", "freq": "weekly", "min": 15, "wd": 0, "id": "t2"}, {"area": "廚房", "name": "瓦斯爐清潔", "freq": "weekly", "min": 15, "wd": 0, "id": "t3"}, {"area": "主臥廁所", "name": "濕區洗地板、牆壁", "freq": "weekly", "min": 20, "wd": 2, "id": "t4"}, {"area": "客衛", "name": "整理雜物", "freq": "weekly", "min": 10, "wd": 4, "id": "t5"}, {"area": "客衛", "name": "除塵", "freq": "weekly", "min": 5, "wd": 4, "id": "t6"}, {"area": "玄關", "name": "整理雜物", "freq": "weekly", "min": 10, "wd": 4, "id": "t7"}, {"area": "玄關", "name": "除塵", "freq": "weekly", "min": 5, "wd": 4, "id": "t8"}, {"area": "客廳", "name": "除塵", "freq": "weekly", "min": 10, "wd": 2, "id": "t9"}, {"area": "餐廳", "name": "整理雜物", "freq": "weekly", "min": 10, "wd": 5, "id": "t10"}, {"area": "餐廳", "name": "除塵", "freq": "weekly", "min": 5, "wd": 5, "id": "t11"}, {"area": "主臥", "name": "床單、枕頭套清洗", "freq": "biweekly", "min": 10, "id": "t12"}, {"area": "主臥", "name": "床罩、被單清洗", "freq": "monthly", "min": 10, "v": "A", "id": "t13"}, {"area": "主臥", "name": "床架擦拭", "freq": "monthly", "min": 5, "v": "A", "id": "t14"}, {"area": "主臥", "name": "梳妝台整理", "freq": "monthly", "min": 10, "v": "A", "id": "t15"}, {"area": "主臥", "name": "衣服整理", "freq": "monthly", "min": 15, "v": "B", "id": "t16"}, {"area": "主臥", "name": "冷氣濾網", "freq": "monthly", "min": 10, "v": "B", "id": "t17"}, {"area": "主臥", "name": "清淨機濾網", "freq": "monthly", "min": 5, "v": "A", "id": "t18"}, {"area": "主臥", "name": "衣櫥擦拭", "freq": "quarterly", "min": 15, "v": "B", "c": 2, "id": "t19"}, {"area": "主臥", "name": "電風扇拆洗", "freq": "quarterly", "min": 15, "v": "A", "c": 1, "id": "t20"}, {"area": "姊姊房間", "name": "床單、枕頭套清洗", "freq": "biweekly", "min": 10, "id": "t21"}, {"area": "姊姊房間", "name": "吸塵", "freq": "monthly", "min": 10, "v": "B", "id": "t22"}, {"area": "姊姊房間", "name": "冷氣濾網", "freq": "monthly", "min": 10, "v": "B", "id": "t23"}, {"area": "姊姊房間", "name": "清淨機濾網", "freq": "monthly", "min": 5, "v": "A", "id": "t24"}, {"area": "姊姊房間", "name": "電風扇拆洗", "freq": "quarterly", "min": 15, "v": "A", "c": 1, "id": "t25"}, {"area": "弟弟房間", "name": "床單、枕頭套清洗", "freq": "biweekly", "min": 10, "id": "t26"}, {"area": "弟弟房間", "name": "吸塵", "freq": "monthly", "min": 10, "v": "B", "id": "t27"}, {"area": "弟弟房間", "name": "冷氣濾網", "freq": "monthly", "min": 10, "v": "B", "id": "t28"}, {"area": "弟弟房間", "name": "清淨機濾網", "freq": "monthly", "min": 5, "v": "A", "id": "t29"}, {"area": "弟弟房間", "name": "電風扇拆洗", "freq": "quarterly", "min": 15, "v": "A", "c": 1, "id": "t30"}, {"area": "客廳", "name": "書櫃整理", "freq": "monthly", "min": 20, "v": "A", "id": "t31"}, {"area": "客廳", "name": "布沙發清潔", "freq": "monthly", "min": 20, "v": "B", "id": "t32"}, {"area": "客廳", "name": "冷氣濾網", "freq": "monthly", "min": 10, "v": "B", "id": "t33"}, {"area": "客廳", "name": "清淨機濾網", "freq": "monthly", "min": 5, "v": "A", "id": "t34"}, {"area": "客廳", "name": "沙發底下", "freq": "quarterly", "min": 10, "v": "A", "c": 2, "id": "t35"}, {"area": "客廳", "name": "櫃子底部", "freq": "quarterly", "min": 10, "v": "A", "c": 0, "id": "t36"}, {"area": "客廳", "name": "電視背面", "freq": "quarterly", "min": 5, "v": "B", "c": 0, "id": "t37"}, {"area": "客廳", "name": "窗簾除塵", "freq": "quarterly", "min": 15, "v": "B", "c": 2, "id": "t38"}, {"area": "客廳", "name": "電風扇拆洗", "freq": "quarterly", "min": 15, "v": "A", "c": 1, "id": "t39"}, {"area": "玄關", "name": "清洗鞋櫃", "freq": "quarterly", "min": 20, "v": "A", "c": 0, "id": "t40"}, {"area": "玄關", "name": "擦拭大門", "freq": "quarterly", "min": 10, "v": "A", "c": 1, "id": "t41"}, {"area": "廚房", "name": "冰箱內部擦拭", "freq": "monthly", "min": 20, "v": "B", "id": "t42"}, {"area": "廚房", "name": "抽油煙機濾網", "freq": "monthly", "min": 15, "v": "A", "id": "t43"}, {"area": "廚房", "name": "洗碗機清潔", "freq": "monthly", "min": 10, "v": "B", "id": "t44"}, {"area": "廚房", "name": "烘碗機清潔", "freq": "monthly", "min": 10, "v": "B", "id": "t45"}, {"area": "廚房", "name": "電器櫃整理", "freq": "quarterly", "min": 20, "v": "A", "c": 0, "id": "t46"}, {"area": "廚房", "name": "餐具櫃整理", "freq": "quarterly", "min": 20, "v": "A", "c": 1, "id": "t47"}, {"area": "廚房", "name": "上下櫃整理", "freq": "quarterly", "min": 30, "v": "A", "c": 2, "id": "t48"}, {"area": "餐廳", "name": "文具推車整理", "freq": "monthly", "min": 15, "v": "B", "id": "t49"}, {"area": "餐廳", "name": "鋼琴背面除塵", "freq": "quarterly", "min": 10, "v": "A", "c": 0, "id": "t50"}, {"area": "客衛", "name": "洗手台", "freq": "monthly", "min": 5, "v": "B", "id": "t51"}, {"area": "客衛", "name": "洗地板", "freq": "monthly", "min": 10, "v": "A", "id": "t52"}, {"area": "客衛", "name": "馬桶大清洗", "freq": "monthly", "min": 15, "v": "A", "id": "t53"}, {"area": "客衛", "name": "除水垢", "freq": "monthly", "min": 10, "v": "B", "id": "t54"}, {"area": "客衛", "name": "排水孔清理", "freq": "monthly", "min": 5, "v": "A", "id": "t55"}, {"area": "客衛", "name": "磁磚縫除霉", "freq": "monthly", "min": 15, "v": "B", "id": "t56"}, {"area": "客衛", "name": "儲物庫存盤點", "freq": "monthly", "min": 10, "v": "B", "id": "t57"}, {"area": "客衛", "name": "抽風扇除塵", "freq": "quarterly", "min": 10, "v": "A", "c": 0, "id": "t58"}, {"area": "客衛", "name": "儲物深度整理與丟棄", "freq": "quarterly", "min": 30, "v": "A", "c": 2, "id": "t59"}, {"area": "主臥廁所", "name": "乾區地板", "freq": "monthly", "min": 10, "v": "B", "id": "t60"}, {"area": "主臥廁所", "name": "洗手台", "freq": "monthly", "min": 5, "v": "B", "id": "t61"}, {"area": "主臥廁所", "name": "馬桶大清洗", "freq": "monthly", "min": 15, "v": "A", "id": "t62"}, {"area": "主臥廁所", "name": "外對窗整理", "freq": "quarterly", "min": 15, "v": "A", "c": 0, "id": "t63"}, {"area": "前陽台", "name": "盆栽除雜草", "freq": "monthly", "min": 20, "v": "B", "id": "t64"}, {"area": "前陽台", "name": "落地窗內外清洗", "freq": "quarterly", "min": 25, "v": "A", "c": 1, "id": "t65"}, {"area": "前陽台", "name": "清洗鞋櫃", "freq": "quarterly", "min": 20, "v": "B", "c": 0, "id": "t66"}, {"area": "後陽台", "name": "地板清潔", "freq": "monthly", "min": 15, "v": "B", "id": "t67"}, {"area": "後陽台", "name": "洗烘衣機清潔", "freq": "monthly", "min": 15, "v": "B", "id": "t68"}, {"area": "後陽台", "name": "洗衣精盤點", "freq": "monthly", "min": 5, "v": "A", "id": "t69"}, {"area": "主臥", "name": "換季", "freq": "halfyear", "min": 45, "months": [4, 10], "id": "t70"}, {"area": "廚房", "name": "抽油煙機整台清潔", "freq": "halfyear", "min": 45, "months": [1, 7], "id": "t71"}];
+
+/* ============ 時間換算 ============ */
+const DAY = 86400000;
+const sod = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const mod = (a, n) => ((a % n) + n) % n;
+function pos(d) {
+  const week = Math.floor(Math.round((sod(d) - ANCHOR) / DAY) / 7);
+  return { w: mod(week, 4) + 1, c: mod(Math.floor(week / 4), 3) };
+}
+
+/* ============ 排程規則 ============ */
+let TASKS = DEFAULT_TASKS.slice();
+
+// 某任務是否出現在「循環 c、第 w 週、星期 wd」（不含每半年）
+function hits(t, c, w, wd) {
+  if (wd === 6) return false;
+  const s = SLOT[t.area];
+  switch (t.freq) {
+    case 'weekly':    return t.wd === wd;
+    case 'biweekly':  return s.wd === wd && (w === s.A || w === s.B);
+    case 'monthly':   return s.wd === wd && w === s[t.v];
+    case 'quarterly': return s.wd === wd && w === s[t.v] && c === t.c;
+  }
+  return false;
+}
+function loadAt(c, w, wd, list = TASKS) {
+  return list.reduce((sum, t) => sum + (hits(t, c, w, wd) ? t.min : 0), 0);
+}
+function worstOf(w, wd, list) { return Math.max(...[0,1,2].map(c => loadAt(c, w, wd, list))); }
+
+// 每半年項目：該月負荷最低的一天
+const hyCache = new Map();
+function halfyearDay(t, year, month) {
+  const ck = `${t.id}|${year}|${month}|${TASKS.length}`;
+  if (hyCache.has(ck)) return hyCache.get(ck);
+  let best = null;
+  for (let i = 1; i <= new Date(year, month, 0).getDate(); i++) {
+    const d = new Date(year, month - 1, i);
+    if (d.getDay() === 6) continue;
+    const p = pos(d), l = loadAt(p.c, p.w, d.getDay());
+    if (!best || l < best.l) best = { d, l };
+  }
+  hyCache.set(ck, best.d);
+  return best.d;
+}
+
+function baseOn(d) {
+  if (d.getDay() === 6) return [];
+  const p = pos(d), wd = d.getDay();
+  const list = TASKS.filter(t => hits(t, p.c, p.w, wd));
+  TASKS.filter(t => t.freq === 'halfyear' && t.months.includes(d.getMonth() + 1))
+    .forEach(t => { if (ymd(halfyearDay(t, d.getFullYear(), d.getMonth() + 1)) === ymd(d)) list.push(t); });
+  return list;
+}
+// 一週的排程：夜班日若有干擾項目，整天與同週另一天對調
+function monday(d) { const m = new Date(d); m.setDate(d.getDate() - mod(d.getDay() - 1, 7)); return sod(m); }
+function weekPlan(mon) {
+  const days = [...Array(7)].map((_, i) => new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + i));
+  const lists = days.map(baseOn), info = days.map(() => ({}));
+  const hit = l => l.some(t => AFFECT.includes(t.area));
+  return { days, lists, info };
+}
+function planOf(d) { const w = weekPlan(monday(d)); const i = mod(d.getDay() - 1, 7); return { list: w.lists[i], info: w.info[i], days: w.days }; }
+function tasksOn(d) { return baseOn(d); }
+
+function groupByArea(list) {
+  const g = {};
+  list.forEach(t => (g[t.area] = g[t.area] || []).push(t));
+  return Object.entries(g).sort((a, b) => b[1].length - a[1].length);
+}
+
+// 新增時自動選擇負荷最低的位置
+function place(t) {
+  const s = SLOT[t.area];
+  if (t.freq === 'weekly') {
+    let best = null;
+    WORKDAYS.forEach(wd => {
+      const m = Math.max(...[1,2,3,4].map(w => worstOf(w, wd)));
+      if (!best || m < best.m) best = { m, wd };
+    });
+    t.wd = best.wd; return best.m + t.min;
+  }
+  if (t.freq === 'biweekly') return Math.max(worstOf(s.A, s.wd), worstOf(s.B, s.wd)) + t.min;
+  if (t.freq === 'monthly') {
+    const a = worstOf(s.A, s.wd), b = worstOf(s.B, s.wd);
+    t.v = a <= b ? 'A' : 'B'; return Math.min(a, b) + t.min;
+  }
+  if (t.freq === 'quarterly') {
+    let best = null;
+    ['A','B'].forEach(v => [0,1,2].forEach(c => {
+      const l = loadAt(c, s[v], s.wd);
+      if (!best || l < best.l) best = { l, v, c };
+    }));
+    t.v = best.v; t.c = best.c; return best.l + t.min;
+  }
+  return t.min;
+}
+function whereText(t) {
+  const s = SLOT[t.area];
+  if (t.freq === 'weekly') return `每週${WD[t.wd]}`;
+  if (t.freq === 'biweekly') return `第 ${s.A}、${s.B} 週週${WD[s.wd]}`;
+  if (t.freq === 'monthly') return `第 ${s[t.v]} 週週${WD[s.wd]}`;
+  if (t.freq === 'quarterly') return `第 ${t.c + 1} 循環第 ${s[t.v]} 週週${WD[s.wd]}`;
+  if (t.freq === 'halfyear') return `${t.months.join('、')} 月`;
+}
+
+/* ============ 雲端儲存（無法使用時存本機） ============ */
+let db = null;
+const done = {}; const loading = {};
+const mk = d => ymd(d).slice(0, 7);
+const lsGet = (k, f) => { try { return JSON.parse(localStorage.getItem(k)) ?? f; } catch (e) { return f; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+
+// 每月紀錄：keys = 已完成、skips = 當天移除、extras = 當天新增的單次項目
+// post = 順延：key → 從哪一天起再出現
+const norm = o => (o && (o.keys || o.skips || o.extras || o.post))
+  ? { keys: Object.assign({}, o.keys), skips: Object.assign({}, o.skips), extras: (o.extras || []).slice(), post: Object.assign({}, o.post) }
+  : { keys: Object.assign({}, o || {}), skips: {}, extras: [], post: {} };
+const monthOf = d => done[mk(d)] = done[mk(d)] || norm(null);
+async function loadMonth(m) {
+  if (done[m] || loading[m]) return;
+  loading[m] = true;
+  done[m] = norm(lsGet('home-done-' + m, null));
+  if (db) {
+    try { const s = await db.doc('done/' + m).get(); if (s.exists) { done[m] = norm(s.data()); lsSet('home-done-' + m, done[m]); } }
+    catch (e) { toast('雲端讀取失敗，暫用這台裝置的紀錄'); }
+  }
+  loading[m] = false; render();
+}
+const saveTimers = {};
+function saveMonth(m) {
+  lsSet('home-done-' + m, done[m]);
+  if (!db) return;
+  clearTimeout(saveTimers[m]);
+  saveTimers[m] = setTimeout(() => db.doc('done/' + m).set(done[m]).catch(() => toast('未能同步到雲端，已存在這台裝置')), 500);
+}
+// 某天原本排定的項目（含當天新增、扣除當天刪除），每項帶 key = 原定日期|id
+function ownList(d) {
+  const md = done[mk(d)] || norm(null), k = ymd(d);
+  return tasksOn(d).map(t => Object.assign({}, t, { key: k + '|' + t.id }))
+    .concat(md.extras.filter(x => x.date === k).map(x => Object.assign({ freq: 'once' }, x, { key: k + '|' + x.id })))
+    .filter(t => !md.skips[t.key]);
+}
+// 順延：只在「今天」計算。從開始使用日起，未完成且未刪除的項目帶到今天；
+// 同一項目之後若又排到（含今天），以最新那次為準，不重複出現
+let START = null;
+const CARRY_DAYS = 182;
+function carried(d) {
+  if (ymd(d) !== ymd(new Date()) || d.getDay() === 6 || !START) return [];
+  const from = new Date(Math.max(START, sod(d) - CARRY_DAYS * DAY));
+  const latest = {};
+  for (let x = sod(from); x < sod(d); x = new Date(x.getFullYear(), x.getMonth(), x.getDate() + 1)) {
+    if (!done[mk(x)]) { loadMonth(mk(x)); continue; }
+    ownList(x).filter(t => t.freq === 'once').forEach(t => latest[t.id] = Object.assign({}, t, { carry: x }));
+  }
+  ownList(d).forEach(t => delete latest[t.id]);
+  return Object.values(latest).filter(t => !(done[mk(t.carry)] || norm(null)).keys[t.key]);
+}
+const postOf = key => ((done[key.slice(0, 7)] || norm(null)).post || {})[key];
+// 當天清單：排定項目＋尚未完成的單次項目
+function dayList(d, withPosted) {
+  const k = ymd(d);
+  return ownList(d).concat(carried(d));
+}
+function nextWorkday(d) { let n = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1); if (n.getDay() === 6) n = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1); return n; }
+const shifts = {}; const shiftLoading = {};
+function shiftOf(d) { const m = shifts[mk(d)]; return m ? (m[ymd(d)] || '') : ''; }
+async function loadShifts(m) {
+  if (shifts[m] || shiftLoading[m]) return;
+  shiftLoading[m] = true;
+  shifts[m] = lsGet('home-shift-' + m, Object.assign({}, DEFAULT_SHIFTS[m] || {}));
+  if (db) {
+    try { const s = await db.doc('shifts/' + m).get(); if (s.exists) { shifts[m] = Object.assign({}, s.data().days || {}); lsSet('home-shift-' + m, shifts[m]); } }
+    catch (e) {}
+  }
+  shiftLoading[m] = false; render();
+}
+let shiftTimer = null;
+function cycleShift(d) {
+  const m = mk(d), map = shifts[m] = shifts[m] || {};
+  const next = SHIFTS[(SHIFTS.indexOf(map[ymd(d)] || '') + 1) % SHIFTS.length];
+  if (next) map[ymd(d)] = next; else delete map[ymd(d)];
+  lsSet('home-shift-' + m, map); render();
+  if (!db) return;
+  clearTimeout(shiftTimer);
+  shiftTimer = setTimeout(() => db.doc('shifts/' + m).set({ days: map }).catch(() => toast('未能同步到雲端，已存在這台裝置')), 600);
+}
+let doneTimer = null;
+// 完成時記下名稱、區域、時間與實際完成日，供「紀錄」頁使用（項目日後被刪減也能顯示）
+function toggle(key, t) {
+  const m = key.slice(0, 7), md = done[m] = done[m] || norm(null);
+  if (md.keys[key]) delete md.keys[key];
+  else md.keys[key] = t ? { n: t.name, a: t.area, m: t.min, at: ymd(new Date()) } : true;
+  saveMonth(m); render();
+}
+async function loadTasks() {
+  const local = lsGet('home-tasks', null);
+  if (local) TASKS = local;
+  if (!db) return;
+  try {
+    const s = await db.doc('config/tasks').get();
+    if (s.exists && Array.isArray(s.data().tasks)) { TASKS = s.data().tasks; lsSet('home-tasks', TASKS); }
+    if (s.exists && s.data().start) { START = new Date(s.data().start + 'T00:00:00'); lsSet('home-start', s.data().start); }
+  } catch (e) { toast('雲端讀取失敗，暫用這台裝置的家務庫'); }
+}
+function initStart() {
+  if (START) return;
+  const st = lsGet('home-start', null);
+  if (st) { START = new Date(st + 'T00:00:00'); return; }
+  START = sod(new Date()); lsSet('home-start', ymd(START)); saveTasks();
+}
+async function saveTasks() {
+  lsSet('home-tasks', TASKS);
+  if (!db) return;
+  try { await db.doc('config/tasks').set(START ? { tasks: TASKS, start: ymd(START) } : { tasks: TASKS }); }
+  catch (e) { toast('未能同步到雲端，已存在這台裝置'); }
+}
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.hidden = false;
+  clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 3200);
+}
+
+
+/* ============ 菜單示範資料（取自現有菜單 app 截圖） ============ */
+const COL = { 牛:'#C8423A', 豬:'#D47A9A', 雞:'#E0972F', 海鮮:'#3E74B8', 蛋:'#E3C23A', 豆腐:'#A88466', 蔬菜:'#6E9E5A', 湯:'#5BA3AE', 甜湯:'#9B86C0', 一鍋:'#4B5690' };
+const DEFAULT_SHIFTS = { '2026-10': (() => {
+  const o = {}, put = (a, b, v) => { for (let i = a; i <= b; i++) o[`2026-10-${String(i).padStart(2,'0')}`] = v; };
+  put(1,1,'休假'); put(2,6,'早'); put(7,8,'休假'); put(9,13,'夜'); put(14,15,'休假'); put(16,20,'中'); put(21,21,'休假'); put(22,26,'早'); put(27,28,'休假'); put(29,31,'夜');
+  return o; })() };
+// 日期 → { note } 或 { main, side, fiber, soup } 或 { onepot }，每道菜 [名稱, 類別]
+const WEEK_MENU = {
+  '2026-10-05': { note: '不排餐' },
+  '2026-10-06': { main: [['蒜香奶油檸檬鮭魚','海鮮']], side: [['肉肉包豆腐','豬']], fiber: [['樹子炒水蓮','蔬菜'],['煎櫛瓜','蔬菜']], soup: [['瓜仔雞湯','雞']] },
+  '2026-10-07': { onepot: [['雞肉親子丼','雞']] },
+  '2026-10-08': { main: [['馬鈴薯燉肉','豬']], side: [['蔥燒豆腐','豆腐']], fiber: [['鹹蛋高麗菜','蛋'],['炒青江菜','蔬菜']], soup: [['香菇雞湯','雞']] },
+  '2026-10-09': { main: [['烤鯖魚','海鮮']], side: [['紅蘿蔔煎蛋','蛋']], fiber: [['炒大黃瓜','蔬菜'],['炒高麗菜','蔬菜']], soup: [['酸菜排骨湯','豬']] },
+  '2026-10-10': { note: '公休' },
+  '2026-10-11': { onepot: [['湯烏龍','一鍋']] }
+};
+const RECIPES = [
+  ['主菜', [['三杯雞','雞'],['乾煎豬肉片','豬'],['乾煎雞腿排','雞'],['乾煎鮭魚','海鮮'],['唐揚雞','雞'],['泰式打拋豬','豬'],['洋蔥雞丁','雞'],['清蒸石斑','海鮮'],['清蒸鱸魚','海鮮'],['烤鯖魚','海鮮'],['牛肉炒空心菜','牛'],['美國小牛','牛'],['蒜香奶油檸檬鮭魚','海鮮'],['蒜香奶油蝦','海鮮'],['蔥爆豬肉','豬'],['金沙松阪豬','豬'],['馬鈴薯燉肉','豬']]],
+  ['副菜', [['肉肉包豆腐','豬'],['蔥燒豆腐','豆腐'],['紅蘿蔔煎蛋','蛋'],['番茄炒蛋','蛋'],['蒸蛋','蛋'],['麻婆豆腐','豆腐']]],
+  ['纖維質', [['樹子炒水蓮','蔬菜'],['煎櫛瓜','蔬菜'],['鹹蛋高麗菜','蛋'],['炒青江菜','蔬菜'],['炒大黃瓜','蔬菜'],['炒高麗菜','蔬菜']]],
+  ['湯', [['瓜仔雞湯','雞'],['香菇雞湯','雞'],['酸菜排骨湯','豬']]],
+  ['甜湯', [['綠豆湯','甜湯'],['紅豆湯','甜湯']]],
+  ['一鍋懶人', [['雞肉親子丼','雞'],['湯烏龍','一鍋']]]
+];
+const peopleOf = d => shiftOf(d) === '中' ? 3 : 4;
+const dishesOf = m => m ? [...(m.onepot || []), ...(m.main || []), ...(m.side || []), ...(m.fiber || []), ...(m.soup || [])] : [];
+
+/* ============ 畫面 ============ */
+let cur = sod(new Date()), page = 'today', choresSub = 'week', menuSub = 'week', recipeCat = 0, recipeQ = '';
+let formArea = null, todayForm = false, armed = null, logMonth = null, calMonth = null;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+const sum = list => list.reduce((s, t) => s + (t.min || 0), 0);
+const ICON = {
+  check: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>',
+  plus: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  trash: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>',
+  copy: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>',
+  search: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>',
+  today: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.2l2.4 2.4 4.6-5"/></svg>',
+  menu: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r=".8" fill="currentColor"/><circle cx="4.5" cy="12" r=".8" fill="currentColor"/><circle cx="4.5" cy="18" r=".8" fill="currentColor"/></svg>',
+  chores: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M4 11l8-6.5 8 6.5v9H4z"/><path d="M10 20v-5h4v5"/></svg>',
+  shop: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M5 9h14l-1.2 10.5H6.2z"/><path d="M9 9a3 3 0 0 1 6 0"/></svg>',
+  shift: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></svg>'
+};
+const tag = (n, c) => `<span class="tag" style="--c:${COL[c] || '#999'}">${esc(n)}</span>`;
+const bar = (n, c) => `<span class="bar" style="--c:${COL[c] || '#999'}">${esc(n)}</span>`;
+const legend = () => `<div class="legend">${Object.entries(COL).map(([k, v]) => `<span style="--c:${v}">${k}</span>`).join('')}</div>`;
+const sbox = s => s ? `<span class="sbox">${s === '休假' ? '休' : s}</span>` : '';
+const nav = (label, p, n) => `<div class="rnav"><button data-nav="${p}" aria-label="上一個">‹</button><span>${label}</span><button data-nav="${n}" aria-label="下一個">›</button></div>`;
+const head = (title, right = '') => `<div class="ptitle"><h1>${title}</h1>${right}</div>`;
+const utabs = (items, curKey, attr) => `<div class="utabs">${items.map(([k, v, c]) => `<button ${attr}="${k}" aria-selected="${k === curKey}">${v}${c !== undefined ? `<small>${c}</small>` : ''}</button>`).join('')}</div>`;
+const isDone = t => !!(done[t.key.slice(0, 7)] || norm(null)).keys[t.key];
+const md2 = d => `${d.getMonth() + 1}/${d.getDate()}`;
+
+/* ---------- 今日 ---------- */
+function todayFormHTML() {
+  return `<div class="form">
+    <label>區域<select id="tf-area">${AREAS.map(a => `<option>${a}</option>`).join('')}<option>其他</option></select></label>
+    <label>項目<select id="tf-pick"></select></label>
+    <label id="tf-namewrap" hidden><input id="tf-name" type="text" placeholder="輸入項目" aria-label="其他項目名稱" autocomplete="off"></label>
+    <label>預估時間（分鐘）<input id="tf-min" type="number" inputmode="numeric" min="5" step="5" value="15"></label>
+    <div class="acts"><button class="btn ghost" id="tf-cancel">取消</button><button class="btn dark" id="tf-save">加入今天</button></div>
+  </div>`;
+}
+function renderToday() {
+  const isT = ymd(cur) === ymd(new Date());
+  let h = `<div class="pg-today">` + head('Today') + nav(`${md2(cur)}（${WD[cur.getDay()]}）`, 'day-', 'day+');
+  if (!isT) h += `<div class="center"><button class="link" id="goToday">回到今天</button></div>`;
+  const m = WEEK_MENU[ymd(cur)], sh = shiftOf(cur);
+  h += `<section class="sec"><div class="shead"><h2>Tonight</h2><span class="meta">${sbox(sh)}${m && !m.note ? `<b>${peopleOf(cur)}人</b>` : ''}</span></div>`;
+  h += m && m.note ? `<p class="muted">${m.note}</p>` : m ? `<div class="tags">${dishesOf(m).map(([n, c]) => tag(n, c)).join('')}</div>` : `<p class="muted">尚未排餐</p>`;
+  h += `</section>`;
+
+  const list = dayList(cur), total = sum(list), n = list.filter(isDone).length, left = sum(list.filter(t => !isDone(t)));
+  h += `<section class="sec"><div class="shead"><h2>Chores</h2><span class="meta">${list.length ? `<span class="${total > LIMIT ? 'over' : ''}">${left ? `剩 ${left} 分` : '全部完成'}</span>` : ''}<button class="cplus" id="tadd" aria-label="增加今天的項目" aria-expanded="${todayForm}">${ICON.plus}</button></span></div>`;
+  if (todayForm) h += todayFormHTML();
+  if (!list.length) h += `<p class="muted">${cur.getDay() === 6 ? '週六不排家務' : '今天沒有家務'}</p>`;
+  else {
+    h += `<div class="progress"><i style="width:${n / list.length * 100}%"></i></div>`;
+    groupByArea(list).forEach(([area, ts]) => {
+      h += `<div class="glabel">${esc(area)}</div>` + ts.map(t => {
+        const dn = isDone(t);
+        const badge = t.carry ? `順延 ${md2(t.carry)}` : t.freq === 'quarterly' ? '季' : t.freq === 'halfyear' ? '半年' : t.freq === 'once' ? '單次' : '';
+        return `<button class="check${dn ? ' done' : ''}" data-key="${t.key}" aria-pressed="${dn}"><span class="box">${ICON.check}</span><span class="label">${esc(t.name)}</span>${badge ? `<span class="badge">${esc(badge)}</span>` : ''}<span class="mins">${t.min} 分</span></button>`;
+      }).join('');
+    });
+  }
+  return h + `</section></div>`;
+}
+
+/* ---------- 菜單 ---------- */
+function renderMenu() {
+  let h = head('Menu') + utabs([['week', '本週'], ['recipes', '食譜']], menuSub, 'data-msub');
+  if (menuSub === 'week') {
+    const mon = monday(cur), sun = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6);
+    h += nav(`${md2(mon)} — ${md2(sun)}`, 'week-', 'week+');
+    h += `<div class="btnrow"><button class="btn dark grow" data-demo>排這週菜單</button><button class="btn sq" data-demo aria-label="複製">${ICON.copy}</button><button class="btn sq warn" data-demo aria-label="清除">${ICON.trash}</button></div>`;
+    h += `<div class="mgrid mhead"><span></span><span>主菜</span><span>副菜</span><span>纖維質</span><span>湯</span></div>`;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + i), m = WEEK_MENU[ymd(d)], sh = shiftOf(d);
+      const ppl = m && !m.note ? `<b>${peopleOf(d)}人</b>` : '';
+      h += `<div class="mgrid mrow${ymd(d) === ymd(new Date()) ? ' now' : ''}"><div class="dcol"><b>週${WD[d.getDay()]}</b><span>${md2(d)}</span><div class="sline">${sbox(sh)}${ppl}</div></div>`;
+      if (!m) h += `<div class="span muted">尚未排餐</div>`;
+      else if (m.note) h += `<div class="span muted">${m.note}</div>`;
+      else if (m.onepot) h += `<div class="span">${m.onepot.map(([n, c]) => bar(n, c)).join('')}</div>`;
+      else h += ['main', 'side', 'fiber', 'soup'].map(k => `<div class="cell">${(m[k] || []).map(([n, c]) => bar(n, c)).join('')}</div>`).join('');
+      h += `</div>`;
+    }
+    h += `<p class="note">示範資料取自現有菜單 app；正式版會直接讀取 Supabase。</p>` + legend();
+  } else {
+    const q = recipeQ.trim();
+    h += `<div class="search">${ICON.search}<input id="rq" type="search" placeholder="搜尋菜名" value="${esc(recipeQ)}" aria-label="搜尋菜名"></div>`;
+    h += utabs(RECIPES.map(([c, items], i) => [String(i), c, items.length]), String(recipeCat), 'data-rcat');
+    const items = q ? RECIPES.flatMap(r => r[1]).filter(([n]) => n.includes(q)) : RECIPES[recipeCat][1];
+    h += `<div class="tags big">${items.map(([n, c]) => tag(n, c)).join('') || '<p class="muted">找不到符合的菜名</p>'}</div>` + legend();
+  }
+  return h;
+}
+
+/* ---------- 家務 ---------- */
+function renderChores() {
+  const right = choresSub === 'lib' ? `<button class="cplus" data-add="${AREAS[0]}" aria-label="增加家務" aria-expanded="${!!formArea}">${ICON.plus}</button>` : '';
+  let h = head('Chores', right) + utabs([['week', '本週'], ['lib', '家務庫', TASKS.length]], choresSub, 'data-csub');
+  if (choresSub === 'week') {
+    const mon = monday(cur), sun = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6);
+    h += nav(`${md2(mon)} — ${md2(sun)}`, 'week-', 'week+') + `<div class="rule"></div>`;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + i), list = dayList(d), total = sum(list);
+      const body = d.getDay() === 6 && !list.length ? `<span class="muted">公休</span>`
+        : groupByArea(list).map(([a, ts]) => `<span class="aline">${esc(a)}<em>${ts.length} 項</em></span>`).join('') || `<span class="muted">無</span>`;
+      h += `<button class="wrow${ymd(d) === ymd(new Date()) ? ' now' : ''}" data-day="${ymd(d)}"><div class="dcol"><b>週${WD[d.getDay()]}</b><span>${md2(d)}</span>${list.length ? `<div class="sline"><b class="${total > LIMIT ? 'over' : ''}">${total}分</b></div>` : ''}</div><div class="wbody">${body}</div></button>`;
+    }
+    h += `<p class="note">點日期可切換到該日的今日頁。</p>`;
+  } else if (choresSub === 'lib') {
+    if (formArea) h += formHTML(formArea);
+    AREAS.forEach(a => {
+      const ts = TASKS.filter(t => t.area === a);
+      h += `<div class="ahead">${a}<span>${ts.length} 項</span></div>` + ts.map(t => `<div class="lrow"><span class="n">${esc(t.name)}</span><span class="f">${FREQ[t.freq]}・${t.min} 分<br>${whereText(t)}</span><button class="ibtn${armed === t.id ? ' arm' : ''}" data-del="${t.id}" aria-label="${armed === t.id ? '再點一次確認刪減' : '刪減'} ${esc(t.name)}">${ICON.trash}</button></div>`).join('');
+    });
+  } else {
+    const base = logMonth || new Date(cur.getFullYear(), cur.getMonth(), 1), m = mk(base);
+    loadMonth(m);
+    const md = done[m] || norm(null), byDay = {};
+    Object.entries(md.keys).forEach(([key, v]) => {
+      const [date, id] = key.split('|');
+      let info = typeof v === 'object' ? v : null;
+      if (!info) { const t = TASKS.find(x => x.id === id) || md.extras.find(x => x.id === id); info = t ? { n: t.name, a: t.area, m: t.min } : { n: '（已刪減的項目）', a: '', m: 0 }; }
+      (byDay[info.at || date] = byDay[info.at || date] || []).push(info);
+    });
+    const days = Object.keys(byDay).sort().reverse(), all = days.flatMap(x => byDay[x]);
+    h += nav(`${base.getFullYear()} 年 ${base.getMonth() + 1} 月`, 'log-', 'log+') + `<div class="shead"><span class="meta"><b>${all.length}</b> 項</span><span class="meta">共 ${all.reduce((s, x) => s + (x.m || 0), 0)} 分</span></div>`;
+    if (!days.length) h += `<p class="muted">這個月還沒有完成紀錄</p>`;
+    days.forEach(x => {
+      const dt = new Date(x + 'T00:00:00'), l = byDay[x];
+      h += `<div class="ahead">${md2(dt)}（${WD[dt.getDay()]}）<span>${l.length} 項</span></div>` + l.map(i => `<div class="lrow"><span class="n">${esc(i.n)}</span><span class="f">${esc(i.a)}${i.m ? `・${i.m} 分` : ''}</span></div>`).join('');
+    });
+  }
+  return h;
+}
+function formHTML(area) {
+  return `<div class="form">
+    <label>區域<select id="f-area">${AREAS.map(a => `<option${a === area ? ' selected' : ''}>${a}</option>`).join('')}</select></label>
+    <label>項目名稱<input id="f-name" type="text" autocomplete="off"></label>
+    <div class="two"><label>週期<select id="f-freq">${Object.entries(FREQ).map(([k, v]) => `<option value="${k}"${k === 'monthly' ? ' selected' : ''}>${v}</option>`).join('')}</select></label>
+    <label>預估時間（分鐘）<input id="f-min" type="number" inputmode="numeric" min="5" step="5" value="15"></label></div>
+    <label id="f-mwrap" hidden>月份<select id="f-months">${MONTH_PAIRS.map((p, i) => `<option value="${i}">${p[0]}、${p[1]} 月</option>`).join('')}</select></label>
+    <div class="acts"><button class="btn ghost" id="f-cancel">取消</button><button class="btn dark" id="f-save">加入</button></div>
+  </div>`;
+}
+
+/* ---------- 待買 ---------- */
+function renderShop() {
+  const items = lsGet('home-shoplist', []);
+  let h = head('Shopping') + `<div class="addrow"><input id="sq" type="text" placeholder="新增品項（可輸入多個）" aria-label="新增品項"><button class="btn dark" id="sadd">加入</button></div>
+    <div class="btnrow"><button class="btn line grow" id="sfrom">從菜單帶入</button><button class="btn sq" id="scopy" aria-label="複製清單">${ICON.copy}</button><button class="btn sq warn" id="sclear" aria-label="清除已買" ${items.some(i => i.d) ? '' : 'disabled'}>${ICON.trash}</button></div>`;
+  if (!items.length) return h + `<p class="muted">還沒有待買的東西。<br>可以從菜單帶入，或自己新增。</p>`;
+  return h + `<div class="rule"></div>` + items.map((it, i) => `<button class="check${it.d ? ' done' : ''}" data-shop="${i}" aria-pressed="${!!it.d}"><span class="box">${ICON.check}</span><span class="label">${esc(it.n)}</span></button>`).join('');
+}
+
+/* ---------- 班別 ---------- */
+function renderShift() {
+  const base = calMonth || new Date(cur.getFullYear(), cur.getMonth(), 1), y = base.getFullYear(), m = base.getMonth();
+  loadShifts(mk(base));
+  const start = new Date(y, m, 1 - mod(new Date(y, m, 1).getDay() - 1, 7));
+  let h = head('Shift') + nav(`${y} 年 ${m + 1} 月`, 'cal-', 'cal+') + `<div class="cal">${['一','二','三','四','五','六','日'].map(w => `<span class="ch">${w}</span>`).join('')}`;
+  for (let i = 0; i < 42; i++) {
+    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+    if (d.getMonth() !== m) loadShifts(mk(d));
+    const sh = shiftOf(d), cls = { 早: 'e', 中: 'mid', 夜: 'n', 休假: 'off' }[sh] || '';
+    h += `<button class="cell2 ${cls}${d.getMonth() !== m ? ' out' : ''}" data-shift="${ymd(d)}" aria-label="${md2(d)} ${sh || '未設定'}"><span class="${ymd(d) === ymd(new Date()) ? 'td' : ''}">${d.getDate()}</span><b>${sh || '・'}</b></button>`;
+  }
+  const last = lastShiftDate(), ext = last ? new Date(last.getFullYear(), last.getMonth() + 2, 0) : null;
+  h += `</div><p class="note">點日期設定班別。早＝黃、中＝粉紅、夜＝藍。中班不在家吃晚餐，用餐人數自動算 3 人。</p>`;
+  h += `<div class="fsec">區間填入</div>
+    <div class="two2"><label>從<input id="rf" type="date"></label><label>到<input id="rt" type="date"></label></div>
+    <label class="fl">班別<select id="rs">${['早','中','夜','休假'].map(x => `<option>${x}</option>`).join('')}<option value="">清除</option></select></label>
+    <button class="btn dark full" id="rfill">填入這段日期</button>`;
+  h += `<div class="fsec">依循環延伸</div>
+    <p class="note" style="margin-top:0">${CYCLE_TEXT}，從已輸入的最後一天${last ? `（${md2(last)}）` : ''}往後推。之後班表出來請核對。</p>
+    <label class="fl">延伸到<input id="rx" type="date" value="${ext ? ymd(ext) : ''}"></label>
+    <button class="btn line full" id="rext">依循環延伸</button>`;
+  return h;
+}
+
+/* ---------- 班別：區間填入與循環延伸 ---------- */
+const CYCLE = [].concat(Array(5).fill('中'), ['休假'], Array(5).fill('早'), ['休假','休假'], Array(5).fill('夜'), ['休假','休假']);
+const CYCLE_TEXT = '中5天 → 休1天 → 早5天 → 休2天 → 夜5天 → 休2天';
+const parseD = v => { const [y, m, d] = v.split('-').map(Number); return new Date(y, m - 1, d); };
+function setShift(d, v) {
+  const m = mk(d), map = shifts[m] = shifts[m] || lsGet('home-shift-' + m, Object.assign({}, DEFAULT_SHIFTS[m] || {}));
+  if (v) map[ymd(d)] = v; else delete map[ymd(d)];
+}
+function saveShifts(months) {
+  months.forEach(m => { lsSet('home-shift-' + m, shifts[m]); if (db) db.doc('shifts/' + m).set({ days: shifts[m] }).catch(() => {}); });
+}
+function lastShiftDate() {
+  const now = new Date(); let best = null;
+  for (let i = -3; i <= 14; i++) {
+    const m = mk(new Date(now.getFullYear(), now.getMonth() + i, 1));
+    const map = shifts[m] || lsGet('home-shift-' + m, DEFAULT_SHIFTS[m] || {});
+    Object.keys(map).forEach(k => { if (map[k] && (!best || k > best)) best = k; });
+  }
+  return best ? parseD(best) : null;
+}
+// 找出最後一天在循環中的位置：比對最近 20 天，取吻合最長的位置
+function cyclePos(last) {
+  let best = { p: -1, n: -1 };
+  for (let p = 0; p < CYCLE.length; p++) {
+    let n = 0;
+    for (let k = 0; k < CYCLE.length; k++) {
+      const v = shiftOf(new Date(last.getFullYear(), last.getMonth(), last.getDate() - k));
+      if (!v) break;
+      if (v !== CYCLE[mod(p - k, CYCLE.length)]) break;
+      n++;
+    }
+    if (n > best.n) best = { p, n };
+  }
+  return best;
+}
+
+/* ---------- 共用 ---------- */
+const PAGES = [['today', 'Today', 'today'], ['menu', 'Menu', 'menu'], ['chores', 'Chores', 'chores'], ['shop', 'Shopping', 'shop'], ['shift', 'Shift', 'shift']];
+function render() {
+  const mon0 = monday(cur);
+  loadMonth(mk(cur)); loadMonth(mk(mon0)); loadMonth(mk(new Date(mon0.getFullYear(), mon0.getMonth(), mon0.getDate() + 6)));
+  loadShifts(mk(cur)); loadShifts(mk(mon0)); loadShifts(mk(new Date(mon0.getFullYear(), mon0.getMonth(), mon0.getDate() + 6)));
+  $('#main').innerHTML = ({ today: renderToday, menu: renderMenu, chores: renderChores, shop: renderShop, shift: renderShift })[page]();
+  $('#tabbar').innerHTML = PAGES.map(([k, v, ic]) => `<button data-page="${k}" aria-current="${page === k ? 'page' : 'false'}">${ICON[ic]}<span>${v}</span></button>`).join('');
+  const ta = $('#tf-area');
+  if (ta) {
+    const pick = $('#tf-pick');
+    const syncPick = () => { const t = TASKS.find(x => x.id === pick.value); $('#tf-namewrap').hidden = !!t; if (t) $('#tf-min').value = t.min; };
+    const syncArea = () => { pick.innerHTML = TASKS.filter(t => t.area === ta.value).map(t => `<option value="${t.id}">${esc(t.name)}（${t.min} 分）</option>`).join('') + `<option value="">其他</option>`; syncPick(); };
+    ta.onchange = syncArea; pick.onchange = syncPick; syncArea();
+  }
+  const fq = $('#f-freq'); if (fq) { const s = () => $('#f-mwrap').hidden = fq.value !== 'halfyear'; fq.onchange = s; s(); }
+  const rq = $('#rq'); if (rq) rq.oninput = () => { recipeQ = rq.value; const p = rq.selectionStart; render(); const n = $('#rq'); n.focus(); n.setSelectionRange(p, p); };
+  const gt = $('#goToday'); if (gt) gt.onclick = () => { cur = sod(new Date()); render(); };
+}
+function shift(d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+
+document.addEventListener('click', e => {
+  const q = s => e.target.closest(s);
+  let b;
+  if (b = q('[data-page]')) { page = b.dataset.page; formArea = null; todayForm = false; armed = null; window.scrollTo(0, 0); return render(); }
+  if (b = q('[data-nav]')) {
+    const k = b.dataset.nav;
+    if (k === 'day-') cur = shift(cur, -1); if (k === 'day+') cur = shift(cur, 1);
+    if (k === 'week-') cur = shift(cur, -7); if (k === 'week+') cur = shift(cur, 7);
+    const lb = logMonth || new Date(cur.getFullYear(), cur.getMonth(), 1), cb = calMonth || new Date(cur.getFullYear(), cur.getMonth(), 1);
+    if (k === 'log-') logMonth = new Date(lb.getFullYear(), lb.getMonth() - 1, 1); if (k === 'log+') logMonth = new Date(lb.getFullYear(), lb.getMonth() + 1, 1);
+    if (k === 'cal-') calMonth = new Date(cb.getFullYear(), cb.getMonth() - 1, 1); if (k === 'cal+') calMonth = new Date(cb.getFullYear(), cb.getMonth() + 1, 1);
+    todayForm = false; return render();
+  }
+  if (b = q('[data-msub]')) { menuSub = b.dataset.msub; return render(); }
+  if (b = q('[data-csub]')) { choresSub = b.dataset.csub; formArea = null; armed = null; return render(); }
+  if (b = q('[data-rcat]')) { recipeCat = +b.dataset.rcat; recipeQ = ''; return render(); }
+  if (q('[data-demo]')) return toast('示範版：此按鈕沿用現有菜單 app 的功能');
+  if (b = q('[data-key]')) return toggle(b.dataset.key, dayList(cur).find(x => x.key === b.dataset.key));
+  if (b = q('[data-day]')) { const [y, m, d] = b.dataset.day.split('-').map(Number); cur = new Date(y, m - 1, d); page = 'today'; window.scrollTo(0, 0); return render(); }
+  if (b = q('[data-shift]')) { const [y, m, d] = b.dataset.shift.split('-').map(Number); return cycleShift(new Date(y, m - 1, d)); }
+  if (q('#tadd')) { todayForm = !todayForm; return render(); }
+  if (q('#tf-cancel')) { todayForm = false; return render(); }
+  if (q('#tf-save')) {
+    const lib = TASKS.find(x => x.id === $('#tf-pick').value);
+    const name = lib ? lib.name : $('#tf-name').value.trim(), min = parseInt($('#tf-min').value, 10);
+    if (!name) { $('#tf-name').focus(); return toast('請輸入項目'); }
+    if (!(min > 0)) return toast('請輸入預估時間');
+    monthOf(cur).extras.push({ id: 'x' + Date.now().toString(36), date: ymd(cur), area: $('#tf-area').value, name, min });
+    saveMonth(mk(cur)); todayForm = false; render();
+    const tot = sum(dayList(cur)); return toast(tot > LIMIT ? `已加入，今天共 ${tot} 分，超過 1 小時` : '已加入今天');
+  }
+  if (b = q('[data-add]')) { formArea = formArea ? null : b.dataset.add; armed = null; return render(); }
+  if (q('#f-cancel')) { formArea = null; return render(); }
+  if (q('#f-save')) {
+    const name = $('#f-name').value.trim(), min = parseInt($('#f-min').value, 10), freq = $('#f-freq').value;
+    if (!name) { $('#f-name').focus(); return toast('請輸入項目名稱'); }
+    if (!(min > 0)) return toast('請輸入預估時間');
+    const task = { id: 't' + Date.now().toString(36), area: $('#f-area').value, name, freq, min };
+    if (freq === 'halfyear') task.months = MONTH_PAIRS[+$('#f-months').value];
+    const peak = place(task); TASKS.push(task); saveTasks(); formArea = null; render();
+    return toast(peak > LIMIT ? `已排入${whereText(task)}，該日將達 ${peak} 分` : `已排入${whereText(task)}`);
+  }
+  if (b = q('[data-del]')) {
+    const id = b.dataset.del;
+    if (armed !== id) { armed = id; return render(); }
+    const t = TASKS.find(x => x.id === id); TASKS = TASKS.filter(x => x.id !== id); armed = null; saveTasks(); render();
+    return toast(`已刪減「${t.name}」`);
+  }
+  if (q('#rfill')) {
+    const f = $('#rf').value, t = $('#rt').value, v = $('#rs').value;
+    if (!f || !t) return toast('請選擇起訖日期');
+    let a = parseD(f), z = parseD(t); if (a > z) [a, z] = [z, a];
+    const ms = new Set();
+    for (let d = a; d <= z; d = shift(d, 1)) { setShift(d, v); ms.add(mk(d)); }
+    saveShifts(ms); render(); return toast(`已填入 ${md2(a)}–${md2(z)}：${v || '清除'}`);
+  }
+  if (q('#rext')) {
+    const last = lastShiftDate(), to = $('#rx').value;
+    if (!last) return toast('請先輸入至少一段班別');
+    if (!to) return toast('請選擇延伸到哪一天');
+    const end = parseD(to);
+    if (end <= last) return toast(`已輸入到 ${md2(last)}，請選擇更晚的日期`);
+    const { p, n } = cyclePos(last);
+    if (n < 3) return toast('最近的班別與循環對不上，請先手動核對');
+    const ms = new Set(); let i = p;
+    for (let d = shift(last, 1); d <= end; d = shift(d, 1)) { i = (i + 1) % CYCLE.length; setShift(d, CYCLE[i]); ms.add(mk(d)); }
+    saveShifts(ms); render(); return toast(`已依循環延伸到 ${md2(end)}`);
+  }
+  if (q('#sadd')) {
+    const v = $('#sq').value.split(/[,，、\s]+/).map(x => x.trim()).filter(Boolean);
+    if (!v.length) return $('#sq').focus();
+    lsSet('home-shoplist', lsGet('home-shoplist', []).concat(v.map(n => ({ n })))); return render();
+  }
+  if (q('#sfrom')) {
+    const mon = monday(cur), names = [];
+    for (let i = 0; i < 7; i++) dishesOf(WEEK_MENU[ymd(shift(mon, i))]).forEach(([n]) => names.push(n));
+    const have = new Set(lsGet('home-shoplist', []).map(i => i.n));
+    lsSet('home-shoplist', lsGet('home-shoplist', []).concat(names.filter(n => !have.has(n)).map(n => ({ n }))));
+    render(); return toast('示範版以菜名帶入；正式版會帶入食材');
+  }
+  if (q('#scopy')) { const t = lsGet('home-shoplist', []).filter(i => !i.d).map(i => i.n).join('\n'); try { navigator.clipboard.writeText(t); toast('已複製待買清單'); } catch (er) { toast('無法複製'); } return; }
+  if (q('#sclear')) { lsSet('home-shoplist', lsGet('home-shoplist', []).filter(i => !i.d)); render(); return toast('已清除已買項目'); }
+  if (b = q('[data-shop]')) { const l = lsGet('home-shoplist', []); l[+b.dataset.shop].d = !l[+b.dataset.shop].d; lsSet('home-shoplist', l); return render(); }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'sq') $('#sadd').click(); });
+
+(async () => {
+  await loadTasks(); initStart(); render();
+})();
+
+</script>
+</body>
+</html>
