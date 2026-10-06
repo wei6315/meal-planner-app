@@ -492,7 +492,7 @@ const dist = (uses, id, ds) => {
 
 // 從符合硬規則的食譜中挑一道；軟規則（重複窗口、食材重疊）用扣分處理，庫存不足時自動放寬
 function choose(uses, ds, slot, beefOk, chosen, exclude){
-  const egg = chosen.some(c => c.category !== '湯' && c.ingredients.includes('蛋'));   // 湯品的蛋屬配料，不計入
+  const egg = chosen.some(c => c.ingredients.includes('蛋'));
   const tagsUsed = new Set(chosen.flatMap(c => c.ingredients));
   const idsUsed = new Set(chosen.map(c => c.id));
   const win = catSet[slot];
@@ -500,7 +500,7 @@ function choose(uses, ds, slot, beefOk, chosen, exclude){
   for (const r of recipes){
     if (!r.active || r.category !== slot || idsUsed.has(r.id) || (exclude && exclude.has(r.id))) continue;
     if (r.has_beef && !beefOk) continue;                       // 硬規則：含牛只排爸爸不在家的日子
-    if (egg && r.category !== '湯' && r.ingredients.includes('蛋')) continue;   // 硬規則：同一餐蛋類最多 1 道（湯品除外）
+    if (egg && r.ingredients.includes('蛋')) continue;         // 硬規則：同一餐蛋類最多 1 道
     const dd = dist(uses, r.id, ds);
     let s = Math.min(dd, 60) + (r.kid_rating || 3) * 2 + Math.random() * 8;
     if (win != null ? dd < win : dd <= 1) s -= 100;            // 軟規則：重複窗口（副菜只避免連續兩天）
@@ -711,13 +711,14 @@ async function swapSheet(itemId){
   const uses = new Map();
   h.data.filter(x => x.id !== it.id).forEach(x => addUse(uses, x.recipe_id, x.meal_date));
   const others = wItems.filter(x => x.meal_date === ds && x.id !== it.id).map(x => byId[x.recipe_id]).filter(Boolean);
-  const egg = others.some(r => r.category !== '湯' && r.ingredients.includes('蛋')), ids = new Set(others.map(r => r.id));
+  const egg = others.some(r => r.ingredients.includes('蛋')), ids = new Set(others.map(r => r.id));
+  // 手動更換：同分類的菜全部可選；不符合自動排菜規則的排在後面並註明原因
   const list = recipes
-    .filter(r => r.active && r.category === it.slot && !ids.has(r.id) && (beefOk || !r.has_beef) && !(egg && r.category !== '湯' && r.ingredients.includes('蛋')))
-    .map(r => ({ r, dd: dist(uses, r.id, ds) }))
-    .sort((a, b) => b.dd - a.dd || a.r.name.localeCompare(b.r.name, 'zh-Hant'));
-  const html = `<button data-r="__rand"><b>隨機換一道</b></button>` + list.map(({ r, dd }) =>
-    `<button data-r="${esc(r.id)}"><i class="dot k-${kindOf(r)}"></i>${esc(r.name)}${r.id === it.recipe_id ? '<small>目前</small>' : ''}${r.has_beef ? '<small class="red">含牛</small>' : ''}<small>${dd >= 60 ? '近期沒吃過' : dd + ' 天前後吃過'}</small></button>`).join('');
+    .filter(r => r.active && r.category === it.slot && !ids.has(r.id))
+    .map(r => ({ r, dd: dist(uses, r.id, ds), why: [!beefOk && r.has_beef ? '爸爸在家' : '', egg && r.ingredients.includes('蛋') ? '同餐已有蛋' : ''].filter(Boolean).join('・') }))
+    .sort((a, b) => !!a.why - !!b.why || b.dd - a.dd || a.r.name.localeCompare(b.r.name, 'zh-Hant'));
+  const html = `<button data-r="__rand"><b>隨機換一道</b></button>` + list.map(({ r, dd, why }) =>
+    `<button data-r="${esc(r.id)}"><i class="dot k-${kindOf(r)}"></i>${esc(r.name)}${r.id === it.recipe_id ? '<small>目前</small>' : ''}${r.has_beef ? '<small class="red">含牛</small>' : ''}${why ? `<small class="red">${why}</small>` : ''}<small>${dd >= 60 ? '近期沒吃過' : dd + ' 天前後吃過'}</small></button>`).join('');
   openPick(`更換「${byId[it.recipe_id] ? byId[it.recipe_id].name : ''}」`, html, async btn => {
     let rid = btn.dataset.r;
     if (rid === '__rand'){
