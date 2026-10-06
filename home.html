@@ -61,24 +61,24 @@ small{font-size:13px}
 /* 本週菜單 */
 .wk{margin-top:4px}
 .wr{display:grid;grid-template-columns:54px repeat(4,minmax(0,1fr));gap:5px;padding:7px 0;border-top:1px solid var(--line);align-items:center}
-.wr.hd{border-top:0;border-bottom:0;padding:4px 0 6px;font-size:13px;color:var(--sub);letter-spacing:.14em}
+.wr.hd{border-top:0;border-bottom:0;padding:4px 0 6px;font-size:12px;color:var(--sub);letter-spacing:.14em}
 .wr.hd span{padding-left:10px}
 .wr.hd span:first-child{padding:0}
 .dc{background:none;border:0;padding:0;text-align:left;line-height:1.35;display:flex;flex-direction:column;gap:1px}
-.dc b{font-size:18px;font-weight:500}
-.dc .d1{font-size:13px;color:var(--sub)}
-.dc .d2{font-size:13px;white-space:nowrap;display:flex;align-items:center;gap:4px}
-.dc .d2 b{font-size:13px;font-weight:600}
+.dc b{font-size:16px;font-weight:500}
+.dc .d1{font-size:12px;color:var(--sub)}
+.dc .d2{font-size:12px;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.dc .d2 b{font-size:12px;font-weight:600}
 .sq{display:inline-grid;place-items:center;min-width:16px;height:16px;border:1px solid var(--ink);border-radius:2px;font-size:12px;line-height:1}
 .dc .ok{color:#5E8E55;margin-left:3px;font-weight:600}
 .dc .wn{color:#C27A1A;margin-left:3px;font-weight:600}
 .dc .no{color:var(--red)}
 .wc{display:flex;flex-direction:column;gap:5px;min-width:0}
 .wc.span{grid-column:2/-1}
-.dish{display:block;width:100%;background:none;border:0;border-left:3px solid var(--kd);border-radius:0;padding:1px 0 1px 6px;text-align:left;font-size:16px;line-height:1.4;font-weight:400;color:var(--ink);overflow-wrap:anywhere}
+.dish{display:block;width:100%;background:none;border:0;border-left:3px solid var(--kd);border-radius:0;padding:1px 0 1px 6px;text-align:left;font-size:14px;line-height:1.4;font-weight:400;color:var(--ink);overflow-wrap:anywhere}
 .dish:active{opacity:.55}
 .bf{font-style:normal;font-size:12px;font-weight:700;color:var(--red);margin-right:3px}
-.em{grid-column:2/-1;color:var(--sub);font-size:16px;padding-left:2px}
+.em{grid-column:2/-1;color:var(--sub);font-size:14px;padding-left:2px}
 
 /* 班別 */
 .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
@@ -199,6 +199,9 @@ button:disabled{opacity:.45}
 
 
 /* ===== 家務與 Today ===== */
+#pickBody .delrow{color:var(--red);display:flex;align-items:center;gap:8px}
+#pickBody .delrow svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex:none}
+#pickBody .delrow small{margin-left:auto}
 .subnav{padding:0 0 12px}
 .sech{display:flex;align-items:center;justify-content:space-between;margin:22px 0 8px;min-height:34px}
 .sech h2{margin:0;font-size:21px;font-weight:600;letter-spacing:.08em}
@@ -717,10 +720,24 @@ async function swapSheet(itemId){
     .filter(r => r.active && r.category === it.slot && !ids.has(r.id))
     .map(r => ({ r, dd: dist(uses, r.id, ds), why: [!beefOk && r.has_beef ? '爸爸在家' : '', egg && r.ingredients.includes('蛋') ? '同餐已有蛋' : ''].filter(Boolean).join('・') }))
     .sort((a, b) => !!a.why - !!b.why || b.dd - a.dd || a.r.name.localeCompare(b.r.name, 'zh-Hant'));
-  const html = `<button data-r="__rand"><b>隨機換一道</b></button>` + list.map(({ r, dd, why }) =>
+  const canDel = it.slot === '纖維質';      // 纖維質可只煮一道
+  const delBtn = canDel ? `<button data-r="__del" class="delrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg><b>移除這道</b><small>這天只煮其他纖維質</small></button>` : '';
+  const html = `<button data-r="__rand"><b>隨機換一道</b></button>` + delBtn + list.map(({ r, dd, why }) =>
     `<button data-r="${esc(r.id)}"><i class="dot k-${kindOf(r)}"></i>${esc(r.name)}${r.id === it.recipe_id ? '<small>目前</small>' : ''}${r.has_beef ? '<small class="red">含牛</small>' : ''}${why ? `<small class="red">${why}</small>` : ''}<small>${dd >= 60 ? '近期沒吃過' : dd + ' 天前後吃過'}</small></button>`).join('');
   openPick(`更換「${byId[it.recipe_id] ? byId[it.recipe_id].name : ''}」`, html, async btn => {
     let rid = btn.dataset.r;
+    if (rid === '__del'){
+      closePick();
+      const r = await db.from('meal_items').delete().eq('id', it.id);
+      if (r.error) return toast('移除失敗：' + r.error.message, true);
+      wItems = wItems.filter(x => x.id !== it.id); drawMenu();
+      const name = byId[it.recipe_id] ? byId[it.recipe_id].name : '';
+      return toast(`已移除「${name}」`, false, { label: '復原', fn: async () => {
+        const w = await db.from('meal_items').insert(it);
+        if (w.error) return toast('復原失敗：' + w.error.message, true);
+        wItems.push(it); drawMenu();
+      } });
+    }
     if (rid === '__rand'){
       const p = choose(uses, ds, it.slot, beefOk, others, new Set([it.recipe_id]));
       if (!p) return toast('沒有其他可換的食譜', true);
