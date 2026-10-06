@@ -1,754 +1,1351 @@
 <!doctype html>
-<html lang="zh-Hant-TW">
+<html lang="zh-Hant">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>家</title>
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#F7F5F0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="HOME">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<meta name="apple-mobile-web-app-title" content="home">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap">
+<title>HOME</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
-  --bg:#F5F4F0; --paper:#FFFEFB; --ink:#2A2826; --sub:#8A857D; --line:#DEDAD2; --line2:#E9E6DF;
-  --warn:#C8423A; --e:#F2EACB; --m:#F1D9D6; --n:#D8E2EA; --off:#FFFEFB;
-  box-sizing:border-box;
-  padding-top:env(safe-area-inset-top,0px);
+  --bg:#F7F5F0; --paper:#FFFEFB; --ink:#2B2A28; --sub:#8A857B; --line:#E4DFD4; --line2:#CFC9BC;
+  --accent:#3A4E6B; --red:#C73E3A;
+  --font:"PingFang TC","Hiragino Sans","Noto Sans TC","Helvetica Neue",system-ui,sans-serif;
 }
-@media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){ --bg:#1B1A18; --paper:#24221F; --ink:#ECE9E3; --sub:#9E988E; --line:#3A3733; --line2:#2E2B28; --e:#4A4430; --m:#4A3533; --n:#2F3A44; --off:#24221F; }
-}
-:root[data-theme="dark"]{ --bg:#1B1A18; --paper:#24221F; --ink:#ECE9E3; --sub:#9E988E; --line:#3A3733; --line2:#2E2B28; --e:#4A4430; --m:#4A3533; --n:#2F3A44; --off:#24221F; }
-*,*::before,*::after{box-sizing:inherit}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',sans-serif;-webkit-font-smoothing:antialiased}
-button,input,select{font:inherit;color:inherit}
-button{background:none;border:0;padding:0;cursor:pointer;text-align:left}
-button:disabled{opacity:.35;cursor:default}
-:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
-.wrap{max-width:520px;margin:0 auto;padding:0 22px calc(110px + env(safe-area-inset-bottom,0px))}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--font);letter-spacing:.03em;-webkit-text-size-adjust:100%;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+button,input,select,textarea{font:inherit;letter-spacing:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+[hidden]{display:none!important}
+.wrap{max-width:560px;margin:0 auto;padding:0 16px 130px}
+small{font-size:11px}
 
-.ptitle{display:flex;justify-content:space-between;align-items:center;padding:34px 0 18px}
-.ptitle h1{margin:0;font-weight:300;font-size:32px;letter-spacing:.18em}
-.cplus{width:44px;height:44px;border:1px solid var(--ink);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:transform .15s}
-.cplus[aria-expanded="true"]{transform:rotate(45deg)}
-.rnav{display:flex;align-items:center;justify-content:center;gap:28px;margin:4px 0 18px;font-size:18px;letter-spacing:.06em;font-weight:300}
-.rnav button{width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:21px;color:var(--sub);text-align:center}
-.center{text-align:center;margin:-10px 0 10px}
-.link{font-size:11px;color:var(--sub);text-decoration:underline;text-underline-offset:3px;min-height:32px}
+/* 色彩分類：只用在項目前面的細條 */
+.k-牛{--kd:#C73E3A}.k-豬{--kd:#D4789A}.k-雞{--kd:#E39A2D}.k-海鮮{--kd:#3F78B5}.k-蛋{--kd:#E5C23A}
+.k-豆腐{--kd:#A9896A}.k-蔬菜{--kd:#6E9F5B}.k-湯{--kd:#5FA3AD}.k-甜湯{--kd:#9A7FB5}.k-一鍋{--kd:#4C5A8C}
+.dot{display:inline-block;width:3px;height:12px;background:var(--kd);flex:none}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;margin:10px 0 0;color:var(--sub);font-size:12px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
 
-.utabs{display:flex;gap:24px;overflow-x:auto;margin-bottom:18px;border-bottom:1px solid var(--line2)}
-.utabs button{flex:none;min-height:46px;font-size:16px;color:var(--sub);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
-.utabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
-.utabs small{font-size:11px;margin-left:5px}
+/* 標題與按鈕 */
+.top{display:flex;align-items:flex-end;justify-content:space-between;padding:16px 0 8px}
+.top h1{margin:0;font-size:28px;line-height:1.2;font-weight:300;letter-spacing:.16em}
+.plus{width:34px;height:34px;border-radius:50%;border:1px solid var(--ink);background:none;font-size:20px;font-weight:300;line-height:1;padding:0 0 2px}
+.btn{border:1px solid var(--ink);background:none;border-radius:2px;padding:11px 16px;letter-spacing:.08em}
+.btn.primary{background:var(--ink);color:#fff}
+.btn.wide{width:100%}
+.btn:active{opacity:.6}
+.bar{display:flex;gap:10px;margin:0 0 10px}
+.bar .btn{flex:1}
+.note{margin:6px 0;color:var(--sub);font-size:12px}
+.warn{color:var(--red)}
+.card{background:none;padding:14px 0;margin:0;border-top:1px solid var(--line)}
+.h2{margin:26px 0 4px;font-size:12px;color:var(--sub);letter-spacing:.14em}
 
-.sec{margin-bottom:30px}
-.shead{display:flex;justify-content:space-between;align-items:center;min-height:44px;margin-bottom:10px}
-.shead h2{margin:0;font-size:17px;font-weight:700;letter-spacing:.06em}
-.meta{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--sub)}
-.meta b{color:var(--ink);font-size:13px}
-.sbox{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 3px;border:1.5px solid var(--ink);border-radius:3px;font-size:11px;color:var(--ink)}
-.muted{color:var(--sub);font-size:13px;margin:6px 0}
-.over{color:var(--warn)!important}
+/* 週次切換 */
+.wnav{display:flex;align-items:center;justify-content:center;gap:4px;margin:0 0 8px}
+.wnav b{min-width:150px;text-align:center;font-weight:400;font-size:16px;letter-spacing:.1em}
+.wnav button{width:44px;height:34px;border:0;background:none;color:var(--sub);font-size:22px;font-weight:300;line-height:1}
+.bar.slim .btn{padding:9px 14px;font-size:14px}
+.bar.slim .btn.primary{flex:1}
 
-.tags{display:flex;flex-wrap:wrap;gap:10px}
-.tag{display:inline-flex;align-items:center;min-height:42px;padding:0 16px 0 14px;background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:3px;font-size:14px}
-.tags.big .tag{min-height:48px;font-size:15px}
-.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin:20px 0;font-size:12px;color:var(--sub)}
-.legend span{display:flex;align-items:center;gap:8px}
-.legend span::before{content:'';width:4px;height:16px;background:var(--c);border-radius:1px}
+/* 本週菜單 */
+.wk{margin-top:4px}
+.wr{display:grid;grid-template-columns:54px repeat(4,minmax(0,1fr));gap:5px;padding:7px 0;border-top:1px solid var(--line);align-items:center}
+.wr.hd{border-top:0;border-bottom:0;padding:4px 0 6px;font-size:11px;color:var(--sub);letter-spacing:.14em}
+.wr.hd span{padding-left:10px}
+.wr.hd span:first-child{padding:0}
+.dc{background:none;border:0;padding:0;text-align:left;line-height:1.35;display:flex;flex-direction:column;gap:1px}
+.dc b{font-size:14px;font-weight:500}
+.dc .d1{font-size:11px;color:var(--sub)}
+.dc .d2{font-size:11px;white-space:nowrap;display:flex;align-items:center;gap:4px}
+.dc .d2 b{font-size:11px;font-weight:600}
+.sq{display:inline-grid;place-items:center;min-width:16px;height:16px;border:1px solid var(--ink);border-radius:2px;font-size:10px;line-height:1}
+.dc .ok{color:#5E8E55;margin-left:3px;font-weight:600}
+.dc .wn{color:#C27A1A;margin-left:3px;font-weight:600}
+.dc .no{color:var(--red)}
+.wc{display:flex;flex-direction:column;gap:5px;min-width:0}
+.wc.span{grid-column:2/-1}
+.dish{display:block;width:100%;background:none;border:0;border-left:3px solid var(--kd);border-radius:0;padding:1px 0 1px 6px;text-align:left;font-size:13px;line-height:1.4;font-weight:400;color:var(--ink);overflow-wrap:anywhere}
+.dish:active{opacity:.55}
+.bf{font-style:normal;font-size:10px;font-weight:700;color:var(--red);margin-right:3px}
+.em{grid-column:2/-1;color:var(--sub);font-size:13px;padding-left:2px}
 
-.progress{height:2px;background:var(--line2);margin-bottom:4px}
-.progress i{display:block;height:100%;background:var(--ink);transition:width .25s}
-.glabel{font-size:11px;color:var(--sub);letter-spacing:.12em;margin:18px 0 0;padding-bottom:6px;border-bottom:1px solid var(--line)}
-.check{display:flex;align-items:center;gap:14px;width:100%;min-height:54px;border-bottom:1px solid var(--line2)}
-.box{width:22px;height:22px;border:1.5px solid var(--sub);border-radius:3px;flex:none;display:flex;align-items:center;justify-content:center}
-.box svg{opacity:0}
-.check.done .box{background:var(--ink);border-color:var(--ink)}.check.done .box svg{opacity:1}
-.label{flex:1;font-size:14px}
-.check.done .label{text-decoration:line-through;color:var(--sub)}
-.badge{font-size:11px;color:var(--sub);border:1px solid var(--line);border-radius:2px;padding:1px 6px}
-.mins{font-size:11px;color:var(--sub)}
+/* 班別 */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal .h{text-align:center;font-size:11px;color:var(--sub);padding:2px 0 4px}
+.cal .c{border:0;border-radius:2px;background:var(--paper);min-height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:2px}
+.cal .c.out{opacity:.4}
+.cal .c b{font-weight:400;font-size:12px;color:var(--sub);min-width:20px;height:20px;display:grid;place-items:center;border-radius:10px}
+.cal .c b.today{background:var(--ink);color:#fff}
+.cal .c span{font-size:14px;font-weight:500}
+.cal .c.s-早{background:#F4EAC6}.cal .c.s-中{background:#F2D8D3}.cal .c.s-夜{background:#D9E3EC}.cal .c.s-休假{background:var(--paper)}
+.range{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.range .full{grid-column:1/-1}
+.range label{font-size:12px;color:var(--sub)}
+.inp{display:block;width:100%;margin-top:4px;padding:8px 0;border:0;border-bottom:1px solid var(--line2);border-radius:0;background:none;font-size:16px;color:var(--ink)}
+textarea.inp{border:1px solid var(--line2);padding:8px;border-radius:2px}
 
-.btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:3px;font-size:14px;letter-spacing:.1em;text-align:center}
-.btn.dark{background:var(--ink);color:var(--bg);padding:0 22px}
-.btn.line{border:1px solid var(--ink)}
-.btn.ghost{color:var(--sub);padding:0 16px}
-.btn.sq{width:48px;flex:none;border:1px solid var(--ink)}
-.btn.sq.warn{border-color:var(--line);color:var(--warn)}
-.btn.grow{flex:1}
-.btnrow{display:flex;gap:10px;margin-bottom:18px}
+/* 食譜 */
+.search{position:relative;margin:0 0 6px}
+.search svg{position:absolute;left:0;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--sub);fill:none;stroke-width:1.5;stroke-linecap:round}
+#q{width:100%;border:0;border-bottom:1px solid var(--line2);border-radius:0;background:none;padding:9px 0 9px 26px;font-size:16px}
+.pills{display:flex;gap:18px;overflow-x:auto;scrollbar-width:none;padding:6px 0 16px}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:0 0 auto;border:0;border-bottom:1px solid transparent;border-radius:0;background:none;padding:4px 0;color:var(--sub);white-space:nowrap}
+.pill small{margin-left:4px}
+.pill[aria-selected=true]{color:var(--ink);border-bottom-color:var(--ink)}
+.tiles{display:flex;flex-wrap:wrap;gap:8px}
+.tile{background:var(--paper);border:1px solid var(--line2);border-left:3px solid var(--kd);border-radius:2px;padding:6px 12px 6px 9px;font-size:14px;color:var(--ink);text-align:left}
+.tile small{margin-left:6px;color:var(--sub)}
+.tile.off{border-style:dashed;border-left-style:solid;opacity:.5}
+.tile:active{background:var(--bg)}
+.empty{margin:28px 2px;color:var(--sub)}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sw input{appearance:none;-webkit-appearance:none;flex:none;width:40px;height:22px;border-radius:11px;background:var(--line2);position:relative;margin:0;transition:background .2s}
+.sw input::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s}
+.sw input:checked{background:var(--ink)}
+#fBeef:checked{background:var(--red)}
+.sw input:checked::after{transform:translateX(18px)}
+.logout{display:block;width:100%;margin-top:22px;border:0;border-top:1px solid var(--line);background:none;color:var(--sub);padding:16px;letter-spacing:.1em}
 
-.mgrid{display:grid;grid-template-columns:64px repeat(4,minmax(0,1fr));gap:10px;align-items:center}
-.mhead{font-size:13px;color:var(--sub);letter-spacing:.1em;padding:6px 0 12px;border-bottom:1px solid var(--line);text-align:center}
-.mrow{padding:18px 0;border-bottom:1px solid var(--line);min-height:96px}
-.mrow.now .dcol b{text-decoration:underline;text-underline-offset:5px}
-.dcol b{display:block;font-size:15px}
-.dcol > span{font-size:12px;color:var(--sub)}
-.sline{display:flex;align-items:center;gap:6px;margin-top:4px;font-size:12px}
-.cell{display:flex;flex-direction:column;gap:10px}
-.span{grid-column:2 / -1}
-.bar{display:block;padding-left:10px;border-left:4px solid var(--c);font-size:13px;line-height:1.45}
+/* 底部導覽 */
+.tabbar{position:fixed;left:0;right:0;bottom:0;display:flex;background:rgba(247,245,240,.94);border-top:1px solid var(--line);padding:7px 0 calc(7px + env(safe-area-inset-bottom));z-index:5}
+.tabbar button{flex:1;background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;letter-spacing:.1em;color:var(--sub);padding:2px 0}
+.tabbar svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round}
+.tabbar button[aria-current=page]{color:var(--ink)}
 
-.rule{border-top:1px solid var(--line)}
-.wrow{display:flex;gap:16px;width:100%;padding:16px 0;border-bottom:1px solid var(--line)}
-.wrow .dcol{width:64px;flex:none}
-.wrow .sline b,.mrow .sline b{font-weight:400}
-.wrow .sline b{color:var(--sub)}
-.wrow.now .dcol b{text-decoration:underline;text-underline-offset:5px}
-.wbody{flex:1;display:flex;flex-direction:column;gap:6px;justify-content:center}
-.aline{display:flex;justify-content:space-between;font-size:13px;padding-left:10px;border-left:4px solid var(--line)}
-.aline em{font-style:normal;color:var(--sub);font-size:11px}
+/* 面板 */
+dialog{border:0;padding:0;width:100%;max-width:560px;margin:auto auto 0;border-radius:0;background:var(--bg);color:var(--ink);max-height:92vh;overflow:auto}
+dialog::backdrop{background:rgba(43,42,40,.35)}
+dialog[open]{animation:up .22s cubic-bezier(.2,.8,.2,1)}
+@keyframes up{from{transform:translateY(30px);opacity:.3}to{transform:none;opacity:1}}
+.sh{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 20px;background:var(--bg);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2}
+.sh h2{margin:0;font-size:15px;font-weight:500;text-align:center;flex:1;letter-spacing:.1em}
+.sh button{background:none;border:0;color:var(--accent);font-size:15px;padding:4px 0;min-width:56px}
+.sh button:first-child{text-align:left}.sh button:last-child{text-align:right}
+.sh .go{font-weight:600}
+.sbody{padding:6px 20px calc(24px + env(safe-area-inset-bottom))}
+.grp{padding:14px 0;border-bottom:1px solid var(--line)}
+.lab{display:block;font-size:12px;color:var(--sub);margin-bottom:6px;letter-spacing:.1em}
+.grp .note{margin:8px 0 0}
+.row2{display:grid;grid-template-columns:1fr;gap:14px}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:1px solid var(--line2);background:none;border-radius:2px;padding:5px 12px}
+.seg button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px}
+.tag{display:inline-flex;align-items:center;gap:2px;border:1px solid var(--line2);border-radius:2px;padding:2px 2px 2px 9px}
+.tag button{border:0;background:none;padding:0 6px;font-size:16px;line-height:1;color:var(--sub)}
+.sug{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.sug button{border:1px dashed var(--line2);background:none;border-radius:2px;padding:1px 9px;color:var(--sub);font-size:13px}
+.err{margin:12px 0 0;color:var(--red)}
+.dng{display:block;width:100%;border:0;border-bottom:1px solid var(--line);background:none;padding:15px 0;text-align:left;font-size:15px}
+.dng.red{color:var(--red)}
+#dangerZone{padding-top:10px}
+.opts{max-height:60vh;overflow:auto}
+.opts button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:15px 2px;border:0;border-bottom:1px solid var(--line);border-radius:0;background:none}
+.opts small{margin-left:auto;color:var(--sub)}
+.opts small.red{margin-left:0;color:var(--red)}
+.opts .askmsg{margin:12px 0 6px;white-space:pre-line;line-height:1.7;color:var(--sub);font-size:13px}
+.opts .okbtn{justify-content:center;margin-top:12px;background:var(--ink);color:#fff;border:0;border-radius:2px;padding:13px;letter-spacing:.1em}
+.opts .okbtn.danger{background:var(--red)}
+.opts textarea{width:100%;min-height:200px;padding:10px;border:1px solid var(--line2);border-radius:2px;background:var(--paper)}
+button:disabled{opacity:.45}
 
-.ahead{display:flex;justify-content:space-between;align-items:baseline;margin:26px 0 0;padding-bottom:8px;border-bottom:1px solid var(--line);font-size:16px;font-weight:700}
-.ahead span{font-size:11px;font-weight:400;color:var(--sub)}
-.lrow{display:flex;align-items:center;gap:10px;min-height:54px;border-bottom:1px solid var(--line2)}
-.lrow .n{flex:1;font-size:14px}
-.lrow .f{font-size:11px;color:var(--sub);text-align:right;line-height:1.5}
-.ibtn{width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:var(--sub);border-radius:3px;flex:none}
-.ibtn.arm{background:var(--warn);color:#fff}
+/* 登入 */
+#login{max-width:420px;margin:0 auto;padding:16vh 24px 40px}
+#login h1{font-size:28px;margin:0 0 6px;font-weight:300;letter-spacing:.16em}
+#login p{margin:0 0 30px;color:var(--sub);font-size:13px}
+.group{margin-bottom:18px}
+.group input{display:block;width:100%;border:0;border-bottom:1px solid var(--line2);background:none;padding:13px 0;font-size:16px;border-radius:0}
 
-.search{display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line);margin-bottom:22px;color:var(--sub)}
-.search input{flex:1;min-height:52px;border:0;background:transparent;font-size:16px;outline:none}
-.addrow{display:flex;gap:14px;align-items:flex-end;margin-bottom:16px}
-.addrow input{flex:1;min-height:52px;border:0;border-bottom:1.5px solid var(--line);background:transparent;font-size:15px;outline:none}
+#toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:2px;max-width:88vw;z-index:20;font-size:13px;text-align:center;letter-spacing:.06em}
+#toast.bad{background:var(--red)}
+.demo{margin:14px 0 0;padding:8px 12px;border:1px dashed var(--line2);font-size:12px;color:var(--sub)}
+@media (prefers-reduced-motion:reduce){dialog[open]{animation:none}.sw input,.sw input::after{transition:none}}
+/* 待買清單 */
+.addrow{display:flex;gap:12px;align-items:flex-end;margin-bottom:12px}
+.addrow .inp{margin-top:0;flex:1}
+.addrow .btn{flex:none;padding:9px 18px}
+.gh{display:flex;align-items:baseline;gap:8px;margin:22px 0 2px;font-size:12px;color:var(--sub);letter-spacing:.14em}
+.it{display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line);padding:10px 0}
+.ck{width:22px;height:22px;flex:none;border:1px solid var(--line2);border-radius:50%;background:none;padding:0;position:relative}
+.it.done .ck{background:var(--ink);border-color:var(--ink)}
+.it.done .ck::after{content:"";position:absolute;left:6px;top:3px;width:5px;height:10px;border:solid #fff;border-width:0 1.5px 1.5px 0;transform:rotate(45deg)}
+.in{flex:1;min-width:0;text-align:left;background:none;border:0;border-left:3px solid var(--kd);padding:0 0 0 9px;display:flex;flex-direction:column;line-height:1.4}
+.in .nm{font-size:15px}
+.in small{color:var(--sub);font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.it.done .in{opacity:.4}
+.it.done .nm{text-decoration:line-through}
+.k-none{--kd:#CFC9BC}
+.rm{flex:none;width:36px;height:36px;border:0;background:none;color:var(--sub);font-size:22px;font-weight:300;line-height:1;padding:0}
+.rm:active{color:var(--red)}
+#toast button{margin-left:14px;border:0;background:none;color:#fff;font:inherit;text-decoration:underline;padding:0}
+.bar{align-items:stretch}
+.ib{flex:none;width:46px;display:grid;place-items:center;padding:0;border:1px solid var(--ink);border-radius:2px;background:none;color:var(--ink)}
+.ib svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.ib.warn{color:var(--red);border-color:var(--line2)}
+.ib:active{opacity:.55}
+.ib:disabled{color:var(--sub);opacity:.4}
 
-.form{margin:0 0 18px;padding:16px;border:1px solid var(--line);border-radius:3px;background:var(--paper);display:grid;gap:12px}
-.form label{display:grid;gap:4px;font-size:11px;color:var(--sub)}
-.form input,.form select{min-height:46px;padding:0 10px;border:1px solid var(--line);border-radius:3px;background:var(--bg);font-size:14px;width:100%}
-.form .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.form .acts{display:flex;gap:10px;justify-content:flex-end}
-.form .btn{min-height:44px;font-size:13px}
 
-.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
-.ch{text-align:center;font-size:13px;color:var(--sub);padding:4px 0 8px}
-.cell2{min-height:76px;border-radius:3px;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center}
-.cell2 span{font-size:13px;color:var(--sub);min-width:26px;height:26px;display:flex;align-items:center;justify-content:center}
-.cell2 span.td{background:var(--ink);color:var(--bg);border-radius:50%}
-.cell2 b{font-size:15px;font-weight:700}
-.cell2.e{background:var(--e)}.cell2.mid{background:var(--m)}.cell2.n{background:var(--n)}.cell2.off{background:var(--off)}
-.cell2.out{opacity:.45}
-
-.fsec{margin:34px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--line);font-size:14px;color:var(--sub);letter-spacing:.12em}
-.two2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.two2 label,.fl{display:grid;gap:6px;font-size:13px;color:var(--sub);margin-bottom:16px}
-.two2 input,.fl input,.fl select{min-height:52px;border:0;border-bottom:1.5px solid var(--line);background:transparent;font-size:16px;color:var(--ink);width:100%;border-radius:0}
-.btn.full{width:100%;margin-top:4px}
-.pg-today .shead h2{font-weight:700}
-.pg-today .meta b{font-weight:400}
-.pg-today .box{border-radius:50%}
-.note{font-size:12px;color:var(--sub);line-height:1.8;margin:18px 0 0}
-#tabbar{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;background:var(--bg);border-top:1px solid var(--line);padding:8px 0 calc(10px + env(safe-area-inset-bottom,0px))}
-#tabbar button{flex:1;max-width:110px;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--sub);font-size:11px;letter-spacing:.08em}
-#tabbar button[aria-current="page"]{color:var(--ink)}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));font-size:12px;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:3px;max-width:calc(100% - 44px);text-align:center;z-index:5}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* ===== 家務與 Today ===== */
+.subnav{padding:0 0 12px}
+.sech{display:flex;align-items:center;justify-content:space-between;margin:22px 0 8px;min-height:34px}
+.sech h2{margin:0;font-size:17px;font-weight:600;letter-spacing:.08em}
+.sech .meta{display:flex;align-items:center;gap:10px;color:var(--sub);font-size:13px}
+.sech .meta .over{color:var(--red)}
+.tback{display:block;margin:-4px auto 6px;border:0;background:none;color:var(--sub);font-size:12px;text-decoration:underline;text-underline-offset:3px}
+.tonight{display:flex;flex-wrap:wrap;gap:8px}
+.tonight .tile{cursor:default}
+.tmeta{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--sub)}
+.prog{height:2px;background:var(--line);margin:0 0 2px}
+.prog i{display:block;height:100%;background:var(--ink);transition:width .25s}
+.chit .in{border-left:0;padding-left:0}
+.chit .mn{flex:none;font-size:11px;color:var(--sub);white-space:nowrap}
+.chit .bd{display:inline-block;margin-right:6px;padding:0 5px;border:1px solid var(--line2);border-radius:2px;font-size:10px}
+.plus.open{transform:rotate(45deg)}
+.plus{transition:transform .15s}
+.chform{display:grid;gap:12px;margin:6px 0 14px;padding:14px;background:var(--paper);border:1px solid var(--line)}
+.chform label{font-size:12px;color:var(--sub)}
+.chform .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chform .acts{display:flex;gap:10px;justify-content:flex-end}
+.chform .acts .btn{padding:9px 16px;font-size:14px}
+.cw{display:grid;grid-template-columns:54px 1fr;gap:8px;padding:9px 0;border-top:1px solid var(--line);width:100%;background:none;border-left:0;border-right:0;border-bottom:0;text-align:left;align-items:center}
+.cw .dc .d2{color:var(--sub)}
+.cw.now .dc b{text-decoration:underline;text-underline-offset:4px}
+.cl{display:flex;flex-direction:column;gap:3px;font-size:13px}
+.cl span{display:flex;justify-content:space-between;padding-left:8px;border-left:3px solid var(--line)}
+.cl span small{color:var(--sub)}
+.cl .emp{border:0;padding:0;color:var(--sub)}
+.ahd{display:flex;justify-content:space-between;align-items:baseline;margin:22px 0 0;padding-bottom:6px;border-bottom:1px solid var(--line2);font-size:15px;font-weight:600;letter-spacing:.06em}
+.ahd small{font-weight:400;color:var(--sub)}
+.lr{display:flex;align-items:center;gap:10px;min-height:46px;border-bottom:1px solid var(--line)}
+.lr .n{flex:1;font-size:14px}
+.lr .f{font-size:11px;color:var(--sub);text-align:right;line-height:1.45}
+.lr .rm{font-size:20px}
 </style>
 </head>
 <body>
-<div class="wrap"><main id="main"></main></div>
-<nav id="tabbar" aria-label="主要分頁"></nav>
-<div class="toast" id="toast" hidden></div>
+
+<main id="login" hidden>
+  <h1>晚餐菜單庫</h1>
+  <p>登入後管理菜單與班別</p>
+  <form id="loginForm">
+    <div class="group">
+      <input id="lEmail" type="email" placeholder="Email" aria-label="Email" autocomplete="username" required>
+      <input id="lPass" type="password" placeholder="密碼" aria-label="密碼" autocomplete="current-password" required>
+    </div>
+    <p id="lErr" class="err" role="alert" hidden></p>
+    <button type="submit" id="lBtn" class="btn primary wide">登入</button>
+  </form>
+</main>
+
+<div id="app" class="wrap" hidden>
+  
+  <header class="top"><h1 id="pageTitle">Today</h1><button id="add" class="plus" type="button" aria-label="新增食譜" hidden>＋</button></header>
+
+  <section id="vToday" hidden>
+    <div class="wnav"><button id="tPrev" type="button" aria-label="前一天">‹</button><b id="tLabel"></b><button id="tNext" type="button" aria-label="後一天">›</button></div>
+    <button id="tBack" class="tback" type="button" hidden>回到今天</button>
+    <div class="sech"><h2>Tonight</h2><span id="tMeta" class="tmeta"></span></div>
+    <div id="tMeal" class="tonight"></div>
+    <div class="sech"><h2>Chores</h2><span class="meta"><span id="tLeft"></span><button id="tAdd" class="plus" type="button" aria-label="增加今天的項目">＋</button></span></div>
+    <div id="tForm"></div>
+    <div id="tChores"></div>
+  </section>
+
+  <section id="vChores" hidden>
+    <nav class="pills subnav" aria-label="家務頁籤"><button type="button" class="pill" data-cs="week">本週</button><button type="button" class="pill" data-cs="lib">家務庫<small id="chCount"></small></button></nav>
+    <div id="chBody"></div>
+  </section>
+
+  <section id="vMenu" hidden>
+    <nav class="pills subnav" aria-label="菜單頁籤"><button type="button" class="pill" data-sv="menu" aria-selected="true">本週</button><button type="button" class="pill" data-sv="recipes">食譜</button></nav>
+    <div class="wnav"><button id="wPrev" type="button" aria-label="上一週">‹</button><b id="weekLabel"></b><button id="wNext" type="button" aria-label="下一週">›</button></div>
+    <div class="bar slim"><button id="gen" class="btn primary" type="button">排這週菜單</button><button id="copy" class="ib" type="button" aria-label="複製成文字" title="複製成文字"><svg viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg></button><button id="mClear" class="ib warn" type="button" aria-label="清空本週菜單" title="清空本週菜單"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l.8 11a2 2 0 0 0 2 1.8h4.4a2 2 0 0 0 2-1.8L17 7M10.5 11v5M13.5 11v5"/></svg></button></div>
+    <p id="menuNote" class="note"></p>
+    <div id="days" class="wk"></div>
+    <p class="note">點菜名可更換；點日期可重排、確認或不排餐。</p>
+    <div id="legMenu" class="legend"></div>
+  </section>
+
+  <section id="vShop" hidden>
+    <div class="addrow"><input id="sName" class="inp" placeholder="新增品項（可輸入多個）" autocomplete="off" enterkeyhint="done"><button id="sAdd" class="btn primary" type="button">加入</button></div>
+    <div class="bar slim"><button id="sImport" class="btn" type="button">從菜單帶入</button><button id="sCopy" class="ib" type="button" aria-label="複製清單" title="複製清單"><svg viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg></button><button id="sWipe" class="ib warn" type="button" aria-label="清空待買清單" title="清空待買清單"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l.8 11a2 2 0 0 0 2 1.8h4.4a2 2 0 0 0 2-1.8L17 7M10.5 11v5M13.5 11v5"/></svg></button></div>
+    <div id="shopList"></div>
+    <p id="shopNote" class="note"></p>
+    <button id="sClear" class="logout" type="button" hidden>清除已買</button>
+  </section>
+
+  <section id="vShift" hidden>
+    <div class="wnav"><button id="mPrev" type="button" aria-label="上個月">‹</button><b id="monthLabel"></b><button id="mNext" type="button" aria-label="下個月">›</button></div>
+    <div id="cal" class="cal"></div>
+    <p class="note">點日期設定班別。早＝黃、中＝粉紅、夜＝藍，與「班表小幫手」相同。</p>
+    <div class="h2">區間填入</div>
+    <div class="card range">
+      <label>從<input id="rFrom" type="date" class="inp"></label>
+      <label>到<input id="rTo" type="date" class="inp"></label>
+      <label class="full">班別<select id="rShift" class="inp"><option>早</option><option>中</option><option>夜</option><option>休假</option></select></label>
+      <button id="rGo" class="btn primary full" type="button">填入這段日期</button>
+    </div>
+    <div class="h2">依循環延伸</div>
+    <div class="card range">
+      <p class="note full" style="margin:0">中5天 → 休1天 → 早5天 → 休2天 → 夜5天 → 休2天，從已輸入的最後一天往後推。11 月班表出來後請核對。</p>
+      <label class="full">延伸到<input id="cycTo" type="date" class="inp"></label>
+      <button id="cycGo" class="btn full" type="button" style="background:var(--fill)">依循環延伸</button>
+    </div>
+  </section>
+
+  <section id="vRecipes" hidden>
+    <nav class="pills subnav" aria-label="菜單頁籤"><button type="button" class="pill" data-sv="menu">本週</button><button type="button" class="pill" data-sv="recipes" aria-selected="true">食譜</button></nav>
+    <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input id="q" type="search" placeholder="搜尋菜名或食材" enterkeyhint="search" autocomplete="off"></div>
+    <nav id="tabs" class="pills" role="tablist" aria-label="食譜分類"></nav>
+    <div id="grid" class="tiles"></div>
+    <p id="empty" class="empty" hidden></p>
+    <div id="legRec" class="legend"></div>
+    <div class="card sw" style="margin-top:14px"><span>顯示已停用（<span id="offCount">0</span>）</span><input type="checkbox" id="showOff" aria-label="顯示已停用"></div>
+    <button id="logout" class="logout" type="button">登出</button>
+  </section>
+</div>
+
+<nav id="tabbar" class="tabbar" hidden>
+  <button type="button" data-v="today"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.2l2.4 2.4 4.6-5"/></svg>Today</button>
+  <button type="button" data-v="menu"><svg viewBox="0 0 24 24"><path d="M9 6.5h11M9 12h11M9 17.5h11"/><circle cx="4.8" cy="6.5" r=".6"/><circle cx="4.8" cy="12" r=".6"/><circle cx="4.8" cy="17.5" r=".6"/></svg>Menu</button>
+  <button type="button" data-v="chores"><svg viewBox="0 0 24 24"><path d="M4 11l8-6.5 8 6.5v9H4z"/><path d="M10 20v-5h4v5"/></svg>Chores</button>
+  <button type="button" data-v="shop"><svg viewBox="0 0 24 24"><path d="M4 8.5h16l-1.5 9.2a2 2 0 0 1-2 1.7H7.5a2 2 0 0 1-2-1.7z"/><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"/></svg>Shopping</button>
+  <button type="button" data-v="shift"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Shift</button>
+</nav>
+
+<dialog id="sheet">
+  <form id="form" novalidate>
+    <div class="sh"><button type="button" id="btnCancel">取消</button><h2 id="sheetTitle">新增食譜</h2><button type="button" id="btnSave" class="go">儲存</button></div>
+    <div class="sbody">
+      <div class="grp"><label class="lab" for="fName">菜名</label><input id="fName" class="inp" maxlength="40" autocomplete="off"></div>
+      <div class="grp"><span class="lab">分類</span><div id="fCat" class="seg"></div></div>
+      <div class="grp">
+        <span class="lab">主食材</span>
+        <div id="tagBox" class="tags"></div>
+        <div id="tagSug" class="sug"></div>
+        <input id="tagIn" class="inp" placeholder="輸入食材，按 Enter 加入（例：蛋、雞）" autocomplete="off">
+      </div>
+      <div class="grp"><label class="sw"><span>含牛</span><input type="checkbox" id="fBeef"></label><p id="beefNote" class="note"></p></div>
+      <div class="grp row2">
+        <div><label class="lab" for="fMin">烹調時間（分鐘）</label><input id="fMin" class="inp" type="number" inputmode="numeric" min="1" max="600"></div>
+        <div><span class="lab">孩子接受度</span><div id="fRate" class="seg"></div></div>
+      </div>
+      <div class="grp"><label class="lab" for="fNotes">備註</label><textarea id="fNotes" class="inp" rows="3" placeholder="做法、連結、小提醒"></textarea></div>
+      <p id="formErr" class="err" role="alert" hidden></p>
+      <div id="dangerZone">
+        <button type="button" id="btnOff" class="dng">停用這道菜</button>
+        <button type="button" id="btnDel" class="dng red">刪除這道菜</button>
+        <p class="note">停用：不再排進菜單，歷史紀錄保留，可隨時還原。<br>刪除：永久移除；曾排進菜單的菜不能刪除，請改用停用。</p>
+      </div>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="pick">
+  <div class="sh"><span style="min-width:56px"></span><h2 id="pickTitle"></h2><button type="button" id="pickClose">關閉</button></div>
+  <div class="sbody"><div id="pickBody" class="opts"></div></div>
+</dialog>
+
+<div id="toast" role="status" hidden></div>
+
 <script>
+const SUPABASE_URL = 'https://mnduxvbjpqstasdpmfcu.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_yJ5i68wsYvtK9UX1l4V0Mw_dVmqyzce';
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* ============ 固定設定 ============ */
-const ANCHOR = new Date(2026, 9, 5);   // 第 1 循環第 1 週的週一
-const LIMIT = 60;                      // 每日上限（分鐘）
-// 各區輪值日：wd = 星期（1 一 … 5 五），A / B = 4 週循環中的第幾週
-const SLOT = {
-  '主臥':{wd:1,A:1,B:3}, '姊姊房間':{wd:2,A:1,B:3}, '客廳':{wd:3,A:1,B:3}, '弟弟房間':{wd:4,A:1,B:3}, '玄關':{wd:5,A:1,B:3},
-  '廚房':{wd:1,A:2,B:4}, '餐廳':{wd:2,A:2,B:4}, '客衛':{wd:3,A:2,B:4}, '主臥廁所':{wd:4,A:2,B:4},
-  '前陽台':{wd:5,A:2,B:2}, '後陽台':{wd:5,A:4,B:4}
-};
-const AREAS = ['玄關','客廳','餐廳','廚房','主臥','姊姊房間','弟弟房間','主臥廁所','客衛','前陽台','後陽台'];
+const CATS = ['主菜','副菜','纖維質','湯','甜湯','一鍋懶人料理'];
+const SLOT_ORDER = ['主菜','副菜','纖維質','湯','一鍋懶人料理','甜湯'];
+const SHIFTS = ['早','中','夜','休假'];
+const ABSENT = ['中'];            // 爸爸不在家吃晚餐的班別（只有這些日子才能排含牛的菜）
 const WD = ['日','一','二','三','四','五','六'];
-const WORKDAYS = [1,2,3,4,5,0];
-const FREQ = { weekly:'每週', biweekly:'隔週', monthly:'每月', quarterly:'每季', halfyear:'每半年' };
-const AFFECT = ['主臥', '主臥廁所'];   // 爸爸夜班補眠時會干擾的區域
-const SHIFTS = ['', '早', '中', '夜', '休假'];
-const MONTH_PAIRS = [[1,7],[2,8],[3,9],[4,10],[5,11],[6,12]];
-// 預設家務（雲端沒有資料時使用；之後以雲端為準）
-const DEFAULT_TASKS = [{"area": "廚房", "name": "冰箱清過期食材", "freq": "weekly", "min": 15, "wd": 0, "id": "t1"}, {"area": "廚房", "name": "地板除油", "freq": "weekly", "min": 15, "wd": 0, "id": "t2"}, {"area": "廚房", "name": "瓦斯爐清潔", "freq": "weekly", "min": 15, "wd": 0, "id": "t3"}, {"area": "主臥廁所", "name": "濕區洗地板、牆壁", "freq": "weekly", "min": 20, "wd": 2, "id": "t4"}, {"area": "客衛", "name": "整理雜物", "freq": "weekly", "min": 10, "wd": 4, "id": "t5"}, {"area": "客衛", "name": "除塵", "freq": "weekly", "min": 5, "wd": 4, "id": "t6"}, {"area": "玄關", "name": "整理雜物", "freq": "weekly", "min": 10, "wd": 4, "id": "t7"}, {"area": "玄關", "name": "除塵", "freq": "weekly", "min": 5, "wd": 4, "id": "t8"}, {"area": "客廳", "name": "除塵", "freq": "weekly", "min": 10, "wd": 2, "id": "t9"}, {"area": "餐廳", "name": "整理雜物", "freq": "weekly", "min": 10, "wd": 5, "id": "t10"}, {"area": "餐廳", "name": "除塵", "freq": "weekly", "min": 5, "wd": 5, "id": "t11"}, {"area": "主臥", "name": "床單、枕頭套清洗", "freq": "biweekly", "min": 10, "id": "t12"}, {"area": "主臥", "name": "床罩、被單清洗", "freq": "monthly", "min": 10, "v": "A", "id": "t13"}, {"area": "主臥", "name": "床架擦拭", "freq": "monthly", "min": 5, "v": "A", "id": "t14"}, {"area": "主臥", "name": "梳妝台整理", "freq": "monthly", "min": 10, "v": "A", "id": "t15"}, {"area": "主臥", "name": "衣服整理", "freq": "monthly", "min": 15, "v": "B", "id": "t16"}, {"area": "主臥", "name": "冷氣濾網", "freq": "monthly", "min": 10, "v": "B", "id": "t17"}, {"area": "主臥", "name": "清淨機濾網", "freq": "monthly", "min": 5, "v": "A", "id": "t18"}, {"area": "主臥", "name": "衣櫥擦拭", "freq": "quarterly", "min": 15, "v": "B", "c": 2, "id": "t19"}, {"area": "主臥", "name": "電風扇拆洗", "freq": "quarterly", "min": 15, "v": "A", "c": 1, "id": "t20"}, {"area": "姊姊房間", "name": "床單、枕頭套清洗", "freq": "biweekly", "min": 10, "id": "t21"}, {"area": "姊姊房間", "name": "吸塵", "freq": "monthly", "min": 10, "v": "B", "id": "t22"}, {"area": "姊姊房間", "name": "冷氣濾網", "freq": "monthly", "min": 10, "v": "B", "id": "t23"}, {"area": "姊姊房間", "name": "清淨機濾網", "freq": "monthly", "min": 5, "v": "A", "id": "t24"}, {"area": "姊姊房間", "name": "電風扇拆洗", "freq": "quarterly", "min": 15, "v": "A", "c": 1, "id": "t25"}, {"area": "弟弟房間", "name": "床單、枕頭套清洗", "freq": "biweekly", "min": 10, "id": "t26"}, {"area": "弟弟房間", "name": "吸塵", "freq": "monthly", "min": 10, "v": "B", "id": "t27"}, {"area": "弟弟房間", "name": "冷氣濾網", "freq": "monthly", "min": 10, "v": "B", "id": "t28"}, {"area": "弟弟房間", "name": "清淨機濾網", "freq": "monthly", "min": 5, "v": "A", "id": "t29"}, {"area": "弟弟房間", "name": "電風扇拆洗", "freq": "quarterly", "min": 15, "v": "A", "c": 1, "id": "t30"}, {"area": "客廳", "name": "書櫃整理", "freq": "monthly", "min": 20, "v": "A", "id": "t31"}, {"area": "客廳", "name": "布沙發清潔", "freq": "monthly", "min": 20, "v": "B", "id": "t32"}, {"area": "客廳", "name": "冷氣濾網", "freq": "monthly", "min": 10, "v": "B", "id": "t33"}, {"area": "客廳", "name": "清淨機濾網", "freq": "monthly", "min": 5, "v": "A", "id": "t34"}, {"area": "客廳", "name": "沙發底下", "freq": "quarterly", "min": 10, "v": "A", "c": 2, "id": "t35"}, {"area": "客廳", "name": "櫃子底部", "freq": "quarterly", "min": 10, "v": "A", "c": 0, "id": "t36"}, {"area": "客廳", "name": "電視背面", "freq": "quarterly", "min": 5, "v": "B", "c": 0, "id": "t37"}, {"area": "客廳", "name": "窗簾除塵", "freq": "quarterly", "min": 15, "v": "B", "c": 2, "id": "t38"}, {"area": "客廳", "name": "電風扇拆洗", "freq": "quarterly", "min": 15, "v": "A", "c": 1, "id": "t39"}, {"area": "玄關", "name": "清洗鞋櫃", "freq": "quarterly", "min": 20, "v": "A", "c": 0, "id": "t40"}, {"area": "玄關", "name": "擦拭大門", "freq": "quarterly", "min": 10, "v": "A", "c": 1, "id": "t41"}, {"area": "廚房", "name": "冰箱內部擦拭", "freq": "monthly", "min": 20, "v": "B", "id": "t42"}, {"area": "廚房", "name": "抽油煙機濾網", "freq": "monthly", "min": 15, "v": "A", "id": "t43"}, {"area": "廚房", "name": "洗碗機清潔", "freq": "monthly", "min": 10, "v": "B", "id": "t44"}, {"area": "廚房", "name": "烘碗機清潔", "freq": "monthly", "min": 10, "v": "B", "id": "t45"}, {"area": "廚房", "name": "電器櫃整理", "freq": "quarterly", "min": 20, "v": "A", "c": 0, "id": "t46"}, {"area": "廚房", "name": "餐具櫃整理", "freq": "quarterly", "min": 20, "v": "A", "c": 1, "id": "t47"}, {"area": "廚房", "name": "上下櫃整理", "freq": "quarterly", "min": 30, "v": "A", "c": 2, "id": "t48"}, {"area": "餐廳", "name": "文具推車整理", "freq": "monthly", "min": 15, "v": "B", "id": "t49"}, {"area": "餐廳", "name": "鋼琴背面除塵", "freq": "quarterly", "min": 10, "v": "A", "c": 0, "id": "t50"}, {"area": "客衛", "name": "洗手台", "freq": "monthly", "min": 5, "v": "B", "id": "t51"}, {"area": "客衛", "name": "洗地板", "freq": "monthly", "min": 10, "v": "A", "id": "t52"}, {"area": "客衛", "name": "馬桶大清洗", "freq": "monthly", "min": 15, "v": "A", "id": "t53"}, {"area": "客衛", "name": "除水垢", "freq": "monthly", "min": 10, "v": "B", "id": "t54"}, {"area": "客衛", "name": "排水孔清理", "freq": "monthly", "min": 5, "v": "A", "id": "t55"}, {"area": "客衛", "name": "磁磚縫除霉", "freq": "monthly", "min": 15, "v": "B", "id": "t56"}, {"area": "客衛", "name": "儲物庫存盤點", "freq": "monthly", "min": 10, "v": "B", "id": "t57"}, {"area": "客衛", "name": "抽風扇除塵", "freq": "quarterly", "min": 10, "v": "A", "c": 0, "id": "t58"}, {"area": "客衛", "name": "儲物深度整理與丟棄", "freq": "quarterly", "min": 30, "v": "A", "c": 2, "id": "t59"}, {"area": "主臥廁所", "name": "乾區地板", "freq": "monthly", "min": 10, "v": "B", "id": "t60"}, {"area": "主臥廁所", "name": "洗手台", "freq": "monthly", "min": 5, "v": "B", "id": "t61"}, {"area": "主臥廁所", "name": "馬桶大清洗", "freq": "monthly", "min": 15, "v": "A", "id": "t62"}, {"area": "主臥廁所", "name": "外對窗整理", "freq": "quarterly", "min": 15, "v": "A", "c": 0, "id": "t63"}, {"area": "前陽台", "name": "盆栽除雜草", "freq": "monthly", "min": 20, "v": "B", "id": "t64"}, {"area": "前陽台", "name": "落地窗內外清洗", "freq": "quarterly", "min": 25, "v": "A", "c": 1, "id": "t65"}, {"area": "前陽台", "name": "清洗鞋櫃", "freq": "quarterly", "min": 20, "v": "B", "c": 0, "id": "t66"}, {"area": "後陽台", "name": "地板清潔", "freq": "monthly", "min": 15, "v": "B", "id": "t67"}, {"area": "後陽台", "name": "洗烘衣機清潔", "freq": "monthly", "min": 15, "v": "B", "id": "t68"}, {"area": "後陽台", "name": "洗衣精盤點", "freq": "monthly", "min": 5, "v": "A", "id": "t69"}, {"area": "主臥", "name": "換季", "freq": "halfyear", "min": 45, "months": [4, 10], "id": "t70"}, {"area": "廚房", "name": "抽油煙機整台清潔", "freq": "halfyear", "min": 45, "months": [1, 7], "id": "t71"}];
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-/* ============ 時間換算 ============ */
-const DAY = 86400000;
-const sod = d => new Date(d.getFullYear(), d.getMonth(), d.getDate());
-const ymd = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-const mod = (a, n) => ((a % n) + n) % n;
-function pos(d) {
-  const week = Math.floor(Math.round((sod(d) - ANCHOR) / DAY) / 7);
-  return { w: mod(week, 4) + 1, c: mod(Math.floor(week / 4), 3) };
-}
+/* ---------- 日期工具（一律用本機時間） ---------- */
+const pad = n => String(n).padStart(2,'0');
+const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+const addDays = (d,n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x; };
+const mondayOf = d => { const x = new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate() - ((x.getDay()+6)%7)); return x; };
+const isoWd = d => ((d.getDay()+6)%7)+1;
+const dayDiff = (a,b) => Math.round((parse(a) - parse(b)) / 864e5);
+const md = ds => `${+ds.slice(5,7)}/${+ds.slice(8,10)}`;
 
-/* ============ 排程規則 ============ */
-let TASKS = DEFAULT_TASKS.slice();
+/* ---------- 全域狀態 ---------- */
+let recipes = [], byId = {}, shiftSet = {}, weekdaySet = {}, catSet = {};
+let view = 'menu', weekStart = mondayOf(new Date()), monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+let wShifts = {}, wMeals = {}, wItems = [];
+let tab = CATS[0], cur = null, tags = [], cat = CATS[0], rate = null, entered = false, tt, pickHandler = null;
 
-// 某任務是否出現在「循環 c、第 w 週、星期 wd」（不含每半年）
-function hits(t, c, w, wd) {
-  if (wd === 6) return false;
-  const s = SLOT[t.area];
-  switch (t.freq) {
-    case 'weekly':    return t.wd === wd;
-    case 'biweekly':  return s.wd === wd && (w === s.A || w === s.B);
-    case 'monthly':   return s.wd === wd && w === s[t.v];
-    case 'quarterly': return s.wd === wd && w === s[t.v] && c === t.c;
+function toast(msg, bad, action){
+  const t = $('toast'); t.textContent = msg; t.className = bad ? 'bad' : '';
+  if (action){
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = action.label;
+    b.addEventListener('click', () => { t.hidden = true; action.fn(); }); t.append(b);
   }
-  return false;
-}
-function loadAt(c, w, wd, list = TASKS) {
-  return list.reduce((sum, t) => sum + (hits(t, c, w, wd) ? t.min : 0), 0);
-}
-function worstOf(w, wd, list) { return Math.max(...[0,1,2].map(c => loadAt(c, w, wd, list))); }
-
-// 每半年項目：該月負荷最低的一天
-const hyCache = new Map();
-function halfyearDay(t, year, month) {
-  const ck = `${t.id}|${year}|${month}|${TASKS.length}`;
-  if (hyCache.has(ck)) return hyCache.get(ck);
-  let best = null;
-  for (let i = 1; i <= new Date(year, month, 0).getDate(); i++) {
-    const d = new Date(year, month - 1, i);
-    if (d.getDay() === 6) continue;
-    const p = pos(d), l = loadAt(p.c, p.w, d.getDay());
-    if (!best || l < best.l) best = { d, l };
-  }
-  hyCache.set(ck, best.d);
-  return best.d;
+  t.hidden = false; clearTimeout(tt); tt = setTimeout(() => t.hidden = true, action ? 6000 : 3500);
 }
 
-function baseOn(d) {
-  if (d.getDay() === 6) return [];
-  const p = pos(d), wd = d.getDay();
-  const list = TASKS.filter(t => hits(t, p.c, p.w, wd));
-  TASKS.filter(t => t.freq === 'halfyear' && t.months.includes(d.getMonth() + 1))
-    .forEach(t => { if (ymd(halfyearDay(t, d.getFullYear(), d.getMonth() + 1)) === ymd(d)) list.push(t); });
-  return list;
+/* ---------- 登入 ---------- */
+async function init(){
+  const { data: { session } } = await db.auth.getSession();
+  session ? enter() : leave();
+  db.auth.onAuthStateChange((ev, s) => setTimeout(() => s ? enter() : leave(), 0));
 }
-// 一週的排程：夜班日若有干擾項目，整天與同週另一天對調
-function monday(d) { const m = new Date(d); m.setDate(d.getDate() - mod(d.getDay() - 1, 7)); return sod(m); }
-function weekPlan(mon) {
-  const days = [...Array(7)].map((_, i) => new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + i));
-  const lists = days.map(baseOn), info = days.map(() => ({}));
-  const hit = l => l.some(t => AFFECT.includes(t.area));
-  return { days, lists, info };
+async function enter(){
+  if (entered) return;
+  entered = true;
+  $('login').hidden = true; $('app').hidden = false; $('tabbar').hidden = false;
+  await loadAll();
 }
-function planOf(d) { const w = weekPlan(monday(d)); const i = mod(d.getDay() - 1, 7); return { list: w.lists[i], info: w.info[i], days: w.days }; }
-function tasksOn(d) { return baseOn(d); }
+function leave(){
+  entered = false; recipes = [];
+  $('app').hidden = true; $('tabbar').hidden = true; $('login').hidden = false;
+}
+$('loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const err = $('lErr'); err.hidden = true; $('lBtn').disabled = true;
+  const { error } = await db.auth.signInWithPassword({ email: $('lEmail').value.trim(), password: $('lPass').value });
+  $('lBtn').disabled = false;
+  if (error){ err.textContent = '登入失敗：Email 或密碼不正確，請再試一次。'; err.hidden = false; }
+  else $('lPass').value = '';
+});
+$('logout').addEventListener('click', () => db.auth.signOut());
 
-function groupByArea(list) {
-  const g = {};
-  list.forEach(t => (g[t.area] = g[t.area] || []).push(t));
-  return Object.entries(g).sort((a, b) => b[1].length - a[1].length);
-}
-
-// 新增時自動選擇負荷最低的位置
-function place(t) {
-  const s = SLOT[t.area];
-  if (t.freq === 'weekly') {
-    let best = null;
-    WORKDAYS.forEach(wd => {
-      const m = Math.max(...[1,2,3,4].map(w => worstOf(w, wd)));
-      if (!best || m < best.m) best = { m, wd };
-    });
-    t.wd = best.wd; return best.m + t.min;
-  }
-  if (t.freq === 'biweekly') return Math.max(worstOf(s.A, s.wd), worstOf(s.B, s.wd)) + t.min;
-  if (t.freq === 'monthly') {
-    const a = worstOf(s.A, s.wd), b = worstOf(s.B, s.wd);
-    t.v = a <= b ? 'A' : 'B'; return Math.min(a, b) + t.min;
-  }
-  if (t.freq === 'quarterly') {
-    let best = null;
-    ['A','B'].forEach(v => [0,1,2].forEach(c => {
-      const l = loadAt(c, s[v], s.wd);
-      if (!best || l < best.l) best = { l, v, c };
-    }));
-    t.v = best.v; t.c = best.c; return best.l + t.min;
-  }
-  return t.min;
-}
-function whereText(t) {
-  const s = SLOT[t.area];
-  if (t.freq === 'weekly') return `每週${WD[t.wd]}`;
-  if (t.freq === 'biweekly') return `第 ${s.A}、${s.B} 週週${WD[s.wd]}`;
-  if (t.freq === 'monthly') return `第 ${s[t.v]} 週週${WD[s.wd]}`;
-  if (t.freq === 'quarterly') return `第 ${t.c + 1} 循環第 ${s[t.v]} 週週${WD[s.wd]}`;
-  if (t.freq === 'halfyear') return `${t.months.join('、')} 月`;
+async function loadAll(){
+  const rs = await Promise.all([
+    db.from('recipes').select('*').order('name'),
+    db.from('shift_settings').select('*'),
+    db.from('weekday_settings').select('*'),
+    db.from('category_settings').select('*')
+  ]);
+  const bad = rs.find(x => x.error);
+  if (bad){ toast('讀取失敗：' + bad.error.message, true); return; }
+  recipes = rs[0].data; byId = Object.fromEntries(recipes.map(r => [r.id, r]));
+  shiftSet = Object.fromEntries(rs[1].data.map(x => [x.shift, x]));
+  weekdaySet = Object.fromEntries(rs[2].data.map(x => [x.weekday, x.day_type]));
+  catSet = Object.fromEntries(rs[3].data.map(x => [x.category, x.repeat_window_days]));
+  await chLoad();
+  show('today');
 }
 
-/* ============ 雲端儲存（無法使用時存本機） ============ */
-let db = null;
-const done = {}; const loading = {};
-const mk = d => ymd(d).slice(0, 7);
-const lsGet = (k, f) => { try { return JSON.parse(localStorage.getItem(k)) ?? f; } catch (e) { return f; } };
-const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+/* ---------- 頁面切換 ---------- */
+const TITLES = { today:'Today', menu:'Menu', chores:'Chores', shop:'Shopping', shift:'Shift', recipes:'Menu' };
+async function show(v){
+  view = v;
+  $('vToday').hidden = v !== 'today'; $('vChores').hidden = v !== 'chores';
+  $('vMenu').hidden = v !== 'menu'; $('vShop').hidden = v !== 'shop'; $('vShift').hidden = v !== 'shift'; $('vRecipes').hidden = v !== 'recipes';
+  const tabV = v === 'recipes' ? 'menu' : v;
+  $('add').hidden = v !== 'recipes';
+  $('pageTitle').textContent = TITLES[v];
+  document.querySelectorAll('#tabbar button').forEach(b => { if (b.dataset.v === tabV) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
+  if (v === 'today') await renderToday();
+  if (v === 'chores') await renderChores();
+  if (v === 'menu') await renderMenu();
+  if (v === 'shop') await renderShop();
+  if (v === 'shift') await renderShift();
+  if (v === 'recipes') renderRecipes();
+}
+$('tabbar').addEventListener('click', e => { const b = e.target.closest('button'); if (b){ window.scrollTo(0, 0); show(b.dataset.v); } });
+document.addEventListener('click', e => { const b = e.target.closest('[data-sv]'); if (b) show(b.dataset.sv); });
 
-// 每月紀錄：keys = 已完成、skips = 當天移除、extras = 當天新增的單次項目
-// post = 順延：key → 從哪一天起再出現
-const norm = o => (o && (o.keys || o.skips || o.extras || o.post))
-  ? { keys: Object.assign({}, o.keys), skips: Object.assign({}, o.skips), extras: (o.extras || []).slice(), post: Object.assign({}, o.post) }
-  : { keys: Object.assign({}, o || {}), skips: {}, extras: [], post: {} };
-const monthOf = d => done[mk(d)] = done[mk(d)] || norm(null);
-async function loadMonth(m) {
-  if (done[m] || loading[m]) return;
-  loading[m] = true;
-  done[m] = norm(lsGet('home-done-' + m, null));
-  if (db) {
-    try { const s = await db.doc('done/' + m).get(); if (s.exists) { done[m] = norm(s.data()); lsSet('home-done-' + m, done[m]); } }
-    catch (e) { toast('雲端讀取失敗，暫用這台裝置的紀錄'); }
-  }
-  loading[m] = false; render();
+/* ---------- 通用選單面板 ---------- */
+function openPick(title, html, handler){
+  $('pickTitle').textContent = title; $('pickBody').innerHTML = html; pickHandler = handler;
+  if (!$('pick').open) $('pick').showModal();
 }
-const saveTimers = {};
-function saveMonth(m) {
-  lsSet('home-done-' + m, done[m]);
-  if (!db) return;
-  clearTimeout(saveTimers[m]);
-  saveTimers[m] = setTimeout(() => db.doc('done/' + m).set(done[m]).catch(() => toast('未能同步到雲端，已存在這台裝置')), 500);
-}
-// 某天原本排定的項目（含當天新增、扣除當天刪除），每項帶 key = 原定日期|id
-function ownList(d) {
-  const md = done[mk(d)] || norm(null), k = ymd(d);
-  return tasksOn(d).map(t => Object.assign({}, t, { key: k + '|' + t.id }))
-    .concat(md.extras.filter(x => x.date === k).map(x => Object.assign({ freq: 'once' }, x, { key: k + '|' + x.id })))
-    .filter(t => !md.skips[t.key]);
-}
-// 順延：只在「今天」計算。從開始使用日起，未完成且未刪除的項目帶到今天；
-// 同一項目之後若又排到（含今天），以最新那次為準，不重複出現
-let START = null;
-const CARRY_DAYS = 182;
-function carried(d) {
-  if (ymd(d) !== ymd(new Date()) || d.getDay() === 6 || !START) return [];
-  const from = new Date(Math.max(START, sod(d) - CARRY_DAYS * DAY));
-  const latest = {};
-  for (let x = sod(from); x < sod(d); x = new Date(x.getFullYear(), x.getMonth(), x.getDate() + 1)) {
-    if (!done[mk(x)]) { loadMonth(mk(x)); continue; }
-    ownList(x).filter(t => t.freq === 'once').forEach(t => latest[t.id] = Object.assign({}, t, { carry: x }));
-  }
-  ownList(d).forEach(t => delete latest[t.id]);
-  return Object.values(latest).filter(t => !(done[mk(t.carry)] || norm(null)).keys[t.key]);
-}
-const postOf = key => ((done[key.slice(0, 7)] || norm(null)).post || {})[key];
-// 當天清單：排定項目＋尚未完成的單次項目
-function dayList(d, withPosted) {
-  const k = ymd(d);
-  return ownList(d).concat(carried(d));
-}
-function nextWorkday(d) { let n = new Date(d.getFullYear(), d.getMonth(), d.getDate() + 1); if (n.getDay() === 6) n = new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1); return n; }
-const shifts = {}; const shiftLoading = {};
-function shiftOf(d) { const m = shifts[mk(d)]; return m ? (m[ymd(d)] || '') : ''; }
-async function loadShifts(m) {
-  if (shifts[m] || shiftLoading[m]) return;
-  shiftLoading[m] = true;
-  shifts[m] = lsGet('home-shift-' + m, Object.assign({}, DEFAULT_SHIFTS[m] || {}));
-  if (db) {
-    try { const s = await db.doc('shifts/' + m).get(); if (s.exists) { shifts[m] = Object.assign({}, s.data().days || {}); lsSet('home-shift-' + m, shifts[m]); } }
-    catch (e) {}
-  }
-  shiftLoading[m] = false; render();
-}
-let shiftTimer = null;
-function cycleShift(d) {
-  const m = mk(d), map = shifts[m] = shifts[m] || {};
-  const next = SHIFTS[(SHIFTS.indexOf(map[ymd(d)] || '') + 1) % SHIFTS.length];
-  if (next) map[ymd(d)] = next; else delete map[ymd(d)];
-  lsSet('home-shift-' + m, map); render();
-  if (!db) return;
-  clearTimeout(shiftTimer);
-  shiftTimer = setTimeout(() => db.doc('shifts/' + m).set({ days: map }).catch(() => toast('未能同步到雲端，已存在這台裝置')), 600);
-}
-let doneTimer = null;
-// 完成時記下名稱、區域、時間與實際完成日，供「紀錄」頁使用（項目日後被刪減也能顯示）
-function toggle(key, t) {
-  const m = key.slice(0, 7), md = done[m] = done[m] || norm(null);
-  if (md.keys[key]) delete md.keys[key];
-  else md.keys[key] = t ? { n: t.name, a: t.area, m: t.min, at: ymd(new Date()) } : true;
-  saveMonth(m); render();
-}
-async function loadTasks() {
-  const local = lsGet('home-tasks', null);
-  if (local) TASKS = local;
-  if (!db) return;
-  try {
-    const s = await db.doc('config/tasks').get();
-    if (s.exists && Array.isArray(s.data().tasks)) { TASKS = s.data().tasks; lsSet('home-tasks', TASKS); }
-    if (s.exists && s.data().start) { START = new Date(s.data().start + 'T00:00:00'); lsSet('home-start', s.data().start); }
-  } catch (e) { toast('雲端讀取失敗，暫用這台裝置的家務庫'); }
-}
-function initStart() {
-  if (START) return;
-  const st = lsGet('home-start', null);
-  if (st) { START = new Date(st + 'T00:00:00'); return; }
-  START = sod(new Date()); lsSet('home-start', ymd(START)); saveTasks();
-}
-async function saveTasks() {
-  lsSet('home-tasks', TASKS);
-  if (!db) return;
-  try { await db.doc('config/tasks').set(START ? { tasks: TASKS, start: ymd(START) } : { tasks: TASKS }); }
-  catch (e) { toast('未能同步到雲端，已存在這台裝置'); }
-}
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.hidden = false;
-  clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 3200);
-}
+const closePick = () => { if ($('pick').open) $('pick').close(); };
+$('pickBody').addEventListener('click', e => { const b = e.target.closest('button'); if (b && pickHandler) pickHandler(b); });
+$('pickClose').addEventListener('click', closePick);
+// 頁內確認視窗：回傳 true（按確定）或 false（關閉）
+const ask = (title, msg, ok = '確定', danger = false) => new Promise(res => {
+  let yes = false;
+  openPick(title, `<p class="askmsg">${esc(msg)}</p><button type="button" class="okbtn${danger ? ' danger' : ''}">${esc(ok)}</button>`, () => { yes = true; closePick(); });
+  const onClose = () => { if ($('pick').open) return; $('pick').removeEventListener('close', onClose); res(yes); };
+  $('pick').addEventListener('close', onClose);
+});
+$('pick').addEventListener('click', e => { if (e.target === $('pick')) closePick(); });
 
-
-/* ============ 菜單示範資料（取自現有菜單 app 截圖） ============ */
-const COL = { 牛:'#C8423A', 豬:'#D47A9A', 雞:'#E0972F', 海鮮:'#3E74B8', 蛋:'#E3C23A', 豆腐:'#A88466', 蔬菜:'#6E9E5A', 湯:'#5BA3AE', 甜湯:'#9B86C0', 一鍋:'#4B5690' };
-const DEFAULT_SHIFTS = { '2026-10': (() => {
-  const o = {}, put = (a, b, v) => { for (let i = a; i <= b; i++) o[`2026-10-${String(i).padStart(2,'0')}`] = v; };
-  put(1,1,'休假'); put(2,6,'早'); put(7,8,'休假'); put(9,13,'夜'); put(14,15,'休假'); put(16,20,'中'); put(21,21,'休假'); put(22,26,'早'); put(27,28,'休假'); put(29,31,'夜');
-  return o; })() };
-// 日期 → { note } 或 { main, side, fiber, soup } 或 { onepot }，每道菜 [名稱, 類別]
-const WEEK_MENU = {
-  '2026-10-05': { note: '不排餐' },
-  '2026-10-06': { main: [['蒜香奶油檸檬鮭魚','海鮮']], side: [['肉肉包豆腐','豬']], fiber: [['樹子炒水蓮','蔬菜'],['煎櫛瓜','蔬菜']], soup: [['瓜仔雞湯','雞']] },
-  '2026-10-07': { onepot: [['雞肉親子丼','雞']] },
-  '2026-10-08': { main: [['馬鈴薯燉肉','豬']], side: [['蔥燒豆腐','豆腐']], fiber: [['鹹蛋高麗菜','蛋'],['炒青江菜','蔬菜']], soup: [['香菇雞湯','雞']] },
-  '2026-10-09': { main: [['烤鯖魚','海鮮']], side: [['紅蘿蔔煎蛋','蛋']], fiber: [['炒大黃瓜','蔬菜'],['炒高麗菜','蔬菜']], soup: [['酸菜排骨湯','豬']] },
-  '2026-10-10': { note: '公休' },
-  '2026-10-11': { onepot: [['湯烏龍','一鍋']] }
+/* =====================================================
+   排菜引擎（純函式；之後可原封不動搬到雲端函式）
+   ===================================================== */
+/*ENGINE_START*/
+const addUse = (m, id, ds) => { if (!m.has(id)) m.set(id, []); m.get(id).push(ds); };
+const dist = (uses, id, ds) => {
+  let best = Infinity;
+  for (const u of (uses.get(id) || [])) if (u !== ds) best = Math.min(best, Math.abs(dayDiff(u, ds)));
+  return best;
 };
-const RECIPES = [
-  ['主菜', [['三杯雞','雞'],['乾煎豬肉片','豬'],['乾煎雞腿排','雞'],['乾煎鮭魚','海鮮'],['唐揚雞','雞'],['泰式打拋豬','豬'],['洋蔥雞丁','雞'],['清蒸石斑','海鮮'],['清蒸鱸魚','海鮮'],['烤鯖魚','海鮮'],['牛肉炒空心菜','牛'],['美國小牛','牛'],['蒜香奶油檸檬鮭魚','海鮮'],['蒜香奶油蝦','海鮮'],['蔥爆豬肉','豬'],['金沙松阪豬','豬'],['馬鈴薯燉肉','豬']]],
-  ['副菜', [['肉肉包豆腐','豬'],['蔥燒豆腐','豆腐'],['紅蘿蔔煎蛋','蛋'],['番茄炒蛋','蛋'],['蒸蛋','蛋'],['麻婆豆腐','豆腐']]],
-  ['纖維質', [['樹子炒水蓮','蔬菜'],['煎櫛瓜','蔬菜'],['鹹蛋高麗菜','蛋'],['炒青江菜','蔬菜'],['炒大黃瓜','蔬菜'],['炒高麗菜','蔬菜']]],
-  ['湯', [['瓜仔雞湯','雞'],['香菇雞湯','雞'],['酸菜排骨湯','豬']]],
-  ['甜湯', [['綠豆湯','甜湯'],['紅豆湯','甜湯']]],
-  ['一鍋懶人', [['雞肉親子丼','雞'],['湯烏龍','一鍋']]]
-];
-const peopleOf = d => shiftOf(d) === '中' ? 3 : 4;
-const dishesOf = m => m ? [...(m.onepot || []), ...(m.main || []), ...(m.side || []), ...(m.fiber || []), ...(m.soup || [])] : [];
 
-/* ============ 畫面 ============ */
-let cur = sod(new Date()), page = 'today', choresSub = 'week', menuSub = 'week', recipeCat = 0, recipeQ = '';
-let formArea = null, todayForm = false, armed = null, logMonth = null, calMonth = null;
-const $ = s => document.querySelector(s);
-const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
-const sum = list => list.reduce((s, t) => s + (t.min || 0), 0);
-const ICON = {
-  check: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>',
-  plus: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
-  trash: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>',
-  copy: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>',
-  search: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>',
-  today: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.2l2.4 2.4 4.6-5"/></svg>',
-  menu: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r=".8" fill="currentColor"/><circle cx="4.5" cy="12" r=".8" fill="currentColor"/><circle cx="4.5" cy="18" r=".8" fill="currentColor"/></svg>',
-  chores: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M4 11l8-6.5 8 6.5v9H4z"/><path d="M10 20v-5h4v5"/></svg>',
-  shop: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M5 9h14l-1.2 10.5H6.2z"/><path d="M9 9a3 3 0 0 1 6 0"/></svg>',
-  shift: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="4" y="5.5" width="16" height="14.5" rx="2"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></svg>'
-};
-const tag = (n, c) => `<span class="tag" style="--c:${COL[c] || '#999'}">${esc(n)}</span>`;
-const bar = (n, c) => `<span class="bar" style="--c:${COL[c] || '#999'}">${esc(n)}</span>`;
-const legend = () => `<div class="legend">${Object.entries(COL).map(([k, v]) => `<span style="--c:${v}">${k}</span>`).join('')}</div>`;
-const sbox = s => s ? `<span class="sbox">${s === '休假' ? '休' : s}</span>` : '';
-const nav = (label, p, n) => `<div class="rnav"><button data-nav="${p}" aria-label="上一個">‹</button><span>${label}</span><button data-nav="${n}" aria-label="下一個">›</button></div>`;
-const head = (title, right = '') => `<div class="ptitle"><h1>${title}</h1>${right}</div>`;
-const utabs = (items, curKey, attr) => `<div class="utabs">${items.map(([k, v, c]) => `<button ${attr}="${k}" aria-selected="${k === curKey}">${v}${c !== undefined ? `<small>${c}</small>` : ''}</button>`).join('')}</div>`;
-const isDone = t => !!(done[t.key.slice(0, 7)] || norm(null)).keys[t.key];
-const md2 = d => `${d.getMonth() + 1}/${d.getDate()}`;
-
-/* ---------- 今日 ---------- */
-function todayFormHTML() {
-  return `<div class="form">
-    <label>區域<select id="tf-area">${AREAS.map(a => `<option>${a}</option>`).join('')}<option>其他</option></select></label>
-    <label>項目<select id="tf-pick"></select></label>
-    <label id="tf-namewrap" hidden><input id="tf-name" type="text" placeholder="輸入項目" aria-label="其他項目名稱" autocomplete="off"></label>
-    <label>預估時間（分鐘）<input id="tf-min" type="number" inputmode="numeric" min="5" step="5" value="15"></label>
-    <div class="acts"><button class="btn ghost" id="tf-cancel">取消</button><button class="btn dark" id="tf-save">加入今天</button></div>
-  </div>`;
-}
-function renderToday() {
-  const isT = ymd(cur) === ymd(new Date());
-  let h = `<div class="pg-today">` + head('Today') + nav(`${md2(cur)}（${WD[cur.getDay()]}）`, 'day-', 'day+');
-  if (!isT) h += `<div class="center"><button class="link" id="goToday">回到今天</button></div>`;
-  const m = WEEK_MENU[ymd(cur)], sh = shiftOf(cur);
-  h += `<section class="sec"><div class="shead"><h2>Tonight</h2><span class="meta">${sbox(sh)}${m && !m.note ? `<b>${peopleOf(cur)}人</b>` : ''}</span></div>`;
-  h += m && m.note ? `<p class="muted">${m.note}</p>` : m ? `<div class="tags">${dishesOf(m).map(([n, c]) => tag(n, c)).join('')}</div>` : `<p class="muted">尚未排餐</p>`;
-  h += `</section>`;
-
-  const list = dayList(cur), total = sum(list), n = list.filter(isDone).length, left = sum(list.filter(t => !isDone(t)));
-  h += `<section class="sec"><div class="shead"><h2>Chores</h2><span class="meta">${list.length ? `<span class="${total > LIMIT ? 'over' : ''}">${left ? `剩 ${left} 分` : '全部完成'}</span>` : ''}<button class="cplus" id="tadd" aria-label="增加今天的項目" aria-expanded="${todayForm}">${ICON.plus}</button></span></div>`;
-  if (todayForm) h += todayFormHTML();
-  if (!list.length) h += `<p class="muted">${cur.getDay() === 6 ? '週六不排家務' : '今天沒有家務'}</p>`;
-  else {
-    h += `<div class="progress"><i style="width:${n / list.length * 100}%"></i></div>`;
-    groupByArea(list).forEach(([area, ts]) => {
-      h += `<div class="glabel">${esc(area)}</div>` + ts.map(t => {
-        const dn = isDone(t);
-        const badge = t.carry ? `順延 ${md2(t.carry)}` : t.freq === 'quarterly' ? '季' : t.freq === 'halfyear' ? '半年' : t.freq === 'once' ? '單次' : '';
-        return `<button class="check${dn ? ' done' : ''}" data-key="${t.key}" aria-pressed="${dn}"><span class="box">${ICON.check}</span><span class="label">${esc(t.name)}</span>${badge ? `<span class="badge">${esc(badge)}</span>` : ''}<span class="mins">${t.min} 分</span></button>`;
-      }).join('');
-    });
-  }
-  return h + `</section></div>`;
-}
-
-/* ---------- 菜單 ---------- */
-function renderMenu() {
-  let h = head('Menu') + utabs([['week', '本週'], ['recipes', '食譜']], menuSub, 'data-msub');
-  if (menuSub === 'week') {
-    const mon = monday(cur), sun = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6);
-    h += nav(`${md2(mon)} — ${md2(sun)}`, 'week-', 'week+');
-    h += `<div class="btnrow"><button class="btn dark grow" data-demo>排這週菜單</button><button class="btn sq" data-demo aria-label="複製">${ICON.copy}</button><button class="btn sq warn" data-demo aria-label="清除">${ICON.trash}</button></div>`;
-    h += `<div class="mgrid mhead"><span></span><span>主菜</span><span>副菜</span><span>纖維質</span><span>湯</span></div>`;
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + i), m = WEEK_MENU[ymd(d)], sh = shiftOf(d);
-      const ppl = m && !m.note ? `<b>${peopleOf(d)}人</b>` : '';
-      h += `<div class="mgrid mrow${ymd(d) === ymd(new Date()) ? ' now' : ''}"><div class="dcol"><b>週${WD[d.getDay()]}</b><span>${md2(d)}</span><div class="sline">${sbox(sh)}${ppl}</div></div>`;
-      if (!m) h += `<div class="span muted">尚未排餐</div>`;
-      else if (m.note) h += `<div class="span muted">${m.note}</div>`;
-      else if (m.onepot) h += `<div class="span">${m.onepot.map(([n, c]) => bar(n, c)).join('')}</div>`;
-      else h += ['main', 'side', 'fiber', 'soup'].map(k => `<div class="cell">${(m[k] || []).map(([n, c]) => bar(n, c)).join('')}</div>`).join('');
-      h += `</div>`;
-    }
-    h += `<p class="note">示範資料取自現有菜單 app；正式版會直接讀取 Supabase。</p>` + legend();
-  } else {
-    const q = recipeQ.trim();
-    h += `<div class="search">${ICON.search}<input id="rq" type="search" placeholder="搜尋菜名" value="${esc(recipeQ)}" aria-label="搜尋菜名"></div>`;
-    h += utabs(RECIPES.map(([c, items], i) => [String(i), c, items.length]), String(recipeCat), 'data-rcat');
-    const items = q ? RECIPES.flatMap(r => r[1]).filter(([n]) => n.includes(q)) : RECIPES[recipeCat][1];
-    h += `<div class="tags big">${items.map(([n, c]) => tag(n, c)).join('') || '<p class="muted">找不到符合的菜名</p>'}</div>` + legend();
-  }
-  return h;
-}
-
-/* ---------- 家務 ---------- */
-function renderChores() {
-  const right = choresSub === 'lib' ? `<button class="cplus" data-add="${AREAS[0]}" aria-label="增加家務" aria-expanded="${!!formArea}">${ICON.plus}</button>` : '';
-  let h = head('Chores', right) + utabs([['week', '本週'], ['lib', '家務庫', TASKS.length]], choresSub, 'data-csub');
-  if (choresSub === 'week') {
-    const mon = monday(cur), sun = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6);
-    h += nav(`${md2(mon)} — ${md2(sun)}`, 'week-', 'week+') + `<div class="rule"></div>`;
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + i), list = dayList(d), total = sum(list);
-      const body = d.getDay() === 6 && !list.length ? `<span class="muted">公休</span>`
-        : groupByArea(list).map(([a, ts]) => `<span class="aline">${esc(a)}<em>${ts.length} 項</em></span>`).join('') || `<span class="muted">無</span>`;
-      h += `<button class="wrow${ymd(d) === ymd(new Date()) ? ' now' : ''}" data-day="${ymd(d)}"><div class="dcol"><b>週${WD[d.getDay()]}</b><span>${md2(d)}</span>${list.length ? `<div class="sline"><b class="${total > LIMIT ? 'over' : ''}">${total}分</b></div>` : ''}</div><div class="wbody">${body}</div></button>`;
-    }
-    h += `<p class="note">點日期可切換到該日的今日頁。</p>`;
-  } else if (choresSub === 'lib') {
-    if (formArea) h += formHTML(formArea);
-    AREAS.forEach(a => {
-      const ts = TASKS.filter(t => t.area === a);
-      h += `<div class="ahead">${a}<span>${ts.length} 項</span></div>` + ts.map(t => `<div class="lrow"><span class="n">${esc(t.name)}</span><span class="f">${FREQ[t.freq]}・${t.min} 分<br>${whereText(t)}</span><button class="ibtn${armed === t.id ? ' arm' : ''}" data-del="${t.id}" aria-label="${armed === t.id ? '再點一次確認刪減' : '刪減'} ${esc(t.name)}">${ICON.trash}</button></div>`).join('');
-    });
-  } else {
-    const base = logMonth || new Date(cur.getFullYear(), cur.getMonth(), 1), m = mk(base);
-    loadMonth(m);
-    const md = done[m] || norm(null), byDay = {};
-    Object.entries(md.keys).forEach(([key, v]) => {
-      const [date, id] = key.split('|');
-      let info = typeof v === 'object' ? v : null;
-      if (!info) { const t = TASKS.find(x => x.id === id) || md.extras.find(x => x.id === id); info = t ? { n: t.name, a: t.area, m: t.min } : { n: '（已刪減的項目）', a: '', m: 0 }; }
-      (byDay[info.at || date] = byDay[info.at || date] || []).push(info);
-    });
-    const days = Object.keys(byDay).sort().reverse(), all = days.flatMap(x => byDay[x]);
-    h += nav(`${base.getFullYear()} 年 ${base.getMonth() + 1} 月`, 'log-', 'log+') + `<div class="shead"><span class="meta"><b>${all.length}</b> 項</span><span class="meta">共 ${all.reduce((s, x) => s + (x.m || 0), 0)} 分</span></div>`;
-    if (!days.length) h += `<p class="muted">這個月還沒有完成紀錄</p>`;
-    days.forEach(x => {
-      const dt = new Date(x + 'T00:00:00'), l = byDay[x];
-      h += `<div class="ahead">${md2(dt)}（${WD[dt.getDay()]}）<span>${l.length} 項</span></div>` + l.map(i => `<div class="lrow"><span class="n">${esc(i.n)}</span><span class="f">${esc(i.a)}${i.m ? `・${i.m} 分` : ''}</span></div>`).join('');
-    });
-  }
-  return h;
-}
-function formHTML(area) {
-  return `<div class="form">
-    <label>區域<select id="f-area">${AREAS.map(a => `<option${a === area ? ' selected' : ''}>${a}</option>`).join('')}</select></label>
-    <label>項目名稱<input id="f-name" type="text" autocomplete="off"></label>
-    <div class="two"><label>週期<select id="f-freq">${Object.entries(FREQ).map(([k, v]) => `<option value="${k}"${k === 'monthly' ? ' selected' : ''}>${v}</option>`).join('')}</select></label>
-    <label>預估時間（分鐘）<input id="f-min" type="number" inputmode="numeric" min="5" step="5" value="15"></label></div>
-    <label id="f-mwrap" hidden>月份<select id="f-months">${MONTH_PAIRS.map((p, i) => `<option value="${i}">${p[0]}、${p[1]} 月</option>`).join('')}</select></label>
-    <div class="acts"><button class="btn ghost" id="f-cancel">取消</button><button class="btn dark" id="f-save">加入</button></div>
-  </div>`;
-}
-
-/* ---------- 待買 ---------- */
-function renderShop() {
-  const items = lsGet('home-shoplist', []);
-  let h = head('Shopping') + `<div class="addrow"><input id="sq" type="text" placeholder="新增品項（可輸入多個）" aria-label="新增品項"><button class="btn dark" id="sadd">加入</button></div>
-    <div class="btnrow"><button class="btn line grow" id="sfrom">從菜單帶入</button><button class="btn sq" id="scopy" aria-label="複製清單">${ICON.copy}</button><button class="btn sq warn" id="sclear" aria-label="清除已買" ${items.some(i => i.d) ? '' : 'disabled'}>${ICON.trash}</button></div>`;
-  if (!items.length) return h + `<p class="muted">還沒有待買的東西。<br>可以從菜單帶入，或自己新增。</p>`;
-  return h + `<div class="rule"></div>` + items.map((it, i) => `<button class="check${it.d ? ' done' : ''}" data-shop="${i}" aria-pressed="${!!it.d}"><span class="box">${ICON.check}</span><span class="label">${esc(it.n)}</span></button>`).join('');
-}
-
-/* ---------- 班別 ---------- */
-function renderShift() {
-  const base = calMonth || new Date(cur.getFullYear(), cur.getMonth(), 1), y = base.getFullYear(), m = base.getMonth();
-  loadShifts(mk(base));
-  const start = new Date(y, m, 1 - mod(new Date(y, m, 1).getDay() - 1, 7));
-  let h = head('Shift') + nav(`${y} 年 ${m + 1} 月`, 'cal-', 'cal+') + `<div class="cal">${['一','二','三','四','五','六','日'].map(w => `<span class="ch">${w}</span>`).join('')}`;
-  for (let i = 0; i < 42; i++) {
-    const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
-    if (d.getMonth() !== m) loadShifts(mk(d));
-    const sh = shiftOf(d), cls = { 早: 'e', 中: 'mid', 夜: 'n', 休假: 'off' }[sh] || '';
-    h += `<button class="cell2 ${cls}${d.getMonth() !== m ? ' out' : ''}" data-shift="${ymd(d)}" aria-label="${md2(d)} ${sh || '未設定'}"><span class="${ymd(d) === ymd(new Date()) ? 'td' : ''}">${d.getDate()}</span><b>${sh || '・'}</b></button>`;
-  }
-  const last = lastShiftDate(), ext = last ? new Date(last.getFullYear(), last.getMonth() + 2, 0) : null;
-  h += `</div><p class="note">點日期設定班別。早＝黃、中＝粉紅、夜＝藍。中班不在家吃晚餐，用餐人數自動算 3 人。</p>`;
-  h += `<div class="fsec">區間填入</div>
-    <div class="two2"><label>從<input id="rf" type="date"></label><label>到<input id="rt" type="date"></label></div>
-    <label class="fl">班別<select id="rs">${['早','中','夜','休假'].map(x => `<option>${x}</option>`).join('')}<option value="">清除</option></select></label>
-    <button class="btn dark full" id="rfill">填入這段日期</button>`;
-  h += `<div class="fsec">依循環延伸</div>
-    <p class="note" style="margin-top:0">${CYCLE_TEXT}，從已輸入的最後一天${last ? `（${md2(last)}）` : ''}往後推。之後班表出來請核對。</p>
-    <label class="fl">延伸到<input id="rx" type="date" value="${ext ? ymd(ext) : ''}"></label>
-    <button class="btn line full" id="rext">依循環延伸</button>`;
-  return h;
-}
-
-/* ---------- 班別：區間填入與循環延伸 ---------- */
-const CYCLE = [].concat(Array(5).fill('中'), ['休假'], Array(5).fill('早'), ['休假','休假'], Array(5).fill('夜'), ['休假','休假']);
-const CYCLE_TEXT = '中5天 → 休1天 → 早5天 → 休2天 → 夜5天 → 休2天';
-const parseD = v => { const [y, m, d] = v.split('-').map(Number); return new Date(y, m - 1, d); };
-function setShift(d, v) {
-  const m = mk(d), map = shifts[m] = shifts[m] || lsGet('home-shift-' + m, Object.assign({}, DEFAULT_SHIFTS[m] || {}));
-  if (v) map[ymd(d)] = v; else delete map[ymd(d)];
-}
-function saveShifts(months) {
-  months.forEach(m => { lsSet('home-shift-' + m, shifts[m]); if (db) db.doc('shifts/' + m).set({ days: shifts[m] }).catch(() => {}); });
-}
-function lastShiftDate() {
-  const now = new Date(); let best = null;
-  for (let i = -3; i <= 14; i++) {
-    const m = mk(new Date(now.getFullYear(), now.getMonth() + i, 1));
-    const map = shifts[m] || lsGet('home-shift-' + m, DEFAULT_SHIFTS[m] || {});
-    Object.keys(map).forEach(k => { if (map[k] && (!best || k > best)) best = k; });
-  }
-  return best ? parseD(best) : null;
-}
-// 找出最後一天在循環中的位置：比對最近 20 天，取吻合最長的位置
-function cyclePos(last) {
-  let best = { p: -1, n: -1 };
-  for (let p = 0; p < CYCLE.length; p++) {
-    let n = 0;
-    for (let k = 0; k < CYCLE.length; k++) {
-      const v = shiftOf(new Date(last.getFullYear(), last.getMonth(), last.getDate() - k));
-      if (!v) break;
-      if (v !== CYCLE[mod(p - k, CYCLE.length)]) break;
-      n++;
-    }
-    if (n > best.n) best = { p, n };
+// 從符合硬規則的食譜中挑一道；軟規則（重複窗口、食材重疊）用扣分處理，庫存不足時自動放寬
+function choose(uses, ds, slot, beefOk, chosen, exclude){
+  const egg = chosen.some(c => c.ingredients.includes('蛋'));
+  const tagsUsed = new Set(chosen.flatMap(c => c.ingredients));
+  const idsUsed = new Set(chosen.map(c => c.id));
+  const win = catSet[slot];
+  let best = null, bs = -1e9;
+  for (const r of recipes){
+    if (!r.active || r.category !== slot || idsUsed.has(r.id) || (exclude && exclude.has(r.id))) continue;
+    if (r.has_beef && !beefOk) continue;                       // 硬規則：含牛只排爸爸不在家的日子
+    if (egg && r.ingredients.includes('蛋')) continue;         // 硬規則：同一餐蛋類最多 1 道
+    const dd = dist(uses, r.id, ds);
+    let s = Math.min(dd, 60) + (r.kid_rating || 3) * 2 + Math.random() * 8;
+    if (win != null ? dd < win : dd <= 1) s -= 100;            // 軟規則：重複窗口（副菜只避免連續兩天）
+    s -= r.ingredients.filter(t => tagsUsed.has(t)).length * 25; // 軟規則：同餐食材不重疊
+    if (beefOk && r.has_beef) s += 6;
+    if (s > bs){ bs = s; best = r; }
   }
   return best;
 }
 
-/* ---------- 共用 ---------- */
-const PAGES = [['today', 'Today', 'today'], ['menu', 'Menu', 'menu'], ['chores', 'Chores', 'chores'], ['shop', 'Shopping', 'shop'], ['shift', 'Shift', 'shift']];
-function render() {
-  const mon0 = monday(cur);
-  loadMonth(mk(cur)); loadMonth(mk(mon0)); loadMonth(mk(new Date(mon0.getFullYear(), mon0.getMonth(), mon0.getDate() + 6)));
-  loadShifts(mk(cur)); loadShifts(mk(mon0)); loadShifts(mk(new Date(mon0.getFullYear(), mon0.getMonth(), mon0.getDate() + 6)));
-  $('#main').innerHTML = ({ today: renderToday, menu: renderMenu, chores: renderChores, shop: renderShop, shift: renderShift })[page]();
-  $('#tabbar').innerHTML = PAGES.map(([k, v, ic]) => `<button data-page="${k}" aria-current="${page === k ? 'page' : 'false'}">${ICON[ic]}<span>${v}</span></button>`).join('');
-  const ta = $('#tf-area');
-  if (ta) {
-    const pick = $('#tf-pick');
-    const syncPick = () => { const t = TASKS.find(x => x.id === pick.value); $('#tf-namewrap').hidden = !!t; if (t) $('#tf-min').value = t.min; };
-    const syncArea = () => { pick.innerHTML = TASKS.filter(t => t.area === ta.value).map(t => `<option value="${t.id}">${esc(t.name)}（${t.min} 分）</option>`).join('') + `<option value="">其他</option>`; syncPick(); };
-    ta.onchange = syncArea; pick.onchange = syncPick; syncArea();
+function planDay(uses, ds, type, sh){
+  const cfg = shiftSet[sh] || { headcount: 4, fiber_count: 2 };
+  const beefOk = ABSENT.includes(sh);
+  const slots = type === '一鍋'
+    ? [['一鍋懶人料理', 1]]
+    : [['主菜',1], ['副菜',1], ['湯',1], ...Array.from({ length: cfg.fiber_count }, (_, i) => ['纖維質', i+1])];
+  const chosen = [], rows = [];
+  for (const [slot, pos] of slots){
+    const r = choose(uses, ds, slot, beefOk, chosen);
+    if (r){ chosen.push(r); rows.push({ meal_date: ds, slot, position: pos, recipe_id: r.id }); addUse(uses, r.id, ds); }
   }
-  const fq = $('#f-freq'); if (fq) { const s = () => $('#f-mwrap').hidden = fq.value !== 'halfyear'; fq.onchange = s; s(); }
-  const rq = $('#rq'); if (rq) rq.oninput = () => { recipeQ = rq.value; const p = rq.selectionStart; render(); const n = $('#rq'); n.focus(); n.setSelectionRange(p, p); };
-  const gt = $('#goToday'); if (gt) gt.onclick = () => { cur = sod(new Date()); render(); };
+  return { headcount: cfg.headcount, rows, missing: slots.length - rows.length };
 }
-function shift(d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+/*ENGINE_END*/
 
-document.addEventListener('click', e => {
-  const q = s => e.target.closest(s);
-  let b;
-  if (b = q('[data-page]')) { page = b.dataset.page; formArea = null; todayForm = false; armed = null; window.scrollTo(0, 0); return render(); }
-  if (b = q('[data-nav]')) {
-    const k = b.dataset.nav;
-    if (k === 'day-') cur = shift(cur, -1); if (k === 'day+') cur = shift(cur, 1);
-    if (k === 'week-') cur = shift(cur, -7); if (k === 'week+') cur = shift(cur, 7);
-    const lb = logMonth || new Date(cur.getFullYear(), cur.getMonth(), 1), cb = calMonth || new Date(cur.getFullYear(), cur.getMonth(), 1);
-    if (k === 'log-') logMonth = new Date(lb.getFullYear(), lb.getMonth() - 1, 1); if (k === 'log+') logMonth = new Date(lb.getFullYear(), lb.getMonth() + 1, 1);
-    if (k === 'cal-') calMonth = new Date(cb.getFullYear(), cb.getMonth() - 1, 1); if (k === 'cal+') calMonth = new Date(cb.getFullYear(), cb.getMonth() + 1, 1);
-    todayForm = false; return render();
+/* ---------- 本週菜單 ---------- */
+const bySlot = (a, b) => SLOT_ORDER.indexOf(a.slot) - SLOT_ORDER.indexOf(b.slot) || a.position - b.position;
+
+async function loadWeek(){
+  const s = fmt(weekStart), e = fmt(addDays(weekStart, 6));
+  const rs = await Promise.all([
+    db.from('shifts').select('*').gte('shift_date', s).lte('shift_date', e),
+    db.from('meals').select('*').gte('meal_date', s).lte('meal_date', e),
+    db.from('meal_items').select('*').gte('meal_date', s).lte('meal_date', e)
+  ]);
+  const bad = rs.find(x => x.error);
+  if (bad){ toast('讀取失敗：' + bad.error.message, true); return false; }
+  wShifts = Object.fromEntries(rs[0].data.map(x => [x.shift_date, x]));
+  wMeals = Object.fromEntries(rs[1].data.map(x => [x.meal_date, x]));
+  wItems = rs[2].data;
+  return true;
+}
+async function renderMenu(){ if (await loadWeek()) drawMenu(); }
+
+const KINDS = ['牛','豬','雞','海鮮','蛋','豆腐','蔬菜','湯','甜湯','一鍋'];
+const PROT = ['牛','豬','雞','海鮮','蛋','豆腐'];
+// 依食材判斷顏色分類：牛 > 豬 > 雞 > 海鮮 > 蛋 > 豆腐，其餘依分類
+function kindOf(r){
+  if (!r) return '一鍋';
+  const t = r.ingredients || [];
+  if (r.has_beef || t.includes('牛')) return '牛';
+  if (t.includes('豬')) return '豬';
+  if (t.includes('雞')) return '雞';
+  if (['魚','蝦','海鮮'].some(x => t.includes(x))) return '海鮮';
+  if (t.includes('蛋')) return '蛋';
+  if (t.includes('豆腐')) return '豆腐';
+  return { '纖維質':'蔬菜', '湯':'湯', '甜湯':'甜湯' }[r.category] || '一鍋';
+}
+const legendHtml = ks => ks.map(k => `<span><i class="dot k-${k}"></i>${k}</span>`).join('');
+function renderLegends(){ $('legMenu').innerHTML = legendHtml(KINDS.filter(k => k !== '甜湯')); $('legRec').innerHTML = legendHtml(KINDS); }
+function dishChip(it){
+  const r = byId[it.recipe_id], k = kindOf(r);
+  return `<button type="button" class="dish k-${k}" data-item="${esc(it.id)}">${k === '牛' ? '<i class="bf">牛</i>' : ''}${esc(r ? r.name : '（已刪除）')}</button>`;
+}
+
+function weekRow(i){
+  const d = addDays(weekStart, i), ds = fmt(d), m = wMeals[ds], sh = wShifts[ds] && wShifts[ds].shift, cfg = shiftSet[sh];
+  const type = m ? m.day_type : weekdaySet[i+1];
+  const its = wItems.filter(x => x.meal_date === ds).sort(bySlot);
+  const hc = type === '公休' ? '' : (m && m.headcount ? m.headcount : (cfg ? cfg.headcount : 4));
+  const flags = (m && m.status === '確認' ? '<span class="ok">✓</span>' : '') +
+    (m && type !== '公休' && cfg && m.headcount !== cfg.headcount ? '<span class="wn">!</span>' : '');
+  const l3 = sh ? `<span class="sq">${sh === '休假' ? '休' : esc(sh)}</span>${hc ? `<b>${hc}人</b>` : ''}` : '<span class="no">未輸入</span>';
+  const dc = `<button type="button" class="dc" data-d="${ds}"><span><b>週${WD[d.getDay()]}</b>${flags}</span><span class="d1">${md(ds)}</span><span class="d2">${l3}</span></button>`;
+  let cells;
+  if (type === '公休') cells = `<div class="em">${m && m.status === '跳過' ? '不排餐' : '公休'}</div>`;
+  else if (!its.length) cells = `<div class="em">尚未排餐</div>`;
+  else if (type === '一鍋') cells = `<div class="wc span">${its.map(dishChip).join('')}</div>`;
+  else cells = ['主菜','副菜','纖維質','湯'].map(s => `<div class="wc">${its.filter(x => x.slot === s).map(dishChip).join('')}</div>`).join('');
+  return `<div class="wr" data-d="${ds}">${dc}${cells}</div>`;
+}
+
+function drawMenu(){
+  const e = addDays(weekStart, 6);
+  $('weekLabel').textContent = `${weekStart.getMonth()+1}/${weekStart.getDate()} – ${e.getMonth()+1}/${e.getDate()}`;
+  let noShift = 0;
+  for (let i = 0; i < 7; i++){
+    const ds = fmt(addDays(weekStart, i)), m = wMeals[ds];
+    if ((m ? m.day_type : weekdaySet[i+1]) !== '公休' && !(wShifts[ds] && wShifts[ds].shift)) noShift++;
   }
-  if (b = q('[data-msub]')) { menuSub = b.dataset.msub; return render(); }
-  if (b = q('[data-csub]')) { choresSub = b.dataset.csub; formArea = null; armed = null; return render(); }
-  if (b = q('[data-rcat]')) { recipeCat = +b.dataset.rcat; recipeQ = ''; return render(); }
-  if (q('[data-demo]')) return toast('示範版：此按鈕沿用現有菜單 app 的功能');
-  if (b = q('[data-key]')) return toggle(b.dataset.key, dayList(cur).find(x => x.key === b.dataset.key));
-  if (b = q('[data-day]')) { const [y, m, d] = b.dataset.day.split('-').map(Number); cur = new Date(y, m - 1, d); page = 'today'; window.scrollTo(0, 0); return render(); }
-  if (b = q('[data-shift]')) { const [y, m, d] = b.dataset.shift.split('-').map(Number); return cycleShift(new Date(y, m - 1, d)); }
-  if (q('#tadd')) { todayForm = !todayForm; return render(); }
-  if (q('#tf-cancel')) { todayForm = false; return render(); }
-  if (q('#tf-save')) {
-    const lib = TASKS.find(x => x.id === $('#tf-pick').value);
-    const name = lib ? lib.name : $('#tf-name').value.trim(), min = parseInt($('#tf-min').value, 10);
-    if (!name) { $('#tf-name').focus(); return toast('請輸入項目'); }
-    if (!(min > 0)) return toast('請輸入預估時間');
-    monthOf(cur).extras.push({ id: 'x' + Date.now().toString(36), date: ymd(cur), area: $('#tf-area').value, name, min });
-    saveMonth(mk(cur)); todayForm = false; render();
-    const tot = sum(dayList(cur)); return toast(tot > LIMIT ? `已加入，今天共 ${tot} 分，超過 1 小時` : '已加入今天');
-  }
-  if (b = q('[data-add]')) { formArea = formArea ? null : b.dataset.add; armed = null; return render(); }
-  if (q('#f-cancel')) { formArea = null; return render(); }
-  if (q('#f-save')) {
-    const name = $('#f-name').value.trim(), min = parseInt($('#f-min').value, 10), freq = $('#f-freq').value;
-    if (!name) { $('#f-name').focus(); return toast('請輸入項目名稱'); }
-    if (!(min > 0)) return toast('請輸入預估時間');
-    const task = { id: 't' + Date.now().toString(36), area: $('#f-area').value, name, freq, min };
-    if (freq === 'halfyear') task.months = MONTH_PAIRS[+$('#f-months').value];
-    const peak = place(task); TASKS.push(task); saveTasks(); formArea = null; render();
-    return toast(peak > LIMIT ? `已排入${whereText(task)}，該日將達 ${peak} 分` : `已排入${whereText(task)}`);
-  }
-  if (b = q('[data-del]')) {
-    const id = b.dataset.del;
-    if (armed !== id) { armed = id; return render(); }
-    const t = TASKS.find(x => x.id === id); TASKS = TASKS.filter(x => x.id !== id); armed = null; saveTasks(); render();
-    return toast(`已刪減「${t.name}」`);
-  }
-  if (q('#rfill')) {
-    const f = $('#rf').value, t = $('#rt').value, v = $('#rs').value;
-    if (!f || !t) return toast('請選擇起訖日期');
-    let a = parseD(f), z = parseD(t); if (a > z) [a, z] = [z, a];
-    const ms = new Set();
-    for (let d = a; d <= z; d = shift(d, 1)) { setShift(d, v); ms.add(mk(d)); }
-    saveShifts(ms); render(); return toast(`已填入 ${md2(a)}–${md2(z)}：${v || '清除'}`);
-  }
-  if (q('#rext')) {
-    const last = lastShiftDate(), to = $('#rx').value;
-    if (!last) return toast('請先輸入至少一段班別');
-    if (!to) return toast('請選擇延伸到哪一天');
-    const end = parseD(to);
-    if (end <= last) return toast(`已輸入到 ${md2(last)}，請選擇更晚的日期`);
-    const { p, n } = cyclePos(last);
-    if (n < 3) return toast('最近的班別與循環對不上，請先手動核對');
-    const ms = new Set(); let i = p;
-    for (let d = shift(last, 1); d <= end; d = shift(d, 1)) { i = (i + 1) % CYCLE.length; setShift(d, CYCLE[i]); ms.add(mk(d)); }
-    saveShifts(ms); render(); return toast(`已依循環延伸到 ${md2(end)}`);
-  }
-  if (q('#sadd')) {
-    const v = $('#sq').value.split(/[,，、\s]+/).map(x => x.trim()).filter(Boolean);
-    if (!v.length) return $('#sq').focus();
-    lsSet('home-shoplist', lsGet('home-shoplist', []).concat(v.map(n => ({ n })))); return render();
-  }
-  if (q('#sfrom')) {
-    const mon = monday(cur), names = [];
-    for (let i = 0; i < 7; i++) dishesOf(WEEK_MENU[ymd(shift(mon, i))]).forEach(([n]) => names.push(n));
-    const have = new Set(lsGet('home-shoplist', []).map(i => i.n));
-    lsSet('home-shoplist', lsGet('home-shoplist', []).concat(names.filter(n => !have.has(n)).map(n => ({ n }))));
-    render(); return toast('示範版以菜名帶入；正式版會帶入食材');
-  }
-  if (q('#scopy')) { const t = lsGet('home-shoplist', []).filter(i => !i.d).map(i => i.n).join('\n'); try { navigator.clipboard.writeText(t); toast('已複製待買清單'); } catch (er) { toast('無法複製'); } return; }
-  if (q('#sclear')) { lsSet('home-shoplist', lsGet('home-shoplist', []).filter(i => !i.d)); render(); return toast('已清除已買項目'); }
-  if (b = q('[data-shop]')) { const l = lsGet('home-shoplist', []); l[+b.dataset.shop].d = !l[+b.dataset.shop].d; lsSet('home-shoplist', l); return render(); }
+  $('mClear').disabled = !Object.keys(wMeals).length;
+  $('days').innerHTML = `<div class="wr hd"><span></span><span>主菜</span><span>副菜</span><span>纖維質</span><span>湯</span></div>` +
+    Array.from({ length: 7 }, (_, i) => weekRow(i)).join('');
+  $('menuNote').innerHTML = noShift ? `<span class="warn">${noShift} 天尚未輸入班別</span>，先以 4 人、不含牛排。請到「爸爸班別」輸入。` : '';
+}
+
+$('mClear').addEventListener('click', async () => {
+  const days = Object.keys(wMeals); if (!days.length) return toast('本週沒有菜單可以清空');
+  if (!(await ask('清空本週菜單？', `會移除這週已排的 ${wItems.length} 道菜，包含已確認的日子，也會取消「不排餐」與改排的設定，全部回到預設。`, '清空', true))) return;
+  const bm = Object.values(wMeals).map(m => ({ meal_date: m.meal_date, day_type: m.day_type, headcount: m.headcount, status: m.status, notes: m.notes ?? null }));
+  const bi = wItems.map(x => ({ meal_date: x.meal_date, slot: x.slot, position: x.position, recipe_id: x.recipe_id }));
+  const r = await db.from('meals').delete().in('meal_date', days);
+  if (r.error) return toast('清空失敗：' + r.error.message, true);
+  await renderMenu();
+  toast('已清空本週菜單', false, { label: '復原', fn: async () => {
+    let w = await db.from('meals').insert(bm);
+    if (!w.error && bi.length) w = await db.from('meal_items').insert(bi);
+    if (w.error) return toast('復原失敗：' + w.error.message, true);
+    await renderMenu();
+  } });
 });
-document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'sq') $('#sadd').click(); });
+$('wPrev').addEventListener('click', () => { weekStart = addDays(weekStart, -7); renderMenu(); });
+$('wNext').addEventListener('click', () => { weekStart = addDays(weekStart, 7); renderMenu(); });
+$('gen').addEventListener('click', async () => {
+  if (wItems.length && !(await ask('重排本週菜單？', '本週已有菜單，重排會覆蓋尚未確認的日子。\n已確認與「不排餐」的日子會保留。', '重排'))) return;
+  generate(null, false);
+});
 
-(async () => {
-  await loadTasks(); initStart(); render();
-})();
+async function generate(only, force, overrides){
+  const targets = [];
+  for (let i = 0; i < 7; i++){
+    const ds = fmt(addDays(weekStart, i)), m = wMeals[ds];
+    if (only && !only.includes(ds)) continue;
+    if (!force && m && ['確認','已煮','跳過'].includes(m.status)) continue;
+    targets.push(ds);
+  }
+  if (!targets.length) return toast('沒有需要排的日子（已確認或不排餐的日子會保留）');
+  $('gen').disabled = true;
+  try {
+    const h = await db.from('meal_items').select('meal_date,recipe_id')
+      .gte('meal_date', fmt(addDays(weekStart, -35))).lte('meal_date', fmt(addDays(weekStart, 41)));
+    if (h.error) return toast('讀取歷史菜單失敗：' + h.error.message, true);
+    const uses = new Map();
+    h.data.filter(x => !targets.includes(x.meal_date)).forEach(x => addUse(uses, x.recipe_id, x.meal_date));
+    const mealRows = [], itemRows = []; let missing = 0, unknownShift = 0;
+    for (const ds of targets){
+      const m0 = wMeals[ds], sh = wShifts[ds] && wShifts[ds].shift;
+      const type = (overrides && overrides[ds]) || (m0 && (m0.day_type === '正餐' || m0.day_type === '一鍋') ? m0.day_type : weekdaySet[isoWd(parse(ds))]);
+      if (type === '公休'){ mealRows.push({ meal_date: ds, day_type: '公休', headcount: null, status: '草稿' }); continue; }
+      if (!sh) unknownShift++;
+      const p = planDay(uses, ds, type, sh);
+      missing += p.missing;
+      mealRows.push({ meal_date: ds, day_type: type, headcount: p.headcount, status: '草稿' });
+      itemRows.push(...p.rows);
+    }
+    let r = await db.from('meals').delete().in('meal_date', targets);
+    if (!r.error) r = await db.from('meals').insert(mealRows);
+    if (!r.error && itemRows.length) r = await db.from('meal_items').insert(itemRows);
+    if (r.error) return toast('儲存菜單失敗：' + r.error.message, true);
+    await renderMenu();
+    toast(missing ? `已排好，但有 ${missing} 個位置找不到可用的食譜，請補充食譜。` : (unknownShift ? `已排好。有 ${unknownShift} 天沒有班別，先以 4 人排。` : '已排好本週菜單'), !!missing);
+  } finally { $('gen').disabled = false; }
+}
 
+$('days').addEventListener('click', e => {
+  const dish = e.target.closest('.dish');
+  if (dish) return swapSheet(dish.dataset.item);
+  const dc = e.target.closest('.dc');
+  if (dc) dayMenu(dc.dataset.d);
+});
+function dayMenu(ds){
+  const d = parse(ds), wdType = weekdaySet[isoWd(d)], m = wMeals[ds], type = m ? m.day_type : wdType;
+  const its = wItems.filter(x => x.meal_date === ds), has = its.length > 0;
+  const sh = wShifts[ds] && wShifts[ds].shift, cfg = shiftSet[sh], skipped = m && m.status === '跳過';
+  const info = [sh ? (sh === '休假' ? '休假' : sh + '班') : '班別未輸入',
+    skipped ? '這天不排餐' : (type === '公休' ? '公休' : `${m && m.headcount ? m.headcount : (cfg ? cfg.headcount : 4)} 人 · ${type}`),
+    m && m.status === '確認' ? '已確認' : '',
+    type !== '公休' && type !== wdType ? `預設為${wdType}` : ''].filter(Boolean).join(' · ');
+  // 每天都可以選「正餐」或「一鍋」；預設的排法（週三、週日一鍋，週六公休，其餘正餐）不變
+  const opts = [['plan', '正餐'], ['plan', '一鍋']].map(([a, t]) => [a, t, (type === t && has ? '重排' : '排') + (t === '一鍋' ? '一鍋' : '正餐'), type === t && has]);
+  if (has) opts.push(['lock', '', m && m.status === '確認' ? '取消確認' : '確認這天', false]);
+  if (type !== '公休') opts.push(['skip', '', '不排餐', false]);
+  openPick(`週${WD[d.getDay()]} ${md(ds)}`, `<p class="askmsg">${esc(info)}</p>` +
+    opts.map(([a, t, l, cur]) => `<button data-a="${a}" data-t="${t}">${l}${cur ? '<small>目前</small>' : ''}</button>`).join(''),
+    btn => { closePick(); dayAct(ds, btn.dataset.a, btn.dataset.t || undefined); });
+}
+async function dayAct(ds, act, t){
+  const m = wMeals[ds];
+  if (act === 'redo'){
+    if (m && m.status === '確認' && !(await ask('重排這天？', '這天已確認，重排會覆蓋目前的菜。', '重排'))) return;
+    return generate([ds], true);
+  }
+  if (act === 'unskip') return generate([ds], true);
+  if (act === 'plan'){
+    if (m && m.status === '確認' && !(await ask('重排這天？', '這天已確認，重排會覆蓋目前的菜。', '重排'))) return;
+    return generate([ds], true, { [ds]: t });
+  }
+  if (act === 'lock'){
+    const r = await db.from('meals').update({ status: m.status === '確認' ? '草稿' : '確認' }).eq('meal_date', ds);
+    if (r.error) return toast('更新失敗：' + r.error.message, true);
+    return renderMenu();
+  }
+  if (act === 'skip'){
+    if (!(await ask('這天不排餐？', '例如外食、出遊。已排的菜會移除。', '不排餐'))) return;
+    let r = await db.from('meals').delete().in('meal_date', [ds]);
+    if (!r.error && weekdaySet[isoWd(parse(ds))] !== '公休') r = await db.from('meals').insert({ meal_date: ds, day_type: '公休', headcount: null, status: '跳過' });
+    if (r.error) return toast('更新失敗：' + r.error.message, true);
+    return renderMenu();
+  }
+}
+
+async function swapSheet(itemId){
+  const it = wItems.find(x => x.id === itemId); if (!it) return;
+  const ds = it.meal_date, sh = wShifts[ds] && wShifts[ds].shift, beefOk = ABSENT.includes(sh);
+  const h = await db.from('meal_items').select('id,meal_date,recipe_id')
+    .gte('meal_date', fmt(addDays(parse(ds), -35))).lte('meal_date', fmt(addDays(parse(ds), 35)));
+  if (h.error) return toast('讀取失敗：' + h.error.message, true);
+  const uses = new Map();
+  h.data.filter(x => x.id !== it.id).forEach(x => addUse(uses, x.recipe_id, x.meal_date));
+  const others = wItems.filter(x => x.meal_date === ds && x.id !== it.id).map(x => byId[x.recipe_id]).filter(Boolean);
+  const egg = others.some(r => r.ingredients.includes('蛋')), ids = new Set(others.map(r => r.id));
+  const list = recipes
+    .filter(r => r.active && r.category === it.slot && !ids.has(r.id) && (beefOk || !r.has_beef) && !(egg && r.ingredients.includes('蛋')))
+    .map(r => ({ r, dd: dist(uses, r.id, ds) }))
+    .sort((a, b) => b.dd - a.dd || a.r.name.localeCompare(b.r.name, 'zh-Hant'));
+  const html = `<button data-r="__rand"><b>隨機換一道</b></button>` + list.map(({ r, dd }) =>
+    `<button data-r="${esc(r.id)}"><i class="dot k-${kindOf(r)}"></i>${esc(r.name)}${r.id === it.recipe_id ? '<small>目前</small>' : ''}${r.has_beef ? '<small class="red">含牛</small>' : ''}<small>${dd >= 60 ? '近期沒吃過' : dd + ' 天前後吃過'}</small></button>`).join('');
+  openPick(`更換「${byId[it.recipe_id] ? byId[it.recipe_id].name : ''}」`, html, async btn => {
+    let rid = btn.dataset.r;
+    if (rid === '__rand'){
+      const p = choose(uses, ds, it.slot, beefOk, others, new Set([it.recipe_id]));
+      if (!p) return toast('沒有其他可換的食譜', true);
+      rid = p.id;
+    }
+    closePick();
+    const r = await db.from('meal_items').update({ recipe_id: rid }).eq('id', it.id);
+    if (r.error) return toast('更換失敗：' + r.error.message, true);
+    it.recipe_id = rid; drawMenu();
+  });
+}
+
+$('copy').addEventListener('click', async () => {
+  const lines = [`${$('weekLabel').textContent} 晚餐菜單`];
+  for (let i = 0; i < 7; i++){
+    const d = addDays(weekStart, i), ds = fmt(d), m = wMeals[ds];
+    const type = m ? m.day_type : weekdaySet[i+1];
+    const head = `週${WD[d.getDay()]} ${md(ds)}`;
+    if (type === '公休'){ lines.push(`${head} ${m && m.status === '跳過' ? '不排餐' : '公休'}`); continue; }
+    const its = wItems.filter(x => x.meal_date === ds).sort(bySlot);
+    if (!its.length){ lines.push(`${head} 尚未排餐`); continue; }
+    lines.push(`${head}（${m.headcount} 人）`);
+    SLOT_ORDER.forEach(s => {
+      const n = its.filter(x => x.slot === s).map(x => byId[x.recipe_id] ? byId[x.recipe_id].name : '').filter(Boolean);
+      if (n.length) lines.push(`${s === '一鍋懶人料理' ? '一鍋' : s}：${n.join('、')}`);
+    });
+  }
+  const text = lines.join('\n');
+  try { await navigator.clipboard.writeText(text); toast('已複製，可以貼到 LINE'); }
+  catch { openPick('複製菜單文字', `<textarea readonly id="cpText">${esc(text)}</textarea>`, () => {}); $('cpText').select(); }
+});
+
+/* ---------- 班別 ---------- */
+async function renderShift(){
+  const gs = mondayOf(monthStart), ge = addDays(gs, 41);
+  $('monthLabel').textContent = `${monthStart.getFullYear()} 年 ${monthStart.getMonth()+1} 月`;
+  const r = await db.from('shifts').select('*').gte('shift_date', fmt(gs)).lte('shift_date', fmt(ge));
+  if (r.error) return toast('讀取失敗：' + r.error.message, true);
+  const map = Object.fromEntries(r.data.map(x => [x.shift_date, x.shift]));
+  const today = fmt(new Date());
+  let h = ['一','二','三','四','五','六','日'].map(x => `<div class="h">${x}</div>`).join('');
+  for (let i = 0; i < 42; i++){
+    const d = addDays(gs, i), ds = fmt(d), sh = map[ds];
+    h += `<button type="button" class="c${sh ? ' s-' + esc(sh) : ''}${d.getMonth() !== monthStart.getMonth() ? ' out' : ''}" data-d="${ds}"><b${ds === today ? ' class="today"' : ''}>${d.getDate()}</b><span>${sh ? esc(sh) : '·'}</span></button>`;
+  }
+  $('cal').innerHTML = h;
+  if (!$('cycTo').value) $('cycTo').value = fmt(new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0));
+}
+$('mPrev').addEventListener('click', () => { monthStart = new Date(monthStart.getFullYear(), monthStart.getMonth() - 1, 1); renderShift(); });
+$('mNext').addEventListener('click', () => { monthStart = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 1); renderShift(); });
+
+async function saveShift(dates, s){
+  const r = s
+    ? await db.from('shifts').upsert(dates.map(d => ({ shift_date: d, shift: s, source: '手動' })), { onConflict: 'shift_date' })
+    : await db.from('shifts').delete().in('shift_date', dates);
+  if (r.error) return toast('儲存失敗：' + r.error.message, true);
+  await renderShift();
+}
+$('cal').addEventListener('click', e => {
+  const b = e.target.closest('.c'); if (!b) return;
+  const ds = b.dataset.d;
+  openPick(`${md(ds)} 的班別`,
+    SHIFTS.map(s => `<button data-s="${s}"><b>${s === '休假' ? '休假' : s + '班'}</b></button>`).join('') + `<button data-s="">清除這天</button>`,
+    async btn => { closePick(); await saveShift([ds], btn.dataset.s || null); });
+});
+$('rGo').addEventListener('click', async () => {
+  const a = $('rFrom').value, b = $('rTo').value;
+  if (!a || !b || a > b) return toast('請選擇正確的起訖日期', true);
+  const n = dayDiff(b, a) + 1;
+  if (n > 62) return toast('一次最多填 62 天', true);
+  await saveShift(Array.from({ length: n }, (_, i) => fmt(addDays(parse(a), i))), $('rShift').value);
+  toast(`已填入 ${n} 天`);
+});
+$('cycGo').addEventListener('click', async () => {
+  const until = $('cycTo').value; if (!until) return toast('請選擇延伸到哪一天', true);
+  const r = await db.from('shifts').select('*').order('shift_date', { ascending: false }).limit(14);
+  if (r.error) return toast('讀取失敗：' + r.error.message, true);
+  if (!r.data.length) return toast('請先輸入至少一段班別，再依循環延伸', true);
+  const rows = [...r.data].reverse(), last = rows[rows.length - 1];
+  if (until <= last.shift_date) return toast(`已輸入到 ${md(last.shift_date)}，請選更晚的日期`, true);
+  let shift = last.shift, run = 1;
+  for (let i = rows.length - 2; i >= 0; i--){
+    if (rows[i].shift === shift && dayDiff(rows[i+1].shift_date, rows[i].shift_date) === 1) run++; else break;
+  }
+  let prevWork = shift !== '休假' ? shift : null;
+  if (!prevWork) for (let i = rows.length - 1; i >= 0; i--) if (rows[i].shift !== '休假'){ prevWork = rows[i].shift; break; }
+  if (!prevWork) return toast('找不到前一段上班班別，請先手動輸入一段早、中或夜', true);
+  const NEXT = { '中':'早', '早':'夜', '夜':'中' }, REST = { '中':1, '早':2, '夜':2 };
+  const out = []; let d = parse(last.shift_date);
+  while (fmt(d) < until){
+    d = addDays(d, 1);
+    if (shift !== '休假'){ if (run < 5) run++; else { shift = '休假'; run = 1; } }
+    else if (run < REST[prevWork]) run++;
+    else { shift = NEXT[prevWork]; prevWork = shift; run = 1; }
+    out.push({ shift_date: fmt(d), shift, source: '手動' });
+  }
+  const w = await db.from('shifts').upsert(out, { onConflict: 'shift_date' });
+  if (w.error) return toast('儲存失敗：' + w.error.message, true);
+  await renderShift(); toast(`已依循環填入 ${out.length} 天，請核對`);
+});
+
+/* ---------- 食譜 ---------- */
+function renderRecipes(){
+  const k = $('q').value.trim(), off = $('showOff').checked;
+  $('offCount').textContent = recipes.filter(r => !r.active).length;
+  $('tabs').hidden = !!k;
+  $('tabs').innerHTML = CATS.map(c => {
+    const n = recipes.filter(r => r.category === c && r.active).length;
+    return `<button class="pill" role="tab" type="button" data-cat="${esc(c)}" aria-selected="${c === tab}">${esc(c)}<small>${n}</small></button>`;
+  }).join('');
+  const list = recipes.filter(r => (off || r.active) &&
+    (k ? (r.name.includes(k) || r.ingredients.some(t => t.includes(k))) : r.category === tab));
+  $('grid').hidden = !list.length;
+  $('grid').innerHTML = list.map(r =>
+    `<button type="button" class="tile k-${kindOf(r)}${r.active ? '' : ' off'}" data-id="${esc(r.id)}">${esc(r.name)}${r.active ? '' : '<small>停用</small>'}${k ? `<small>${esc(r.category)}</small>` : ''}</button>`).join('');
+  $('empty').hidden = list.length > 0;
+  $('empty').textContent = k ? `找不到「${k}」，換個關鍵字試試。` : `「${tab}」還沒有食譜，點右上角「＋」新增。`;
+}
+$('q').addEventListener('input', renderRecipes);
+$('showOff').addEventListener('change', renderRecipes);
+$('tabs').addEventListener('click', e => { const b = e.target.closest('.pill'); if (b){ tab = b.dataset.cat; renderRecipes(); } });
+$('grid').addEventListener('click', e => { const b = e.target.closest('.tile'); if (b) openSheet(byId[b.dataset.id]); });
+$('add').addEventListener('click', () => openSheet(null));
+
+function openSheet(r){
+  cur = r; cat = r ? r.category : (CATS.includes(tab) ? tab : CATS[0]);
+  tags = r ? [...r.ingredients] : []; rate = r ? r.kid_rating : null;
+  $('sheetTitle').textContent = r ? '編輯食譜' : '新增食譜';
+  $('fName').value = r ? r.name : ''; $('fBeef').checked = r ? r.has_beef : false;
+  $('fMin').value = r && r.cook_minutes ? r.cook_minutes : ''; $('fNotes').value = r && r.notes ? r.notes : '';
+  $('tagIn').value = ''; $('formErr').hidden = true;
+  $('dangerZone').hidden = !r; $('btnOff').textContent = r && !r.active ? '還原這道菜' : '停用這道菜';
+  renderCat(); renderTags(); renderRate(); renderNote();
+  $('sheet').showModal();
+}
+function renderCat(){ $('fCat').innerHTML = CATS.map(c => `<button type="button" data-v="${esc(c)}" aria-pressed="${c === cat}">${esc(c)}</button>`).join(''); }
+$('fCat').addEventListener('click', e => { const b = e.target.closest('button'); if (b){ cat = b.dataset.v; renderCat(); } });
+function renderTags(){
+  $('tagBox').innerHTML = tags.map((t, i) => `<span class="tag">${esc(t)}<button type="button" data-i="${i}" aria-label="移除 ${esc(t)}">×</button></span>`).join('');
+  const freq = {}; recipes.forEach(r => r.ingredients.forEach(t => freq[t] = (freq[t] || 0) + 1));
+  const sug = Object.keys(freq).filter(t => !tags.includes(t)).sort((a, b) => freq[b] - freq[a]).slice(0, 14);
+  $('tagSug').innerHTML = sug.map(t => `<button type="button" data-t="${esc(t)}">＋${esc(t)}</button>`).join('');
+}
+function addTag(t){
+  t = t.trim();
+  if (t && !tags.includes(t)){ tags.push(t); if (t === '牛') $('fBeef').checked = true; }
+  $('tagIn').value = ''; renderTags(); renderNote();
+}
+$('tagBox').addEventListener('click', e => { const b = e.target.closest('button'); if (b){ tags.splice(+b.dataset.i, 1); renderTags(); renderNote(); } });
+$('tagSug').addEventListener('click', e => { const b = e.target.closest('button'); if (b) addTag(b.dataset.t); });
+$('tagIn').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ',' || e.key === '，'){ e.preventDefault(); addTag($('tagIn').value); } });
+$('tagIn').addEventListener('blur', () => { if ($('tagIn').value.trim()) addTag($('tagIn').value); });
+$('fBeef').addEventListener('change', renderNote);
+function renderNote(){ $('beefNote').textContent = tags.includes('牛') ? '食材含「牛」，會自動標為含牛。' : ($('fBeef').checked ? '含牛的菜只會排在爸爸中班的日子。' : ''); }
+function renderRate(){ $('fRate').innerHTML = [1,2,3,4,5].map(n => `<button type="button" data-v="${n}" aria-pressed="${rate === n}">${n}</button>`).join(''); }
+$('fRate').addEventListener('click', e => { const b = e.target.closest('button'); if (b){ const v = +b.dataset.v; rate = rate === v ? null : v; renderRate(); } });
+
+const showErr = m => { const p = $('formErr'); p.textContent = m; p.hidden = !m; };
+const closeSheet = () => $('sheet').close();
+$('btnCancel').addEventListener('click', closeSheet);
+$('sheet').addEventListener('click', e => { if (e.target === $('sheet')) closeSheet(); });
+function upsertLocal(row){
+  const i = recipes.findIndex(r => r.id === row.id);
+  i >= 0 ? recipes[i] = row : recipes.push(row);
+  recipes.sort((a, b) => a.name.localeCompare(b.name, 'zh-Hant'));
+  byId[row.id] = row;
+}
+async function saveRecipe(){
+  showErr('');
+  if ($('tagIn').value.trim()) addTag($('tagIn').value);
+  const name = $('fName').value.trim();
+  if (!name) return showErr('請輸入菜名。');
+  const min = parseInt($('fMin').value, 10);
+  const row = { name, category: cat, ingredients: tags, has_beef: $('fBeef').checked || tags.includes('牛'),
+    cook_minutes: Number.isFinite(min) && min > 0 ? min : null, kid_rating: rate, notes: $('fNotes').value.trim() || null };
+  $('btnSave').disabled = true;
+  const req = cur ? db.from('recipes').update(row).eq('id', cur.id) : db.from('recipes').insert(row);
+  const { data, error } = await req.select().single();
+  $('btnSave').disabled = false;
+  if (error) return showErr(error.code === '23505' ? '已經有同名的食譜，請改用其他名稱。' : '儲存失敗：' + error.message);
+  upsertLocal(data); tab = data.category; $('q').value = '';
+  closeSheet(); renderRecipes(); toast('已儲存「' + data.name + '」');
+}
+$('btnSave').addEventListener('click', saveRecipe);
+$('form').addEventListener('submit', e => { e.preventDefault(); saveRecipe(); });
+['fName','fMin'].forEach(id => $(id).addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); saveRecipe(); } }));
+$('btnOff').addEventListener('click', async () => {
+  if (!cur) return;
+  const next = !cur.active;
+  if (!next && !(await ask(`停用「${cur.name}」？`, '停用後不會再被排進菜單，歷史紀錄會保留，之後可以還原。', '停用'))) return;
+  $('btnOff').disabled = true;
+  const { data, error } = await db.from('recipes').update({ active: next }).eq('id', cur.id).select().single();
+  $('btnOff').disabled = false;
+  if (error) return showErr((next ? '還原' : '停用') + '失敗：' + error.message);
+  upsertLocal(data); closeSheet(); renderRecipes();
+  toast(next ? `已還原「${data.name}」` : `已停用「${data.name}」`);
+});
+
+$('btnDel').addEventListener('click', async () => {
+  if (!cur) return;
+  if (!(await ask(`刪除「${cur.name}」？`, '會永久刪除這道食譜，無法復原。\n如果它曾經排進菜單，系統會擋下，請改用「停用」。', '刪除', true))) return;
+  $('btnDel').disabled = true;
+  const { error } = await db.from('recipes').delete().eq('id', cur.id);
+  $('btnDel').disabled = false;
+  if (error) return showErr(error.code === '23503' ? '這道菜曾排進菜單，不能刪除。請改用「停用」，它就不會再被排進菜單。' : '刪除失敗：' + error.message);
+  const name = cur.name;
+  recipes = recipes.filter(r => r.id !== cur.id); delete byId[cur.id];
+  closeSheet(); renderRecipes(); toast(`已刪除「${name}」`);
+});
+
+/* ---------- 待買清單 ---------- */
+const SHOP_GROUPS = ['蔬菜','肉類','海鮮','蛋豆','乾貨調味','其他'];
+let shop = [];
+const SEAF = ['魚','蝦','鮭','鱸','鯖','石斑','蛤','花枝','透抽','海鮮','蚵'];
+const EGGB = ['蛋','豆腐','豆干','豆皮','豆漿'];
+const MEAT = ['豬','牛','雞','肉','排骨','培根','香腸','火腿'];
+const VEGS = ['菜','瓜','蔥','薑','蒜','菇','筍','椒','茄','蘿蔔','馬鈴薯','地瓜','玉米','洋蔥','芹','韭','豆芽','南瓜','花椰','青花','番茄'];
+const DRYS = ['醬','油','鹽','糖','醋','粉','米','麵','烏龍','海苔','紫菜','味噌','咖哩','胡椒','酒','高湯'];
+function guessGroup(n){
+  const has = a => a.some(k => n.includes(k));
+  if (n.includes('奶')) return '其他';
+  if (has(SEAF)) return '海鮮';
+  if (has(EGGB)) return '蛋豆';
+  if (has(MEAT)) return '肉類';
+  if (has(VEGS)) return '蔬菜';
+  if (has(DRYS)) return '乾貨調味';
+  return '其他';
+}
+const tagGroup = t => ['豬','牛','雞'].includes(t) ? '肉類' : ['魚','蝦','海鮮'].includes(t) ? '海鮮' : ['蛋','豆腐'].includes(t) ? '蛋豆' : '蔬菜';
+function shopKind(it){
+  const n = it.name;
+  if (n.includes('牛')) return '牛'; if (n.includes('豬')) return '豬'; if (n.includes('雞') && !n.includes('蛋')) return '雞';
+  if (SEAF.some(k => n.includes(k))) return '海鮮'; if (n.includes('蛋')) return '蛋'; if (n.includes('豆腐')) return '豆腐';
+  return it.grp === '蔬菜' ? '蔬菜' : 'none';
+}
+
+async function renderShop(){
+  const r = await db.from('shopping_items').select('*').order('created_at', { ascending: true });
+  if (r.error){
+    shop = [];
+    const missing = /shopping_items|relation|schema cache|does not exist/i.test(r.error.message || '');
+    $('shopList').innerHTML = `<p class="empty">${missing ? '還沒建立「待買清單」的資料表。<br>請在 Supabase 的 SQL Editor 執行 03_shopping.sql。' : '讀取失敗：' + esc(r.error.message)}</p>`;
+    $('shopNote').textContent = ''; $('sClear').hidden = true; $('sWipe').disabled = true; return;
+  }
+  shop = r.data; drawShop();
+}
+function drawShop(){
+  const done = shop.filter(x => x.done).length, todo = shop.length - done;
+  $('sWipe').disabled = !shop.length;
+  $('sClear').hidden = !done; $('sClear').textContent = `清除已買（${done}）`;
+  $('shopNote').textContent = shop.length ? `${todo} 項待買` : '';
+  if (!shop.length){ $('shopList').innerHTML = `<p class="empty">還沒有待買的東西。<br>可以從菜單帶入，或自己新增。</p>`; return; }
+  $('shopList').innerHTML = SHOP_GROUPS.map(g => {
+    const xs = shop.filter(x => x.grp === g).sort((a, b) => a.done - b.done);
+    if (!xs.length) return '';
+    return `<div class="gh"><span>${g}</span><small>${xs.filter(x => !x.done).length}</small></div>` + xs.map(it =>
+      `<div class="it${it.done ? ' done' : ''} k-${shopKind(it)}"><button type="button" class="ck" data-id="${esc(it.id)}" aria-pressed="${!!it.done}" aria-label="${it.done ? '取消已買' : '標示已買'}"></button><button type="button" class="in" data-id="${esc(it.id)}"><span class="nm">${esc(it.name)}</span>${it.note ? `<small>${esc(it.note)}</small>` : ''}</button><button type="button" class="rm" data-id="${esc(it.id)}" aria-label="刪除「${esc(it.name)}」">×</button></div>`).join('');
+  }).join('');
+}
+async function addShop(){
+  const names = [...new Set($('sName').value.split(/[,，、\s]+/).map(s => s.trim()).filter(Boolean))];
+  if (!names.length) return;
+  const have = new Set(shop.filter(x => !x.done).map(x => x.name));
+  const rows = names.filter(n => !have.has(n)).map(n => ({ name: n, grp: guessGroup(n) }));
+  if (!rows.length){ $('sName').value = ''; return toast('清單裡已經有了'); }
+  $('sAdd').disabled = true;
+  const r = await db.from('shopping_items').insert(rows).select();
+  $('sAdd').disabled = false;
+  if (r.error) return toast('新增失敗：' + r.error.message, true);
+  shop.push(...r.data); $('sName').value = ''; drawShop();
+  if (rows.length < names.length) toast('已加入 ' + rows.length + ' 項，其餘清單裡已有');
+}
+$('sAdd').addEventListener('click', addShop);
+$('sName').addEventListener('keydown', e => { if (e.key === 'Enter'){ e.preventDefault(); addShop(); } });
+
+async function toggleShop(id){
+  const it = shop.find(x => x.id === id); if (!it) return;
+  it.done = !it.done; drawShop();
+  const r = await db.from('shopping_items').update({ done: it.done }).eq('id', id);
+  if (r.error){ it.done = !it.done; drawShop(); toast('更新失敗：' + r.error.message, true); }
+}
+async function delShop(id){
+  const it = shop.find(x => x.id === id); if (!it) return;
+  shop = shop.filter(x => x.id !== id); drawShop();
+  const r = await db.from('shopping_items').delete().eq('id', id);
+  if (r.error){ shop.push(it); drawShop(); return toast('刪除失敗：' + r.error.message, true); }
+  toast(`已刪除「${it.name}」`, false, { label: '復原', fn: async () => {
+    const w = await db.from('shopping_items').insert({ name: it.name, grp: it.grp, note: it.note, done: it.done }).select().single();
+    if (w.error) return toast('復原失敗：' + w.error.message, true);
+    shop.push(w.data); drawShop();
+  } });
+}
+function itemMenu(id){
+  const it = shop.find(x => x.id === id); if (!it) return;
+  openPick(it.name,
+    (it.note ? `<p class="askmsg">${esc(it.note)}</p>` : '') +
+    SHOP_GROUPS.map(g => `<button data-g="${g}">移到「${g}」${g === it.grp ? '<small>目前</small>' : ''}</button>`).join('') +
+    `<button data-del="1" style="color:var(--red)">刪除這項</button>`,
+    async btn => {
+      closePick();
+      const r = btn.dataset.del ? await db.from('shopping_items').delete().eq('id', id) : await db.from('shopping_items').update({ grp: btn.dataset.g }).eq('id', id);
+      if (r.error) return toast('更新失敗：' + r.error.message, true);
+      if (btn.dataset.del) shop = shop.filter(x => x.id !== id); else it.grp = btn.dataset.g;
+      drawShop();
+    });
+}
+$('shopList').addEventListener('click', e => {
+  const ck = e.target.closest('.ck'); if (ck) return toggleShop(ck.dataset.id);
+  const rm = e.target.closest('.rm'); if (rm) return delShop(rm.dataset.id);
+  const n = e.target.closest('.in'); if (n) itemMenu(n.dataset.id);
+});
+
+// 從菜單帶入：把該週每道菜的「主食材」合併成待買項目，備註寫出是哪幾道菜
+async function importShop(ws){
+  const r = await db.from('meal_items').select('meal_date,recipe_id').gte('meal_date', fmt(ws)).lte('meal_date', fmt(addDays(ws, 6)));
+  if (r.error) return toast('讀取菜單失敗：' + r.error.message, true);
+  const map = new Map(); let noTag = 0;
+  for (const x of r.data){
+    const rc = byId[x.recipe_id]; if (!rc) continue;
+    if (!rc.ingredients.length){ noTag++; continue; }
+    rc.ingredients.forEach(t => { if (!map.has(t)) map.set(t, new Set()); map.get(t).add(rc.name); });
+  }
+  if (!r.data.length) return toast('這週還沒有排菜，請先到「本週菜單」排好');
+  const have = new Set(shop.filter(x => !x.done).map(x => x.name));
+  const rows = [...map].filter(([t]) => !have.has(t)).map(([t, ds]) => ({ name: t, grp: tagGroup(t), note: [...ds].join('、') }));
+  if (rows.length){
+    const w = await db.from('shopping_items').insert(rows).select();
+    if (w.error) return toast('新增失敗：' + w.error.message, true);
+    shop.push(...w.data); drawShop();
+  }
+  toast(`已帶入 ${rows.length} 項${noTag ? `；${noTag} 道菜沒有主食材標籤，請自行補充` : ''}`);
+}
+$('sImport').addEventListener('click', () => {
+  const t = mondayOf(new Date()), n = addDays(t, 7);
+  const lab = d => { const e = addDays(d, 6); return `${d.getMonth()+1}/${d.getDate()} – ${e.getMonth()+1}/${e.getDate()}`; };
+  openPick('從哪一週的菜單帶入？', `<button data-w="0">本週<small>${lab(t)}</small></button><button data-w="1">下週<small>${lab(n)}</small></button>`,
+    btn => { closePick(); importShop(btn.dataset.w === '1' ? n : t); });
+});
+$('sCopy').addEventListener('click', async () => {
+  const lines = ['待買清單'];
+  SHOP_GROUPS.forEach(g => { const xs = shop.filter(x => x.grp === g && !x.done); if (xs.length) lines.push(`【${g}】${xs.map(x => x.name).join('、')}`); });
+  if (lines.length === 1) return toast('沒有待買的東西');
+  const text = lines.join('\n');
+  try { await navigator.clipboard.writeText(text); toast('已複製，可以貼到 LINE'); }
+  catch { openPick('複製待買清單', `<textarea readonly id="cpText">${esc(text)}</textarea>`, () => {}); $('cpText').select(); }
+});
+$('sWipe').addEventListener('click', async () => {
+  if (!shop.length) return toast('清單已經是空的');
+  const n = shop.length, ids = shop.map(x => x.id), backup = shop.map(x => ({ name: x.name, grp: x.grp, note: x.note, done: x.done }));
+  if (!(await ask('清空待買清單？', `會移除全部 ${n} 項，包含還沒買的。`, '清空', true))) return;
+  const r = await db.from('shopping_items').delete().in('id', ids);
+  if (r.error) return toast('清空失敗：' + r.error.message, true);
+  shop = []; drawShop();
+  toast('已清空待買清單', false, { label: '復原', fn: async () => {
+    const w = await db.from('shopping_items').insert(backup).select();
+    if (w.error) return toast('復原失敗：' + w.error.message, true);
+    shop.push(...w.data); drawShop();
+  } });
+});
+$('sClear').addEventListener('click', async () => {
+  const n = shop.filter(x => x.done).length; if (!n) return;
+  if (!(await ask('清除已買？', `會移除已打勾的 ${n} 項。`, '清除'))) return;
+  const r = await db.from('shopping_items').delete().eq('done', true);
+  if (r.error) return toast('清除失敗：' + r.error.message, true);
+  shop = shop.filter(x => !x.done); drawShop();
+});
+
+
+/* =====================================================
+   家務（Today 與 Chores）
+   ===================================================== */
+const CH_ANCHOR = new Date(2026, 9, 5);     // 4 週循環的起點（第 1 循環第 1 週的週一）
+const CH_LIMIT = 60;                         // 每天上限（分鐘）
+// 各區輪值日：wd = 星期（1 一 … 5 五）；A / B = 4 週循環中的第幾週
+const CH_SLOT = {
+  '主臥':{wd:1,A:1,B:3}, '姊姊房間':{wd:2,A:1,B:3}, '客廳':{wd:3,A:1,B:3}, '弟弟房間':{wd:4,A:1,B:3}, '玄關':{wd:5,A:1,B:3},
+  '廚房':{wd:1,A:2,B:4}, '餐廳':{wd:2,A:2,B:4}, '客衛':{wd:3,A:2,B:4}, '主臥廁所':{wd:4,A:2,B:4},
+  '前陽台':{wd:5,A:2,B:2}, '後陽台':{wd:5,A:4,B:4}
+};
+const CH_AREAS = ['玄關','客廳','餐廳','廚房','主臥','姊姊房間','弟弟房間','主臥廁所','客衛','前陽台','後陽台'];
+const CH_FREQ = { weekly:'每週', biweekly:'隔週', monthly:'每月', quarterly:'每季', halfyear:'每半年' };
+const CH_MONTHS = [[1,7],[2,8],[3,9],[4,10],[5,11],[6,12]];
+const chMod = (a, n) => ((a % n) + n) % n;
+let chTasks = [], chErr = '', chSub = 'week', chWeek = mondayOf(new Date()), chLibForm = false;
+let tDay = parse(fmt(new Date())), tDone = new Set(), tExtras = [], tForm = false, tMealData = null;
+
+function chPos(d){
+  const w = Math.floor(Math.round((parse(fmt(d)) - CH_ANCHOR) / 864e5) / 7);
+  return { w: chMod(w, 4) + 1, c: chMod(Math.floor(w / 4), 3) };
+}
+function chHits(t, c, w, wd){
+  if (wd === 6) return false;
+  const s = CH_SLOT[t.area];
+  if (t.freq === 'weekly') return t.wd === wd;
+  if (!s || s.wd !== wd) return false;
+  if (t.freq === 'biweekly') return w === s.A || w === s.B;
+  if (t.freq === 'monthly') return w === s[t.v];
+  if (t.freq === 'quarterly') return w === s[t.v] && c === t.c;
+  return false;
+}
+const chLoadAt = (c, w, wd) => chTasks.reduce((a, t) => a + (chHits(t, c, w, wd) ? t.min : 0), 0);
+const chWorst = (w, wd) => Math.max(...[0, 1, 2].map(c => chLoadAt(c, w, wd)));
+const chHy = new Map();
+function chHalfDay(t, y, m){            // 每半年項目：該月負荷最低的一天
+  const k = `${t.id}|${y}|${m}|${chTasks.length}`;
+  if (chHy.has(k)) return chHy.get(k);
+  let best = null;
+  for (let i = 1; i <= new Date(y, m, 0).getDate(); i++){
+    const d = new Date(y, m - 1, i); if (d.getDay() === 6) continue;
+    const p = chPos(d), l = chLoadAt(p.c, p.w, d.getDay());
+    if (!best || l < best.l) best = { d, l };
+  }
+  chHy.set(k, fmt(best.d)); return fmt(best.d);
+}
+function chOn(d){
+  if (d.getDay() === 6) return [];
+  const p = chPos(d), wd = d.getDay(), ds = fmt(d);
+  return chTasks.filter(t => t.freq === 'halfyear'
+    ? (t.months || []).includes(d.getMonth() + 1) && chHalfDay(t, d.getFullYear(), d.getMonth() + 1) === ds
+    : chHits(t, p.c, p.w, wd));
+}
+function chGroup(list){
+  const g = {}; list.forEach(t => (g[t.area] = g[t.area] || []).push(t));
+  return Object.entries(g).sort((a, b) => b[1].length - a[1].length);
+}
+function chPlace(t){                      // 新增時自動排進負荷最低的位置，回傳該日最高分鐘數
+  const s = CH_SLOT[t.area];
+  if (t.freq === 'weekly'){
+    let best = null;
+    [1, 2, 3, 4, 5, 0].forEach(wd => { const m = Math.max(...[1, 2, 3, 4].map(w => chWorst(w, wd))); if (!best || m < best.m) best = { m, wd }; });
+    t.wd = best.wd; return best.m + t.min;
+  }
+  if (t.freq === 'biweekly') return Math.max(chWorst(s.A, s.wd), chWorst(s.B, s.wd)) + t.min;
+  if (t.freq === 'monthly'){ const a = chWorst(s.A, s.wd), b = chWorst(s.B, s.wd); t.v = a <= b ? 'A' : 'B'; return Math.min(a, b) + t.min; }
+  if (t.freq === 'quarterly'){
+    let best = null;
+    ['A', 'B'].forEach(v => [0, 1, 2].forEach(c => { const l = chLoadAt(c, s[v], s.wd); if (!best || l < best.l) best = { l, v, c }; }));
+    t.v = best.v; t.c = best.c; return best.l + t.min;
+  }
+  return t.min;
+}
+function chWhere(t){
+  const s = CH_SLOT[t.area];
+  if (t.freq === 'weekly') return `每週${WD[t.wd]}`;
+  if (t.freq === 'biweekly') return `第 ${s.A}、${s.B} 週週${WD[s.wd]}`;
+  if (t.freq === 'monthly') return `第 ${s[t.v]} 週週${WD[s.wd]}`;
+  if (t.freq === 'quarterly') return `第 ${t.c + 1} 循環第 ${s[t.v]} 週週${WD[s.wd]}`;
+  return `${(t.months || []).join('、')} 月`;
+}
+const chMissing = msg => /chore|relation|schema cache|does not exist/i.test(msg || '');
+const chSetupMsg = () => `<p class="empty">${chMissing(chErr) ? '還沒建立家務資料表。<br>請在 Supabase 的 SQL Editor 執行 04_chores.sql。' : '讀取家務失敗：' + esc(chErr)}</p>`;
+async function chLoad(){
+  const r = await db.from('chores').select('*');
+  if (r.error){ chErr = r.error.message; chTasks = []; return false; }
+  chErr = ''; chTasks = r.data; chHy.clear(); return true;
+}
+
+/* ---------- Today ---------- */
+async function renderToday(){
+  const ds = fmt(tDay), isT = ds === fmt(new Date());
+  $('tLabel').textContent = `${md(ds)}（${WD[tDay.getDay()]}）`;
+  $('tBack').hidden = isT;
+  const rs = await Promise.all([
+    db.from('shifts').select('*').eq('shift_date', ds),
+    db.from('meals').select('*').eq('meal_date', ds),
+    db.from('meal_items').select('*').eq('meal_date', ds),
+    db.from('chore_done').select('key').eq('log_date', ds),
+    isT ? db.from('chore_extras').select('*').or(`log_date.eq.${ds},and(done.eq.false,log_date.lt.${ds})`)
+        : db.from('chore_extras').select('*').eq('log_date', ds)
+  ]);
+  if (rs.slice(0, 3).some(x => x.error)) toast('讀取晚餐失敗：' + rs.find(x => x.error).error.message, true);
+  tMealData = { sh: rs[0].data && rs[0].data[0] && rs[0].data[0].shift, m: rs[1].data && rs[1].data[0], items: rs[2].data || [] };
+  if (rs[3].error || rs[4].error){ chErr = chErr || (rs[3].error || rs[4].error).message; tDone = new Set(); tExtras = []; }
+  else { tDone = new Set(rs[3].data.map(x => x.key)); tExtras = rs[4].data; }
+  drawToday();
+}
+function drawToday(){
+  const ds = fmt(tDay), { sh, m, items } = tMealData, cfg = shiftSet[sh];
+  const type = m ? m.day_type : weekdaySet[isoWd(tDay)];
+  const hc = type === '公休' ? '' : (m && m.headcount ? m.headcount : (cfg ? cfg.headcount : 4));
+  $('tMeta').innerHTML = (sh ? `<span class="sq">${sh === '休假' ? '休' : esc(sh)}</span>` : '<span class="no">班別未輸入</span>') + (hc ? `${hc}人` : '');
+  const its = items.slice().sort(bySlot);
+  $('tMeal').innerHTML = type === '公休' ? `<p class="note">${m && m.status === '跳過' ? '不排餐' : '公休'}</p>`
+    : !its.length ? '<p class="note">尚未排餐</p>'
+    : its.map(it => { const r = byId[it.recipe_id]; return `<span class="tile k-${kindOf(r)}">${esc(r ? r.name : '（已刪除）')}</span>`; }).join('');
+
+  $('tAdd').classList.toggle('open', tForm);
+  $('tForm').innerHTML = tForm ? tFormHtml() : '';
+  if (tForm) tFormSync(true);
+  if (chErr){ $('tLeft').textContent = ''; $('tChores').innerHTML = chSetupMsg(); return; }
+  const list = chOn(tDay).map(t => ({ ...t, key: ds + '|' + t.id, done: tDone.has(ds + '|' + t.id) }))
+    .concat(tExtras.map(x => ({ id: x.id, area: x.area, name: x.name, min: x.min, once: true, carry: x.log_date < ds ? x.log_date : null, key: 'x|' + x.id, done: x.done })));
+  if (!list.length){ $('tLeft').textContent = ''; $('tChores').innerHTML = `<p class="note">${tDay.getDay() === 6 ? '週六不排家務' : '今天沒有家務'}</p>`; return; }
+  const total = list.reduce((a, t) => a + t.min, 0), left = list.filter(t => !t.done).reduce((a, t) => a + t.min, 0), n = list.filter(t => t.done).length;
+  $('tLeft').innerHTML = left ? `<span class="${total > CH_LIMIT ? 'over' : ''}">剩 ${left} 分</span>` : '全部完成';
+  $('tChores').innerHTML = `<div class="prog"><i style="width:${n / list.length * 100}%"></i></div>` + chGroup(list).map(([a, ts]) =>
+    `<div class="gh"><span>${esc(a)}</span></div>` + ts.map(t => {
+      const bd = t.carry ? `順延 ${md(t.carry)}` : t.once ? '單次' : t.freq === 'quarterly' ? '季' : t.freq === 'halfyear' ? '半年' : '';
+      return `<div class="it chit${t.done ? ' done' : ''}"><button type="button" class="ck" data-k="${esc(t.key)}" aria-pressed="${!!t.done}" aria-label="${t.done ? '取消完成' : '完成'}「${esc(t.name)}」"></button><button type="button" class="in" data-k="${esc(t.key)}"><span class="nm">${esc(t.name)}</span></button><small class="mn">${bd ? `<span class="bd">${esc(bd)}</span>` : ''}${t.min} 分</small></div>`;
+    }).join('')).join('');
+}
+function tFormHtml(){
+  return `<div class="chform">
+    <label>區域<select id="tfArea" class="inp">${CH_AREAS.map(a => `<option>${a}</option>`).join('')}<option>其他</option></select></label>
+    <label>項目<select id="tfPick" class="inp"></select></label>
+    <label id="tfNameW" hidden><input id="tfName" class="inp" placeholder="輸入項目" autocomplete="off" aria-label="項目名稱"></label>
+    <label>預估時間（分鐘）<input id="tfMin" class="inp" type="number" inputmode="numeric" min="5" step="5" value="15"></label>
+    <div class="acts"><button type="button" class="btn" id="tfCancel">取消</button><button type="button" class="btn primary" id="tfSave">加入今天</button></div>
+  </div>`;
+}
+function tFormSync(area){
+  if (area) $('tfPick').innerHTML = chTasks.filter(t => t.area === $('tfArea').value).map(t => `<option value="${esc(t.id)}">${esc(t.name)}（${t.min} 分）</option>`).join('') + '<option value="">其他</option>';
+  const t = chTasks.find(x => x.id === $('tfPick').value);
+  $('tfNameW').hidden = !!t; if (t) $('tfMin').value = t.min;
+}
+$('tForm').addEventListener('change', e => { if (e.target.id === 'tfArea') tFormSync(true); if (e.target.id === 'tfPick') tFormSync(false); });
+$('tForm').addEventListener('click', async e => {
+  if (e.target.id === 'tfCancel'){ tForm = false; return drawToday(); }
+  if (e.target.id !== 'tfSave') return;
+  const lib = chTasks.find(x => x.id === $('tfPick').value);
+  const name = lib ? lib.name : $('tfName').value.trim(), min = parseInt($('tfMin').value, 10);
+  if (!name){ $('tfName').focus(); return toast('請輸入項目', true); }
+  if (!(min > 0)) return toast('請輸入預估時間', true);
+  e.target.disabled = true;
+  const r = await db.from('chore_extras').insert({ log_date: fmt(tDay), area: $('tfArea').value, name, min }).select().single();
+  e.target.disabled = false;
+  if (r.error) return toast('新增失敗：' + r.error.message, true);
+  tExtras.push(r.data); tForm = false; drawToday();
+});
+$('tAdd').addEventListener('click', () => { if (chErr) return toast('請先建立家務資料表', true); tForm = !tForm; drawToday(); });
+$('tChores').addEventListener('click', async e => {
+  const b = e.target.closest('[data-k]'); if (!b) return;
+  const key = b.dataset.k, ds = fmt(tDay);
+  if (key.startsWith('x|')){
+    const x = tExtras.find(y => y.id === key.slice(2)); if (!x) return;
+    x.done = !x.done; drawToday();
+    const r = await db.from('chore_extras').update({ done: x.done, done_at: x.done ? fmt(new Date()) : null }).eq('id', x.id);
+    if (r.error){ x.done = !x.done; drawToday(); toast('更新失敗：' + r.error.message, true); }
+    return;
+  }
+  const t = chTasks.find(y => ds + '|' + y.id === key); if (!t) return;
+  const was = tDone.has(key);
+  was ? tDone.delete(key) : tDone.add(key); drawToday();
+  const r = was ? await db.from('chore_done').delete().eq('key', key)
+    : await db.from('chore_done').insert({ key, log_date: ds, chore_id: t.id, name: t.name, area: t.area, min: t.min });
+  if (r.error){ was ? tDone.add(key) : tDone.delete(key); drawToday(); toast('更新失敗：' + r.error.message, true); }
+});
+$('tPrev').addEventListener('click', () => { tDay = addDays(tDay, -1); tForm = false; renderToday(); });
+$('tNext').addEventListener('click', () => { tDay = addDays(tDay, 1); tForm = false; renderToday(); });
+$('tBack').addEventListener('click', () => { tDay = parse(fmt(new Date())); tForm = false; renderToday(); });
+
+/* ---------- Chores ---------- */
+async function renderChores(){
+  document.querySelectorAll('[data-cs]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.cs === chSub)));
+  $('chCount').textContent = chTasks.length ? chTasks.length : '';
+  if (chErr && !(await chLoad())) return $('chBody').innerHTML = chSetupMsg();
+  if (chSub === 'week') return drawChWeek();
+  drawChLib();
+}
+async function drawChWeek(){
+  const s = fmt(chWeek), e = fmt(addDays(chWeek, 6)), today = fmt(new Date());
+  const r = await db.from('chore_extras').select('*').gte('log_date', s).lte('log_date', e);
+  const ex = r.error ? [] : r.data;
+  let h = `<div class="wnav"><button type="button" data-cw="-1" aria-label="上一週">‹</button><b>${md(s)} – ${md(e)}</b><button type="button" data-cw="1" aria-label="下一週">›</button></div>`;
+  for (let i = 0; i < 7; i++){
+    const d = addDays(chWeek, i), ds = fmt(d);
+    const list = chOn(d).concat(ex.filter(x => x.log_date === ds));
+    const tot = list.reduce((a, t) => a + t.min, 0);
+    const body = !list.length ? `<span class="emp">${d.getDay() === 6 ? '公休' : '無'}</span>`
+      : chGroup(list).map(([a, ts]) => `<span>${esc(a)}<small>${ts.length} 項</small></span>`).join('');
+    h += `<button type="button" class="cw${ds === today ? ' now' : ''}" data-day="${ds}"><span class="dc"><b>週${WD[d.getDay()]}</b><span class="d1">${md(ds)}</span>${list.length ? `<span class="d2${tot > CH_LIMIT ? ' warn' : ''}">${tot}分</span>` : ''}</span><span class="cl">${body}</span></button>`;
+  }
+  $('chBody').innerHTML = h + '<p class="note">點日期可切換到該天的 Today。</p>';
+}
+function drawChLib(){
+  let h = `<div class="sech" style="margin-top:4px"><span class="meta">共 ${chTasks.length} 項・新增會自動排進最空的日子</span><button id="chAdd" class="plus${chLibForm ? ' open' : ''}" type="button" aria-label="增加家務">＋</button></div>`;
+  if (chLibForm) h += `<div class="chform">
+    <label>區域<select id="lfArea" class="inp">${CH_AREAS.map(a => `<option>${a}</option>`).join('')}</select></label>
+    <label>項目名稱<input id="lfName" class="inp" autocomplete="off"></label>
+    <div class="two"><label>週期<select id="lfFreq" class="inp">${Object.entries(CH_FREQ).map(([k, v]) => `<option value="${k}"${k === 'monthly' ? ' selected' : ''}>${v}</option>`).join('')}</select></label>
+    <label>預估時間（分鐘）<input id="lfMin" class="inp" type="number" inputmode="numeric" min="5" step="5" value="15"></label></div>
+    <label id="lfMonW" hidden>月份<select id="lfMon" class="inp">${CH_MONTHS.map((p, i) => `<option value="${i}">${p[0]}、${p[1]} 月</option>`).join('')}</select></label>
+    <div class="acts"><button type="button" class="btn" id="lfCancel">取消</button><button type="button" class="btn primary" id="lfSave">加入</button></div></div>`;
+  CH_AREAS.forEach(a => {
+    const ts = chTasks.filter(t => t.area === a);
+    h += `<div class="ahd">${a}<small>${ts.length} 項</small></div>` + ts.map(t =>
+      `<div class="lr"><span class="n">${esc(t.name)}</span><span class="f">${CH_FREQ[t.freq]}・${t.min} 分<br>${chWhere(t)}</span><button type="button" class="rm" data-del="${esc(t.id)}" aria-label="刪減「${esc(t.name)}」">×</button></div>`).join('');
+  });
+  $('chBody').innerHTML = h;
+}
+$('vChores').addEventListener('click', async e => {
+  const cs = e.target.closest('[data-cs]'); if (cs){ chSub = cs.dataset.cs; chLibForm = false; return renderChores(); }
+  const cw = e.target.closest('[data-cw]'); if (cw){ chWeek = addDays(chWeek, 7 * +cw.dataset.cw); return drawChWeek(); }
+  const day = e.target.closest('[data-day]'); if (day){ tDay = parse(day.dataset.day); window.scrollTo(0, 0); return show('today'); }
+  if (e.target.closest('#chAdd')){ chLibForm = !chLibForm; return drawChLib(); }
+  if (e.target.id === 'lfCancel'){ chLibForm = false; return drawChLib(); }
+  if (e.target.id === 'lfSave'){
+    const name = $('lfName').value.trim(), min = parseInt($('lfMin').value, 10), freq = $('lfFreq').value;
+    if (!name){ $('lfName').focus(); return toast('請輸入項目名稱', true); }
+    if (!(min > 0)) return toast('請輸入預估時間', true);
+    const t = { id: 't' + Date.now().toString(36), area: $('lfArea').value, name, freq, min, wd: null, v: null, c: null, months: null };
+    if (freq === 'halfyear') t.months = CH_MONTHS[+$('lfMon').value];
+    const peak = chPlace(t);
+    const r = await db.from('chores').insert(t);
+    if (r.error) return toast('新增失敗：' + r.error.message, true);
+    chTasks.push(t); chHy.clear(); chLibForm = false; drawChLib(); $('chCount').textContent = chTasks.length;
+    return toast(peak > CH_LIMIT ? `已排入${chWhere(t)}，但該日將達 ${peak} 分鐘` : `已排入${chWhere(t)}`, peak > CH_LIMIT);
+  }
+  const del = e.target.closest('[data-del]');
+  if (del){
+    const t = chTasks.find(x => x.id === del.dataset.del); if (!t) return;
+    if (!(await ask(`刪減「${t.name}」？`, `${t.area}・${CH_FREQ[t.freq]}。刪減後不再排進家務，已完成的紀錄保留。`, '刪減', true))) return;
+    const r = await db.from('chores').delete().eq('id', t.id);
+    if (r.error) return toast('刪減失敗：' + r.error.message, true);
+    chTasks = chTasks.filter(x => x.id !== t.id); chHy.clear(); drawChLib(); $('chCount').textContent = chTasks.length;
+    toast(`已刪減「${t.name}」`, false, { label: '復原', fn: async () => {
+      const w = await db.from('chores').insert(t);
+      if (w.error) return toast('復原失敗：' + w.error.message, true);
+      chTasks.push(t); chHy.clear(); if (view === 'chores') drawChLib();
+    } });
+  }
+});
+$('vChores').addEventListener('change', e => { if (e.target.id === 'lfFreq') $('lfMonW').hidden = e.target.value !== 'halfyear'; });
+
+renderLegends();
+init();
 </script>
 </body>
 </html>
