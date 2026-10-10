@@ -342,10 +342,7 @@ button:disabled{opacity:.45}
         <input id="tagIn" class="inp" placeholder="輸入食材，按 Enter 加入（例：蛋、雞）" autocomplete="off">
       </div>
       <div class="grp"><label class="sw"><span>含牛</span><input type="checkbox" id="fBeef"></label><p id="beefNote" class="note"></p></div>
-      <div class="grp row2">
-        <div><label class="lab" for="fMin">烹調時間（分鐘）</label><input id="fMin" class="inp" type="number" inputmode="numeric" min="1" max="600"></div>
-        <div><span class="lab">孩子接受度</span><div id="fRate" class="seg"></div></div>
-      </div>
+      <div class="grp"><label class="lab" for="fMin">烹調時間（分鐘）</label><input id="fMin" class="inp" type="number" inputmode="numeric" min="1" max="600"></div>
       <div class="grp"><label class="lab" for="fNotes">備註</label><textarea id="fNotes" class="inp" rows="3" placeholder="做法、連結、小提醒"></textarea></div>
       <p id="formErr" class="err" role="alert" hidden></p>
       <div id="dangerZone">
@@ -372,6 +369,7 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const CATS = ['主菜','副菜','纖維質','湯','甜湯','一鍋懶人料理'];
 const SLOT_ORDER = ['主菜','副菜','纖維質','湯','一鍋懶人料理','甜湯'];
 const SHIFTS = ['早','中','夜','休假'];
+const BEEF_DAYS = 2;        // 每週最多幾天吃牛（從爸爸中班的日子隨機挑）
 const ABSENT = ['中'];            // 爸爸不在家吃晚餐的班別（只有這些日子才能排含牛的菜）
 const WD = ['日','一','二','三','四','五','六'];
 const $ = id => document.getElementById(id);
@@ -391,7 +389,7 @@ const md = ds => `${+ds.slice(5,7)}/${+ds.slice(8,10)}`;
 let recipes = [], byId = {}, shiftSet = {}, weekdaySet = {}, catSet = {};
 let view = 'menu', weekStart = mondayOf(new Date()), monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 let wShifts = {}, wMeals = {}, wItems = [];
-let tab = CATS[0], cur = null, tags = [], cat = CATS[0], rate = null, entered = false, tt, pickHandler = null;
+let tab = CATS[0], cur = null, tags = [], cat = CATS[0], entered = false, tt, pickHandler = null;
 
 function toast(msg, bad, action){
   const t = $('toast'); t.textContent = msg; t.className = bad ? 'bad' : '';
@@ -505,18 +503,19 @@ function choose(uses, ds, slot, beefOk, chosen, exclude){
     if (r.has_beef && !beefOk) continue;                       // 硬規則：含牛只排爸爸不在家的日子
     if (egg && r.ingredients.includes('蛋')) continue;         // 硬規則：同一餐蛋類最多 1 道
     const dd = dist(uses, r.id, ds);
-    let s = Math.min(dd, 60) + (r.kid_rating || 3) * 2 + Math.random() * 8;
+    let s = Math.min(dd, 60) + Math.random() * 8;
     if (win != null ? dd < win : dd <= 1) s -= 100;            // 軟規則：重複窗口（副菜只避免連續兩天）
     s -= r.ingredients.filter(t => tagsUsed.has(t)).length * 25; // 軟規則：同餐食材不重疊
-    if (beefOk && r.has_beef) s += 6;
+    const beefIn = chosen.some(c => c.has_beef);
+    if (beefOk && r.has_beef) s += beefIn ? -40 : 40;            // 吃牛的日子：主菜優先排牛，同一餐最多一道
     if (s > bs){ bs = s; best = r; }
   }
   return best;
 }
 
-function planDay(uses, ds, type, sh){
+function planDay(uses, ds, type, sh, beefDay){
   const cfg = shiftSet[sh] || { headcount: 4, fiber_count: 2 };
-  const beefOk = ABSENT.includes(sh);
+  const beefOk = beefDay === undefined ? ABSENT.includes(sh) : beefDay;
   const slots = type === '一鍋'
     ? [['一鍋懶人料理', 1]]
     : [['主菜',1], ['副菜',1], ['湯',1], ...Array.from({ length: cfg.fiber_count }, (_, i) => ['纖維質', i+1])];
@@ -639,12 +638,16 @@ async function generate(only, force, overrides){
     const uses = new Map();
     h.data.filter(x => !targets.includes(x.meal_date)).forEach(x => addUse(uses, x.recipe_id, x.meal_date));
     const mealRows = [], itemRows = []; let missing = 0, unknownShift = 0;
+    // 吃牛的日子：本週已保留的日子若已有牛就先扣掉，剩下名額從爸爸中班的日子隨機挑
+    const keptBeef = new Set(wItems.filter(x => !targets.includes(x.meal_date) && byId[x.recipe_id] && byId[x.recipe_id].has_beef).map(x => x.meal_date)).size;
+    const cand = targets.filter(ds => ABSENT.includes(wShifts[ds] && wShifts[ds].shift)).sort(() => Math.random() - .5);
+    const beefDays = new Set(cand.slice(0, Math.max(0, BEEF_DAYS - keptBeef)));
     for (const ds of targets){
       const m0 = wMeals[ds], sh = wShifts[ds] && wShifts[ds].shift;
       const type = (overrides && overrides[ds]) || (m0 && (m0.day_type === '正餐' || m0.day_type === '一鍋') ? m0.day_type : weekdaySet[isoWd(parse(ds))]);
       if (type === '公休'){ mealRows.push({ meal_date: ds, day_type: '公休', headcount: null, status: '草稿' }); continue; }
       if (!sh) unknownShift++;
-      const p = planDay(uses, ds, type, sh);
+      const p = planDay(uses, ds, type, sh, beefDays.has(ds));
       missing += p.missing;
       mealRows.push({ meal_date: ds, day_type: type, headcount: p.headcount, status: '草稿' });
       itemRows.push(...p.rows);
@@ -739,7 +742,8 @@ async function swapSheet(itemId){
       } });
     }
     if (rid === '__rand'){
-      const p = choose(uses, ds, it.slot, beefOk, others, new Set([it.recipe_id]));
+      const bd = new Set(wItems.filter(x => x.meal_date !== ds && byId[x.recipe_id] && byId[x.recipe_id].has_beef).map(x => x.meal_date)).size;
+      const p = choose(uses, ds, it.slot, beefOk && (others.some(r => r.has_beef) || (byId[it.recipe_id] || {}).has_beef || bd < BEEF_DAYS), others, new Set([it.recipe_id]));
       if (!p) return toast('沒有其他可換的食譜', true);
       rid = p.id;
     }
@@ -864,13 +868,13 @@ $('add').addEventListener('click', () => openSheet(null));
 
 function openSheet(r){
   cur = r; cat = r ? r.category : (CATS.includes(tab) ? tab : CATS[0]);
-  tags = r ? [...r.ingredients] : []; rate = r ? r.kid_rating : null;
+  tags = r ? [...r.ingredients] : [];
   $('sheetTitle').textContent = r ? '編輯食譜' : '新增食譜';
   $('fName').value = r ? r.name : ''; $('fBeef').checked = r ? r.has_beef : false;
   $('fMin').value = r && r.cook_minutes ? r.cook_minutes : ''; $('fNotes').value = r && r.notes ? r.notes : '';
   $('tagIn').value = ''; $('formErr').hidden = true;
   $('dangerZone').hidden = !r; $('btnOff').textContent = r && !r.active ? '還原這道菜' : '停用這道菜';
-  renderCat(); renderTags(); renderRate(); renderNote();
+  renderCat(); renderTags(); renderNote();
   $('sheet').showModal();
 }
 function renderCat(){ $('fCat').innerHTML = CATS.map(c => `<button type="button" data-v="${esc(c)}" aria-pressed="${c === cat}">${esc(c)}</button>`).join(''); }
@@ -892,8 +896,6 @@ $('tagIn').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key ===
 $('tagIn').addEventListener('blur', () => { if ($('tagIn').value.trim()) addTag($('tagIn').value); });
 $('fBeef').addEventListener('change', renderNote);
 function renderNote(){ $('beefNote').textContent = tags.includes('牛') ? '食材含「牛」，會自動標為含牛。' : ($('fBeef').checked ? '含牛的菜只會排在爸爸中班的日子。' : ''); }
-function renderRate(){ $('fRate').innerHTML = [1,2,3,4,5].map(n => `<button type="button" data-v="${n}" aria-pressed="${rate === n}">${n}</button>`).join(''); }
-$('fRate').addEventListener('click', e => { const b = e.target.closest('button'); if (b){ const v = +b.dataset.v; rate = rate === v ? null : v; renderRate(); } });
 
 const showErr = m => { const p = $('formErr'); p.textContent = m; p.hidden = !m; };
 const closeSheet = () => $('sheet').close();
@@ -912,7 +914,7 @@ async function saveRecipe(){
   if (!name) return showErr('請輸入菜名。');
   const min = parseInt($('fMin').value, 10);
   const row = { name, category: cat, ingredients: tags, has_beef: $('fBeef').checked || tags.includes('牛'),
-    cook_minutes: Number.isFinite(min) && min > 0 ? min : null, kid_rating: rate, notes: $('fNotes').value.trim() || null };
+    cook_minutes: Number.isFinite(min) && min > 0 ? min : null, notes: $('fNotes').value.trim() || null };
   $('btnSave').disabled = true;
   const req = cur ? db.from('recipes').update(row).eq('id', cur.id) : db.from('recipes').insert(row);
   const { data, error } = await req.select().single();
