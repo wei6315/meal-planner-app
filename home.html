@@ -366,7 +366,10 @@ const SUPABASE_URL = 'https://mnduxvbjpqstasdpmfcu.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_yJ5i68wsYvtK9UX1l4V0Mw_dVmqyzce';
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const CATS = ['主菜','副菜','纖維質','湯','甜湯','一鍋懶人料理'];
+const VEG1 = '綠色蔬菜', VEG2 = '其他蔬菜';   // 食譜分類：纖維質拆成兩類（菜單上纖維質欄的上、下兩道）
+const CATS = ['主菜','副菜',VEG1,VEG2,'湯','甜湯','一鍋懶人料理'];
+// 菜單位置 → 食譜分類：纖維質第 1 道用綠色蔬菜、第 2 道用其他蔬菜
+const catFor = (slot, pos) => slot === '纖維質' ? (pos === 2 ? VEG2 : VEG1) : slot;
 const SLOT_ORDER = ['主菜','副菜','纖維質','湯','一鍋懶人料理','甜湯'];
 const SHIFTS = ['早','中','夜','休假'];
 const BEEF_DAYS = 2;        // 每週最多幾天吃牛（從爸爸中班的日子隨機挑）
@@ -492,14 +495,15 @@ const dist = (uses, id, ds) => {
 };
 
 // 從符合硬規則的食譜中挑一道；軟規則（重複窗口、食材重疊）用扣分處理，庫存不足時自動放寬
-function choose(uses, ds, slot, beefOk, chosen, exclude){
+function choose(uses, ds, slot, beefOk, chosen, exclude, need){
   const egg = chosen.some(c => c.ingredients.includes('蛋'));
   const tagsUsed = new Set(chosen.flatMap(c => c.ingredients));
   const idsUsed = new Set(chosen.map(c => c.id));
-  const win = catSet[slot];
+  const win = catSet[slot] ?? (slot === VEG1 || slot === VEG2 ? catSet['纖維質'] : undefined);
   let best = null, bs = -1e9;
   for (const r of recipes){
     if (!r.active || r.category !== slot || idsUsed.has(r.id) || (exclude && exclude.has(r.id))) continue;
+    if (need && !need(r)) continue;                            // 指定條件（例：必須是深綠色蔬菜）
     if (r.has_beef && !beefOk) continue;                       // 硬規則：含牛只排爸爸不在家的日子
     if (egg && r.ingredients.includes('蛋')) continue;         // 硬規則：同一餐蛋類最多 1 道
     const dd = dist(uses, r.id, ds);
@@ -521,7 +525,7 @@ function planDay(uses, ds, type, sh, beefDay){
     : [['主菜',1], ['副菜',1], ['湯',1], ...Array.from({ length: cfg.fiber_count }, (_, i) => ['纖維質', i+1])];
   const chosen = [], rows = [];
   for (const [slot, pos] of slots){
-    const r = choose(uses, ds, slot, beefOk, chosen);
+    const r = choose(uses, ds, catFor(slot, pos), beefOk, chosen);
     if (r){ chosen.push(r); rows.push({ meal_date: ds, slot, position: pos, recipe_id: r.id }); addUse(uses, r.id, ds); }
   }
   return { headcount: cfg.headcount, rows, missing: slots.length - rows.length };
@@ -559,7 +563,7 @@ function kindOf(r){
   if (['魚','蝦','海鮮'].some(x => t.includes(x))) return '海鮮';
   if (t.includes('蛋')) return '蛋';
   if (t.includes('豆腐')) return '豆腐';
-  return { '纖維質':'蔬菜', '湯':'湯', '甜湯':'甜湯' }[r.category] || '一鍋';
+  return { [VEG1]:'蔬菜', [VEG2]:'蔬菜', '纖維質':'蔬菜', '湯':'湯', '甜湯':'甜湯' }[r.category] || '一鍋';
 }
 const legendHtml = ks => ks.map(k => `<span><i class="dot k-${k}"></i>${k}</span>`).join('');
 function renderLegends(){ $('legMenu').innerHTML = legendHtml(KINDS.filter(k => k !== '甜湯')); $('legRec').innerHTML = legendHtml(KINDS); }
@@ -720,11 +724,11 @@ async function swapSheet(itemId){
   const egg = others.some(r => r.ingredients.includes('蛋')), ids = new Set(others.map(r => r.id));
   // 手動更換：同分類的菜全部可選；不符合自動排菜規則的排在後面並註明原因
   const list = recipes
-    .filter(r => r.active && r.category === it.slot && !ids.has(r.id))
+    .filter(r => r.active && r.category === catFor(it.slot, it.position) && !ids.has(r.id))
     .map(r => ({ r, dd: dist(uses, r.id, ds), why: [!beefOk && r.has_beef ? '爸爸在家' : '', egg && r.ingredients.includes('蛋') ? '同餐已有蛋' : ''].filter(Boolean).join('・') }))
     .sort((a, b) => !!a.why - !!b.why || b.dd - a.dd || a.r.name.localeCompare(b.r.name, 'zh-Hant'));
   const canDel = it.slot === '纖維質';      // 纖維質可只煮一道
-  const delBtn = canDel ? `<button data-r="__del" class="delrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg><b>移除這道</b><small>這天只煮其他纖維質</small></button>` : '';
+  const delBtn = canDel ? `<button data-r="__del" class="delrow"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg><b>移除這道</b><small>這天只煮一道蔬菜</small></button>` : '';
   const html = `<button data-r="__rand"><b>隨機換一道</b></button>` + delBtn + list.map(({ r, dd, why }) =>
     `<button data-r="${esc(r.id)}"><i class="dot k-${kindOf(r)}"></i>${esc(r.name)}${r.id === it.recipe_id ? '<small>目前</small>' : ''}${r.has_beef ? '<small class="red">含牛</small>' : ''}${why ? `<small class="red">${why}</small>` : ''}<small>${dd >= 60 ? '近期沒吃過' : dd + ' 天前後吃過'}</small></button>`).join('');
   openPick(`更換「${byId[it.recipe_id] ? byId[it.recipe_id].name : ''}」`, html, async btn => {
@@ -743,7 +747,7 @@ async function swapSheet(itemId){
     }
     if (rid === '__rand'){
       const bd = new Set(wItems.filter(x => x.meal_date !== ds && byId[x.recipe_id] && byId[x.recipe_id].has_beef).map(x => x.meal_date)).size;
-      const p = choose(uses, ds, it.slot, beefOk && (others.some(r => r.has_beef) || (byId[it.recipe_id] || {}).has_beef || bd < BEEF_DAYS), others, new Set([it.recipe_id]));
+      const p = choose(uses, ds, catFor(it.slot, it.position), beefOk && (others.some(r => r.has_beef) || (byId[it.recipe_id] || {}).has_beef || bd < BEEF_DAYS), others, new Set([it.recipe_id]));
       if (!p) return toast('沒有其他可換的食譜', true);
       rid = p.id;
     }
@@ -1363,6 +1367,26 @@ $('vChores').addEventListener('click', async e => {
   }
 });
 $('vChores').addEventListener('change', e => { if (e.target.id === 'lfFreq') $('lfMonW').hidden = e.target.value !== 'halfyear'; });
+
+/* ---------- 跨日自動更新 ----------
+   iPhone 主畫面 app 切到背景再回來時不會重新載入，
+   因此回到前景時檢查日期，若已跨日就把所有「今天／本週／本月」重設並重畫 */
+let lastDay = fmt(new Date());
+async function rollDay(){
+  const now = fmt(new Date());
+  if (now === lastDay) return;
+  lastDay = now;
+  const d = parse(now);
+  tDay = d; weekStart = mondayOf(d); chWeek = mondayOf(d);
+  monthStart = new Date(d.getFullYear(), d.getMonth(), 1);
+  $('cycTo').value = '';          // 班別「延伸到」預設日期跟著換成新月份的月底
+  tForm = false;
+  if (entered){ await chLoad(); show(view); }
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) rollDay(); });
+window.addEventListener('pageshow', rollDay);
+window.addEventListener('focus', rollDay);
+setInterval(rollDay, 60000);   // app 一直開著時，跨過午夜也會更新
 
 renderLegends();
 init();
