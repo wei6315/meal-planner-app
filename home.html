@@ -254,6 +254,11 @@ button:disabled{opacity:.45}
 /* ===== 記帳 ===== */
 .lgbig{font-size:46px;font-weight:300;line-height:1.2;margin:2px 0 2px;letter-spacing:.02em}
 .lgsub{font-size:14px;color:var(--sub)}
+.lgpf{margin:0 0 14px}
+.lgpf button{font-size:13px;padding:3px 12px}
+.lgsplit{display:flex;gap:22px;margin-top:10px;font-size:15px}
+.lgsplit span{color:var(--sub);letter-spacing:.08em}
+.lgsplit b{font-weight:400;color:var(--ink);font-family:var(--serif);margin-left:6px}
 .lgcat{margin:14px 0}
 .lgcat .l{display:flex;justify-content:space-between;font-size:16px}
 .lgcat .l span:last-child{color:var(--sub);font-size:14px}
@@ -511,6 +516,7 @@ select.inp{border-radius:0;-webkit-appearance:none;appearance:none}
     <div id="lgMain" hidden>
       <nav class="pills subnav" id="lgMode" aria-label="記帳檢視"><button type="button" class="pill" data-lm="month">月</button><button type="button" class="pill" data-lm="year">年</button></nav>
       <div class="wnav"><button id="lgPrev" type="button" aria-label="上個月">‹</button><b id="lgMonth"></b><button id="lgNext" type="button" aria-label="下個月">›</button></div>
+      <div id="lgPayF" class="seg lgpf" aria-label="付款方式"></div>
       <div id="lgSum"></div>
       <div id="lgYear"></div>
       <div id="lgCats"></div>
@@ -1940,6 +1946,12 @@ setInterval(rollDay, 60000);   // app 一直開著時，跨過午夜也會更新
       if (e.message !== '401'){ $('lgPin').hidden = true; $('lgMain').hidden = false; $('lgList').innerHTML = '<p class="empty">讀取失敗（' + esc(e.message || '無法連線') + '）</p>'; }
     }
   }
+  let payF = '';
+  const drawPayF = () => { $('lgPayF').innerHTML = [['', '全部'], ['現金', '現金'], ['信用卡', '信用卡']].map(([v, t]) => `<button type="button" data-pf="${v}" aria-pressed="${payF === v}">${t}</button>`).join(''); };
+  const splitHtml = exp => {
+    const g = k => exp.filter(r => r.pay_method === k).reduce((s, r) => s + r.amount, 0), none = exp.filter(r => !r.pay_method).reduce((s, r) => s + r.amount, 0);
+    return `<div class="lgsplit"><span>現金<b>${money(g('現金'))}</b></span><span>信用卡<b>${money(g('信用卡'))}</b></span>${none ? `<span>未記<b>${money(none)}</b></span>` : ''}</div>`;
+  };
   function catsHtml(exp, total, catById, memById){
     const byCat = new Map();
     exp.forEach(r => byCat.set(r.category_id, (byCat.get(r.category_id) || 0) + r.amount));
@@ -1957,14 +1969,14 @@ setInterval(rollDay, 60000);   // app 一直開著時，跨過午夜也會更新
     const memById = new Map(members.map(m => [m.id, m.name]));
     $('lgMonth').textContent = `${year} 年`;
     $('lgList').hidden = true; $('lgAdd').closest('.sech').hidden = true; $('lgYear').hidden = false;
-    const exp = rows.filter(r => r.kind === 'expense'), inc = rows.filter(r => r.kind === 'income');
+    const expAll = rows.filter(r => r.kind === 'expense'), exp = payF ? expAll.filter(r => r.pay_method === payF) : expAll, inc = payF ? [] : rows.filter(r => r.kind === 'income');
     const sum = a => a.reduce((s, r) => s + r.amount, 0);
     const total = sum(exp), incT = sum(inc);
     const nowY = todayStr().slice(0, 4), nowM = +todayStr().slice(5, 7);
     const months = year === nowY ? nowM : (year < nowY ? 12 : 0);
     const avg = months ? Math.round(total / months) : 0;
-    $('lgSum').innerHTML = `<div class="h2" style="margin-top:8px">全年支出</div><div class="lgbig">${money(total)}</div><div class="lgsub">${exp.length} 筆` +
-      (incT ? ` ・ 收入 ${money(incT)} ・ 結餘 ${money(incT - total)}` : '') + (avg ? ` ・ 月均支出 ${money(avg)}` : '') + '</div>';
+    $('lgSum').innerHTML = `<div class="h2" style="margin-top:8px">全年${payF ? payF : ''}支出</div><div class="lgbig">${money(total)}</div><div class="lgsub">${exp.length} 筆` +
+      (incT ? ` ・ 收入 ${money(incT)} ・ 結餘 ${money(incT - total)}` : '') + (avg ? ` ・ 月均支出 ${money(avg)}` : '') + '</div>' + (payF ? '' : splitHtml(expAll));
     const per = Array(12).fill(0);
     exp.forEach(r => { per[+r.spent_on.slice(5, 7) - 1] += r.amount; });
     const max = Math.max(...per, 1);
@@ -1983,18 +1995,19 @@ setInterval(rollDay, 60000);   // app 一直開著時，跨過午夜也會更新
     const memById = new Map(members.map(m => [m.id, m.name]));
     const [y, mo] = month.split('-');
     $('lgMonth').textContent = `${y} 年 ${+mo} 月`;
-    const exp = rows.filter(r => r.kind === 'expense'), inc = rows.filter(r => r.kind === 'income');
+    const expAll = rows.filter(r => r.kind === 'expense'), exp = payF ? expAll.filter(r => r.pay_method === payF) : expAll, inc = payF ? [] : rows.filter(r => r.kind === 'income');
     const sum = a => a.reduce((s, r) => s + r.amount, 0);
     const total = sum(exp), incT = sum(inc);
-    $('lgSum').innerHTML = `<div class="h2" style="margin-top:8px">支出</div><div class="lgbig">${money(total)}</div><div class="lgsub">${exp.length} 筆` +
-      (incT ? ` ・ 收入 ${money(incT)} ・ 結餘 ${money(incT - total)}` : '') + '</div>';
+    $('lgSum').innerHTML = `<div class="h2" style="margin-top:8px">${payF ? payF : ''}支出</div><div class="lgbig">${money(total)}</div><div class="lgsub">${exp.length} 筆` +
+      (incT ? ` ・ 收入 ${money(incT)} ・ 結餘 ${money(incT - total)}` : '') + '</div>' + (payF ? '' : splitHtml(expAll));
+    const listRows = payF ? rows.filter(r => r.kind === 'expense' && r.pay_method === payF) : rows;
 
     $('lgCats').innerHTML = catsHtml(exp, total, catById, memById);
 
     rowMap = new Map(rows.map(r => [String(r.id), r]));
-    if (!rows.length){ $('lgList').innerHTML = '<p class="empty">這個月還沒有帳目</p>'; return; }
+    if (!listRows.length){ $('lgList').innerHTML = `<p class="empty">${payF ? '這個月沒有' + payF + '的支出' : '這個月還沒有帳目'}</p>`; return; }
     const groups = new Map();
-    rows.forEach(r => { if (!groups.has(r.spent_on)) groups.set(r.spent_on, []); groups.get(r.spent_on).push(r); });
+    listRows.forEach(r => { if (!groups.has(r.spent_on)) groups.set(r.spent_on, []); groups.get(r.spent_on).push(r); });
     let out = '';
     for (const [date, rs] of groups){
       const dayExp = sum(rs.filter(r => r.kind === 'expense'));
@@ -2074,6 +2087,8 @@ setInterval(rollDay, 60000);   // app 一直開著時，跨過午夜也會更新
     const b = e.target.closest('.lgmo'); if (!b) return;
     month = year + '-' + pad(+b.dataset.m); setMode('month'); load();
   });
+  $('lgPayF').addEventListener('click', e => { const b = e.target.closest('[data-pf]'); if (!b || b.dataset.pf === payF) return; payF = b.dataset.pf; drawPayF(); mode === 'year' ? renderYear() : render(); });
+  drawPayF();
   $('lgAdd').addEventListener('click', () => openSheet(null));
   $('lgList').addEventListener('click', e => { const b = e.target.closest('.lgrow'); if (b) openSheet(rowMap.get(b.dataset.id)); });
   $('lgCancel').addEventListener('click', closeLg);
