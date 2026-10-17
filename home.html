@@ -236,6 +236,164 @@ button:disabled{opacity:.45}
 .lr .n{flex:1;font-size:18px}
 .lr .f{font-size:13px;color:var(--sub);text-align:right;line-height:1.45}
 .lr .rm{font-size:24px}
+
+/* ===== 行事曆 ===== */
+.cal .c .ev{display:block;width:12px;height:2px;background:var(--ink);flex:none}
+.evr{display:flex;align-items:baseline;gap:12px;width:100%;padding:10px 0;border:0;border-bottom:1px solid var(--line);background:none;text-align:left}
+.evr .t{flex:0 0 54px;font-size:14px;color:var(--sub);font-variant-numeric:tabular-nums;line-height:1.35}
+.evr .t small{display:block;font-size:12px}
+.evr .n{flex:1;min-width:0;font-size:18px;overflow-wrap:anywhere}
+.evr .w{flex:none;font-size:13px;color:var(--sub)}
+#evDelW,#lgDelW{padding-top:14px;text-align:right}
+.trash{border:0;background:none;color:var(--red);padding:8px;margin-right:-8px;line-height:0;cursor:pointer}
+.plus.sm{width:28px;height:28px;font-size:20px;padding:0 0 1px}
+.wkh{display:flex;align-items:center;gap:10px;margin:18px 0 2px;padding-bottom:6px;border-bottom:1px solid var(--line2)}
+.wkh .d{flex:1;font-size:16px;color:var(--sub);letter-spacing:.06em}
+.wkh.today .d{color:var(--ink);font-weight:600}
+.wkd .none{margin:8px 0 0;color:var(--line2);font-size:14px}
+/* ===== 記帳 ===== */
+.lgbig{font-size:46px;font-weight:300;line-height:1.2;margin:2px 0 2px;letter-spacing:.02em}
+.lgsub{font-size:14px;color:var(--sub)}
+.lgcat{margin:14px 0}
+.lgcat .l{display:flex;justify-content:space-between;font-size:16px}
+.lgcat .l span:last-child{color:var(--sub);font-size:14px}
+.lgtrack{height:2px;background:var(--line);margin-top:7px}
+.lgtrack i{display:block;height:2px}
+.lgmo{display:flex;align-items:center;gap:10px;width:100%;padding:9px 0;border:0;border-bottom:1px solid var(--line);background:none;text-align:left}
+.lgmo .n{flex:0 0 44px;font-size:15px;color:var(--sub)}
+.lgmo .b{flex:1;height:2px;background:var(--line);position:relative}
+.lgmo .b i{position:absolute;left:0;top:0;height:2px;background:var(--ink)}
+.lgmo .v{flex:0 0 86px;text-align:right;font-size:16px;font-variant-numeric:tabular-nums}
+.lgmo.cur .n{color:var(--ink);font-weight:600}
+.lgmem{font-size:14px;color:var(--sub);margin-top:16px;line-height:1.9}
+.lgday{display:flex;justify-content:space-between;font-size:13px;color:var(--sub);letter-spacing:.12em;border-bottom:1px solid var(--line);padding:22px 0 8px}
+.lgrow{display:flex;align-items:center;gap:12px;width:100%;padding:12px 0;border:0;border-bottom:1px solid var(--line);background:none;text-align:left}
+.lgrow .mk{width:3px;align-self:stretch;flex:none}
+.lgrow .mid{flex:1;min-width:0}
+.lgrow .t{font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lgrow .m{font-size:13px;color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lgrow .a{font-size:18px;font-variant-numeric:tabular-nums}
+#lgPin .group input{text-align:center;letter-spacing:.3em}
+select.inp{border-radius:0;-webkit-appearance:none;appearance:none}
+
+/* ===== 日課風：襯線數字、字距標籤、朱紅印章、藏青重點 ===== */
+:root{--serif:"Hiragino Mincho ProN","Songti TC","Noto Serif TC","Source Han Serif TC",Georgia,"Times New Roman",serif}
+.top h1{font-family:var(--serif)}
+.wnav b,.lgbig,.evr .t{font-family:var(--serif)}
+.wnav b{letter-spacing:.12em;font-weight:400}
+.sech h2{font-size:14px;font-weight:400;color:var(--sub);letter-spacing:.3em}
+.tdhead{display:flex;align-items:flex-start;justify-content:space-between;padding:22px 0 10px}
+.tdd{display:flex;align-items:flex-end;gap:14px}
+.tdd .n{font-family:var(--serif);font-size:84px;font-weight:300;line-height:.95;letter-spacing:-.02em}
+.tdd .mw{display:flex;flex-direction:column;padding-bottom:6px;line-height:1.35}
+.tdd .mw b{font-size:20px;font-weight:600;letter-spacing:.08em}
+.tdd .mw small{font-size:16px;color:var(--sub);letter-spacing:.1em}
+.stamp{display:flex;flex-direction:column;align-items:center;width:34px;border:1px solid var(--red);color:var(--red);padding:7px 0;font-size:16px;line-height:1.25}
+.stamp i{font-style:normal;display:block}
+.stampbtn{border:1px solid var(--line2);background:none;color:var(--sub);padding:5px 12px;font-size:14px;letter-spacing:.1em;border-radius:0}
+.wstrip{display:grid;grid-template-columns:repeat(7,1fr);margin:6px 0 14px}
+.wstrip button{position:relative;background:none;border:0;border-bottom:1px solid transparent;padding:6px 0 8px;display:flex;flex-direction:column;align-items:center;gap:0;color:var(--sub);line-height:1.35}
+.wstrip button span{font-size:16px;letter-spacing:.1em}
+.wstrip button b{font-family:var(--serif);font-weight:400;font-size:15px}
+.wstrip button.on{color:var(--ink);border-bottom-color:var(--ink)}
+.wstrip button.on b{font-weight:600}
+.wstrip button.now::after{content:"";position:absolute;top:2px;right:30%;width:5px;height:5px;border-radius:50%;background:var(--red)}
+.pgrow{display:flex;align-items:baseline;justify-content:space-between;margin:2px 0 6px}
+.pgrow .pg{font-family:var(--serif);font-size:30px;font-weight:300;letter-spacing:.06em}
+.pgrow .pct{font-size:15px;color:var(--sub)}
+.prog{height:1px;background:var(--line2)}
+.prog i{height:2px;margin-top:-.5px;background:var(--accent)}
+.it.done .ck{background:var(--accent);border-color:var(--accent)}
+/* ===== 日課風：套用到其他頁 ===== */
+.pills.subnav{gap:26px;padding-bottom:14px}
+.pills.subnav .pill{font-size:21px;letter-spacing:.14em}
+.h2{font-weight:400;letter-spacing:.3em}
+.gh{letter-spacing:.3em}
+.cal .c b{font-family:var(--serif)}
+.cal .c span{font-weight:400}
+.wkh{border-bottom-color:var(--line2);align-items:center}
+.wkh .d{display:flex;align-items:baseline;gap:10px;color:var(--sub)}
+.wkh .dn{font-family:var(--serif);font-size:30px;font-weight:300;line-height:1;color:var(--ink)}
+.wkh .d small{font-size:15px;letter-spacing:.1em}
+.wkh.today .d{font-weight:400}
+.wkh .tn{font-style:normal;font-size:12px;color:var(--red);border:1px solid var(--red);padding:0 4px;line-height:1.5}
+.lgday span:first-child{font-family:var(--serif);font-size:15px;letter-spacing:.08em}
+.lgrow .a,.lgcat .l span:last-child,.lgmo .v,.lgmo .n,.lgday span:last-child{font-family:var(--serif)}
+.lgrow .a{font-size:19px}
+.lgsub{letter-spacing:.06em}
+#lgAmount{font-family:var(--serif);font-size:28px;font-weight:300;letter-spacing:.04em}
+#lgSheet .inp,#evSheet .inp{font-size:17px}
+.tbtn{text-align:left;font-family:var(--serif);letter-spacing:.06em;cursor:pointer}
+.tbtn:empty::before{content:"--:--";color:var(--sub)}
+#tpSheet .sh h2{font-size:17px;font-weight:400;letter-spacing:.2em}
+#tpSheet .sh button{font-size:16px}
+#tpSheet .lab{font-size:13px;letter-spacing:.2em}
+.tpval{font-family:var(--serif);font-size:44px;text-align:center;letter-spacing:.08em;padding:14px 0 8px}
+.tpval.e{color:var(--sub)}
+.tpg{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.tpg button{border:1px solid var(--line2);background:none;border-radius:2px;padding:7px 0;font-size:16px;font-family:var(--serif);color:var(--ink);text-align:center}
+.tpg button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}
+.dpnav{display:flex;align-items:center;justify-content:space-between;padding:6px 0 10px}
+.dpnav b{font-family:var(--serif);font-weight:400;font-size:19px;letter-spacing:.12em}
+.dpnav button{border:0;background:none;font-size:24px;color:var(--sub);padding:2px 14px;line-height:1}
+.dpwk{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:12px;color:var(--sub);letter-spacing:.1em;padding-bottom:4px}
+.dpg{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.dpg button{border:0;background:none;border-radius:2px;padding:9px 0;font-family:var(--serif);font-size:18px;color:var(--ink);text-align:center}
+.dpg button.o{color:var(--line2)}
+.dpg button.t{box-shadow:inset 0 -2px 0 var(--red)}
+.dpg button[aria-pressed=true]{background:var(--ink);color:#fff}
+#dpVal{font-size:30px;white-space:nowrap}
+.dpg button.o{color:var(--sub);opacity:.4}
+.dpb:empty::before{content:"選擇日期";color:var(--sub)}
+.tpclr{padding-top:10px;text-align:right}
+.tpclr button{border:0;background:none;color:var(--sub);font-size:15px;letter-spacing:.2em;padding:8px 0}
+#lgSheet .seg button,#evSheet .seg button{font-size:15px;padding:4px 11px}
+#lgSheet .lab,#evSheet .lab{font-size:13px;letter-spacing:.2em}
+#lgSheet .sh h2,#evSheet .sh h2{font-size:17px;font-weight:400;letter-spacing:.2em}
+#lgSheet .sh button,#evSheet .sh button{font-size:16px}
+.sech .plus{width:28px;height:28px;font-size:20px;padding:0 0 1px}
+/* ===== 月曆 ===== */
+.mcg{display:grid;grid-template-columns:18px repeat(7,minmax(0,1fr));margin:2px -4px 0}
+.mcg .h{text-align:center;font-size:12px;color:var(--sub);letter-spacing:.06em;padding:2px 0 6px}
+.mcg .wk{font-size:10px;color:var(--line2);padding:6px 0 0;text-align:center;border-top:1px solid var(--line);font-family:var(--serif)}
+.mc{position:relative;width:100%;margin:0;display:flex;flex-direction:column;align-items:stretch;gap:2px;min-height:92px;padding:3px 1px 4px;border:0;border-top:1px solid var(--line);background:none;text-align:left;overflow:hidden}
+.mc .top2{display:flex;justify-content:center;align-items:baseline;gap:3px;padding-top:1px}
+.mc b{font-family:var(--serif);font-weight:400;font-size:15px;line-height:1.3}
+.mc .mcs{font-style:normal;font-size:9px;color:var(--sub)}
+.mc .chip{display:block;font-size:10.5px;line-height:1.35;padding:1px 3px;border-radius:2px;white-space:nowrap;overflow:hidden;text-overflow:clip}
+.mc .more{font-size:10px;color:var(--sub);text-align:center}
+.mc.out{opacity:.35}
+.mc.on{background:rgba(43,42,40,.05)}
+.mc.now b{color:var(--red);font-weight:600}
+.dot.dg{background:var(--kd)}
+#mcDay .sech .meta{gap:12px}
+.evr .em{flex:none;align-self:stretch;width:3px;margin-right:-4px}
+.cl span{border-left-width:3px}
+/* ===== 行事曆字級 ===== */
+.cw .dc .d2 .sq{margin-top:2px}
+.wnav b{font-size:16px}
+.wkh .dn{font-size:26px}
+.wkh .d small{font-size:14px}
+.wkh .tn{font-size:11px}
+.evr .n{font-size:16px}
+.evr .t{font-size:13px}
+.evr .t small{font-size:11px}
+.evr .w{font-size:12px}
+.cal .h{font-size:12px}
+.cal .c{min-height:50px;gap:1px}
+.cal .c b{font-size:13px}
+.cal .c span{font-size:15px}
+#vShift .note{font-size:13px}
+#vShift .range label{font-size:13px}
+#vShift .inp{font-size:17px}
+/* ===== 字級微調（日系）===== */
+.top h1{font-size:30px;font-weight:300;letter-spacing:.14em}
+.sech h2{font-size:19px;font-weight:500;letter-spacing:.1em}
+.wnav b{font-size:18px}
+.lgbig{font-size:40px}
+.evr .n{font-size:17px}
+/* ===== ＋ 按鈕統一縮小 ===== */
+.plus,.plus.sm,.sech .plus,.wkh .plus{width:24px;height:24px;font-size:18px;padding:0 0 1px;border-width:1px}
 </style>
 </head>
 <body>
@@ -258,11 +416,17 @@ button:disabled{opacity:.45}
   <header class="top"><h1 id="pageTitle">Today</h1><button id="add" class="plus" type="button" aria-label="新增食譜" hidden>＋</button></header>
 
   <section id="vToday" hidden>
-    <div class="wnav"><button id="tPrev" type="button" aria-label="前一天">‹</button><b id="tLabel"></b><button id="tNext" type="button" aria-label="後一天">›</button></div>
-    <button id="tBack" class="tback" type="button" hidden>回到今天</button>
-    <div class="sech"><h2>Tonight</h2><span id="tMeta" class="tmeta"></span></div>
+    <div class="tdhead">
+      <div class="tdd"><span class="n" id="tdNum"></span><span class="mw"><b id="tdMon"></b><small id="tdWd"></small></span></div>
+      <span id="tdStamp" class="stamp" hidden><i>今</i><i>日</i></span><button id="tBack" class="stampbtn" type="button" hidden>回到今天</button>
+    </div>
+    <div class="wnav"><button id="tPrev" type="button" aria-label="上一週">‹</button><b id="tLabel"></b><button id="tNext" type="button" aria-label="下一週">›</button></div>
+    <div id="tStrip" class="wstrip"></div>
+    <div class="sech"><h2>晚餐</h2><span id="tMeta" class="tmeta"></span></div>
     <div id="tMeal" class="tonight"></div>
-    <div class="sech"><h2>Chores</h2><span class="meta"><span id="tLeft"></span><button id="tAdd" class="plus" type="button" aria-label="增加今天的項目">＋</button></span></div>
+    <div class="sech"><h2>行程</h2><span class="meta"><button id="evAdd" class="plus" type="button" aria-label="新增行程">＋</button></span></div>
+    <div id="tEvents"></div>
+    <div class="sech"><h2>家務</h2><span class="meta"><span id="tLeft"></span><button id="tAdd" class="plus" type="button" aria-label="增加今天的項目">＋</button></span></div>
     <div id="tForm"></div>
     <div id="tChores"></div>
   </section>
@@ -273,7 +437,7 @@ button:disabled{opacity:.45}
   </section>
 
   <section id="vMenu" hidden>
-    <nav class="pills subnav" aria-label="菜單頁籤"><button type="button" class="pill" data-sv="menu" aria-selected="true">本週</button><button type="button" class="pill" data-sv="recipes">食譜</button></nav>
+    <nav class="pills subnav" aria-label="菜單頁籤"><button type="button" class="pill" data-sv="menu">本週</button><button type="button" class="pill" data-sv="recipes">食譜</button><button type="button" class="pill" data-sv="shop">待買</button></nav>
     <div class="wnav"><button id="wPrev" type="button" aria-label="上一週">‹</button><b id="weekLabel"></b><button id="wNext" type="button" aria-label="下一週">›</button></div>
     <div class="bar slim"><button id="gen" class="btn primary" type="button">排這週菜單</button><button id="copy" class="ib" type="button" aria-label="複製成文字" title="複製成文字"><svg viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg></button><button id="mClear" class="ib warn" type="button" aria-label="清空本週菜單" title="清空本週菜單"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l.8 11a2 2 0 0 0 2 1.8h4.4a2 2 0 0 0 2-1.8L17 7M10.5 11v5M13.5 11v5"/></svg></button></div>
     <p id="menuNote" class="note"></p>
@@ -283,6 +447,7 @@ button:disabled{opacity:.45}
   </section>
 
   <section id="vShop" hidden>
+    <nav class="pills subnav" aria-label="菜單頁籤"><button type="button" class="pill" data-sv="menu">本週</button><button type="button" class="pill" data-sv="recipes">食譜</button><button type="button" class="pill" data-sv="shop">待買</button></nav>
     <div class="addrow"><input id="sName" class="inp" placeholder="新增品項（可輸入多個）" autocomplete="off" enterkeyhint="done"><button id="sAdd" class="btn primary" type="button">加入</button></div>
     <div class="bar slim"><button id="sImport" class="btn" type="button">從菜單帶入</button><button id="sCopy" class="ib" type="button" aria-label="複製清單" title="複製清單"><svg viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></svg></button><button id="sWipe" class="ib warn" type="button" aria-label="清空待買清單" title="清空待買清單"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l.8 11a2 2 0 0 0 2 1.8h4.4a2 2 0 0 0 2-1.8L17 7M10.5 11v5M13.5 11v5"/></svg></button></div>
     <div id="shopList"></div>
@@ -290,10 +455,26 @@ button:disabled{opacity:.45}
     <button id="sClear" class="logout" type="button" hidden>清除已買</button>
   </section>
 
+  <section id="vWeek" hidden>
+    <nav class="pills subnav" aria-label="行事曆頁籤"><button type="button" class="pill" data-sv="week">本週</button><button type="button" class="pill" data-sv="month">月曆</button><button type="button" class="pill" data-sv="shift">班表</button></nav>
+    <div class="wnav"><button id="wkPrev" type="button" aria-label="上一週">‹</button><b id="wkLabel"></b><button id="wkNext" type="button" aria-label="下一週">›</button></div>
+    <div class="sech" style="margin-top:4px"><span id="wkMeta" class="meta"></span><button id="wkAdd" class="plus" type="button" aria-label="新增行程">＋</button></div>
+    <div id="wkBody"></div>
+  </section>
+
+  <section id="vMonth" hidden>
+    <nav class="pills subnav" aria-label="行事曆頁籤"><button type="button" class="pill" data-sv="week">本週</button><button type="button" class="pill" data-sv="month">月曆</button><button type="button" class="pill" data-sv="shift">班表</button></nav>
+    <div class="wnav"><button id="mcPrev" type="button" aria-label="上個月">‹</button><b id="mcLabel"></b><button id="mcNext" type="button" aria-label="下個月">›</button></div>
+    <div id="mcGrid" class="mcg"></div>
+    <div id="mcLeg" class="legend"></div>
+    <div id="mcDay"></div>
+  </section>
+
   <section id="vShift" hidden>
+    <nav class="pills subnav" aria-label="行事曆頁籤"><button type="button" class="pill" data-sv="week">本週</button><button type="button" class="pill" data-sv="month">月曆</button><button type="button" class="pill" data-sv="shift">班表</button></nav>
     <div class="wnav"><button id="mPrev" type="button" aria-label="上個月">‹</button><b id="monthLabel"></b><button id="mNext" type="button" aria-label="下個月">›</button></div>
     <div id="cal" class="cal"></div>
-    <p class="note">點日期設定班別。早＝黃、中＝粉紅、夜＝藍，與「班表小幫手」相同。</p>
+    <p class="note">點日期可新增行程或設定班別。日期下的細線代表當天有行程。早＝黃、中＝粉紅、夜＝藍，與「班表小幫手」相同。</p>
     <div class="h2">區間填入</div>
     <div class="card range">
       <label>從<input id="rFrom" type="date" class="inp"></label>
@@ -310,7 +491,7 @@ button:disabled{opacity:.45}
   </section>
 
   <section id="vRecipes" hidden>
-    <nav class="pills subnav" aria-label="菜單頁籤"><button type="button" class="pill" data-sv="menu">本週</button><button type="button" class="pill" data-sv="recipes" aria-selected="true">食譜</button></nav>
+    <nav class="pills subnav" aria-label="菜單頁籤"><button type="button" class="pill" data-sv="menu">本週</button><button type="button" class="pill" data-sv="recipes">食譜</button><button type="button" class="pill" data-sv="shop">待買</button></nav>
     <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><input id="q" type="search" placeholder="搜尋菜名或食材" enterkeyhint="search" autocomplete="off"></div>
     <nav id="tabs" class="pills" role="tablist" aria-label="食譜分類"></nav>
     <div id="grid" class="tiles"></div>
@@ -319,14 +500,33 @@ button:disabled{opacity:.45}
     <div class="card sw" style="margin-top:14px"><span>顯示已停用（<span id="offCount">0</span>）</span><input type="checkbox" id="showOff" aria-label="顯示已停用"></div>
     <button id="logout" class="logout" type="button">登出</button>
   </section>
+
+  <section id="vLedger" hidden>
+    <div id="lgPin" hidden>
+      <p class="note">輸入家庭密碼後可查看與編輯記帳。</p>
+      <div class="group"><input id="lgPinIn" type="password" placeholder="家庭密碼" aria-label="家庭密碼" autocomplete="current-password" enterkeyhint="go"></div>
+      <p id="lgPinErr" class="err" role="alert"></p>
+      <button id="lgPinOk" class="btn primary wide" type="button">進入</button>
+    </div>
+    <div id="lgMain" hidden>
+      <nav class="pills subnav" id="lgMode" aria-label="記帳檢視"><button type="button" class="pill" data-lm="month">月</button><button type="button" class="pill" data-lm="year">年</button></nav>
+      <div class="wnav"><button id="lgPrev" type="button" aria-label="上個月">‹</button><b id="lgMonth"></b><button id="lgNext" type="button" aria-label="下個月">›</button></div>
+      <div id="lgSum"></div>
+      <div id="lgYear"></div>
+      <div id="lgCats"></div>
+      <div class="sech"><h2>明細</h2><span class="meta"><button id="lgAdd" class="plus" type="button" aria-label="新增一筆">＋</button></span></div>
+      <div id="lgList"></div>
+      <button id="lgLock" class="logout" type="button">鎖定記帳</button>
+    </div>
+  </section>
 </div>
 
 <nav id="tabbar" class="tabbar" hidden>
-  <button type="button" data-v="today"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.2l2.4 2.4 4.6-5"/></svg>Today</button>
-  <button type="button" data-v="menu"><svg viewBox="0 0 24 24"><path d="M9 6.5h11M9 12h11M9 17.5h11"/><circle cx="4.8" cy="6.5" r=".6"/><circle cx="4.8" cy="12" r=".6"/><circle cx="4.8" cy="17.5" r=".6"/></svg>Menu</button>
-  <button type="button" data-v="chores"><svg viewBox="0 0 24 24"><path d="M4 11l8-6.5 8 6.5v9H4z"/><path d="M10 20v-5h4v5"/></svg>Chores</button>
-  <button type="button" data-v="shop"><svg viewBox="0 0 24 24"><path d="M4 8.5h16l-1.5 9.2a2 2 0 0 1-2 1.7H7.5a2 2 0 0 1-2-1.7z"/><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"/></svg>Shopping</button>
-  <button type="button" data-v="shift"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>Shift</button>
+  <button type="button" data-v="today"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.2l2.4 2.4 4.6-5"/></svg>今天</button>
+  <button type="button" data-v="menu"><svg viewBox="0 0 24 24"><path d="M9 6.5h11M9 12h11M9 17.5h11"/><circle cx="4.8" cy="6.5" r=".6"/><circle cx="4.8" cy="12" r=".6"/><circle cx="4.8" cy="17.5" r=".6"/></svg>菜單</button>
+  <button type="button" data-v="chores"><svg viewBox="0 0 24 24"><path d="M4 11l8-6.5 8 6.5v9H4z"/><path d="M10 20v-5h4v5"/></svg>家務</button>
+  <button type="button" data-v="week"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>行事曆</button>
+  <button type="button" data-v="ledger"><svg viewBox="0 0 24 24"><rect x="4" y="4.5" width="16" height="15" rx="2.5"/><path d="M8 9.5h8M8 13.5h5"/></svg>記帳</button>
 </nav>
 
 <dialog id="sheet">
@@ -352,6 +552,54 @@ button:disabled{opacity:.45}
       </div>
     </div>
   </form>
+</dialog>
+
+<dialog id="evSheet">
+  <div class="sh"><button type="button" id="evCancel">取消</button><h2 id="evSheetTitle">新增行程</h2><button type="button" id="evSave" class="go">儲存</button></div>
+  <div class="sbody">
+    <div class="grp"><label class="lab" for="evTitle">要做什麼</label><input id="evTitle" class="inp" maxlength="60" autocomplete="off" placeholder="例：家長會、牙醫、阿嬤生日"></div>
+    <div class="grp"><label class="lab" for="evDate">日期</label><input id="evDate" class="inp" type="date"></div>
+    <div class="grp"><div class="range"><label>開始時間<input id="evTime" type="hidden"><button type="button" id="evTimeB" class="inp tbtn" data-t="evTime"></button></label><label>結束時間（可留空）<input id="evEnd" type="hidden"><button type="button" id="evEndB" class="inp tbtn" data-t="evEnd"></button></label></div><p class="note">兩者都留空＝全天</p></div>
+    <div class="grp"><span class="lab">參與成員（可複選，都不選＝其他）</span><div id="evWho" class="seg"></div></div>
+    <p id="evErr" class="err" role="alert"></p>
+    <div id="evDelW"><button type="button" id="evDel" class="trash" aria-label="刪除這個行程" title="刪除這個行程"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-12M9 7V4h6v3"/></svg></button></div>
+  </div>
+</dialog>
+
+<dialog id="tpSheet">
+  <div class="sh"><button type="button" id="tpCancel">取消</button><h2 id="tpTitle">開始時間</h2><button type="button" id="tpOk" class="go">確定</button></div>
+  <div class="sbody">
+    <div id="tpVal" class="tpval"></div>
+    <div class="grp"><span class="lab">時</span><div id="tpH" class="tpg"></div></div>
+    <div class="grp"><span class="lab">分</span><div id="tpM" class="tpg"></div></div>
+    <div class="tpclr"><button type="button" id="tpClr">清除</button></div>
+  </div>
+</dialog>
+
+<dialog id="dpSheet">
+  <div class="sh"><button type="button" id="dpCancel">取消</button><h2 id="dpTitle">日期</h2><button type="button" id="dpToday" class="go">今天</button></div>
+  <div class="sbody">
+    <div id="dpVal" class="tpval"></div>
+    <div class="dpnav"><button type="button" id="dpPrev" aria-label="上個月">‹</button><b id="dpMon"></b><button type="button" id="dpNext" aria-label="下個月">›</button></div>
+    <div class="dpwk"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+    <div id="dpGrid" class="dpg"></div>
+    <div class="tpclr"><button type="button" id="dpClr">清除</button></div>
+  </div>
+</dialog>
+
+<dialog id="lgSheet">
+  <div class="sh"><button type="button" id="lgCancel">取消</button><h2 id="lgSheetTitle">編輯</h2><button type="button" id="lgSave" class="go">儲存</button></div>
+  <div class="sbody">
+    <div class="grp" id="lgKindW"><span class="lab">類型</span><div id="lgKindSeg" class="seg"></div></div>
+    <div class="grp"><label class="lab" for="lgAmount">金額</label><input id="lgAmount" class="inp" type="number" inputmode="numeric" min="1" placeholder="0"></div>
+    <div class="grp"><label class="lab" for="lgItem">項目</label><input id="lgItem" class="inp" maxlength="40" autocomplete="off" placeholder="例：午餐、全聯"></div>
+    <div class="grp"><span class="lab">分類</span><div id="lgCatSeg" class="seg"></div></div>
+    <div class="grp" id="lgPayW"><span class="lab">付款方式</span><div id="lgPaySeg" class="seg"></div></div>
+    <div class="grp"><label class="lab" for="lgDate">日期</label><input id="lgDate" class="inp" type="date"></div>
+    <div class="grp"><label class="lab" for="lgNote">說明</label><input id="lgNote" class="inp" maxlength="100" autocomplete="off" placeholder="可留空"></div>
+    <p id="lgErr" class="err" role="alert"></p>
+    <div id="lgDelW"><button type="button" id="lgDel" class="trash" aria-label="刪除這筆" title="刪除這筆"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-12M9 7V4h6v3"/></svg></button></div>
+  </div>
 </dialog>
 
 <dialog id="pick">
@@ -426,7 +674,7 @@ $('loginForm').addEventListener('submit', async e => {
   const err = $('lErr'); err.hidden = true; $('lBtn').disabled = true;
   const { error } = await db.auth.signInWithPassword({ email: $('lEmail').value.trim(), password: $('lPass').value });
   $('lBtn').disabled = false;
-  if (error){ err.textContent = '登入失敗：Email 或密碼不正確，請再試一次。'; err.hidden = false; }
+  if (error){ err.textContent = (/Invalid login/i.test(error.message || '') ? '登入失敗：Email 或密碼不正確，請再試一次。' : '登入失敗：' + (error.message || '無法連線') + '（若在預覽視窗開啟，請改用正式網址）'); err.hidden = false; }
   else $('lPass').value = '';
 });
 $('logout').addEventListener('click', () => db.auth.signOut());
@@ -449,21 +697,27 @@ async function loadAll(){
 }
 
 /* ---------- 頁面切換 ---------- */
-const TITLES = { today:'Today', menu:'Menu', chores:'Chores', shop:'Shopping', shift:'Shift', recipes:'Menu' };
+const TITLES = { today:'Today', menu:'菜單', chores:'家務', shop:'菜單', shift:'行事曆', week:'行事曆', month:'行事曆', recipes:'菜單', ledger:'記帳' };
+const MENU_VIEWS = ['menu','shop','recipes'];
 async function show(v){
   view = v;
   $('vToday').hidden = v !== 'today'; $('vChores').hidden = v !== 'chores';
-  $('vMenu').hidden = v !== 'menu'; $('vShop').hidden = v !== 'shop'; $('vShift').hidden = v !== 'shift'; $('vRecipes').hidden = v !== 'recipes';
-  const tabV = v === 'recipes' ? 'menu' : v;
+  $('vMenu').hidden = v !== 'menu'; $('vShop').hidden = v !== 'shop'; $('vShift').hidden = v !== 'shift'; $('vWeek').hidden = v !== 'week'; $('vMonth').hidden = v !== 'month'; $('vRecipes').hidden = v !== 'recipes'; $('vLedger').hidden = v !== 'ledger';
+  const tabV = MENU_VIEWS.includes(v) ? 'menu' : (v === 'shift' || v === 'month') ? 'week' : v;
+  document.querySelectorAll('[data-sv]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.sv === v)));
   $('add').hidden = v !== 'recipes';
   $('pageTitle').textContent = TITLES[v];
+  document.querySelector('header.top').hidden = v === 'today';
   document.querySelectorAll('#tabbar button').forEach(b => { if (b.dataset.v === tabV) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
   if (v === 'today') await renderToday();
   if (v === 'chores') await renderChores();
   if (v === 'menu') await renderMenu();
   if (v === 'shop') await renderShop();
   if (v === 'shift') await renderShift();
+  if (v === 'week') await renderWeek();
+  if (v === 'month') await renderMonth();
   if (v === 'recipes') renderRecipes();
+  if (v === 'ledger') await window.ledgerShow();
 }
 $('tabbar').addEventListener('click', e => { const b = e.target.closest('button'); if (b){ window.scrollTo(0, 0); show(b.dataset.v); } });
 document.addEventListener('click', e => { const b = e.target.closest('[data-sv]'); if (b) show(b.dataset.sv); });
@@ -788,18 +1042,247 @@ $('copy').addEventListener('click', async () => {
   catch { openPick('複製菜單文字', `<textarea readonly id="cpText">${esc(text)}</textarea>`, () => {}); $('cpText').select(); }
 });
 
+/* ---------- 行事曆（與班別放一起）---------- */
+const EV_MEM = ['爸爸','媽媽','姊姊','弟弟'];
+let evSel = new Set();
+const EV_C = { '爸爸':['#DCEED7','#3D7A38','#6FAE68'], '媽媽':['#F8EDC4','#86680F','#E3B93C'], '姊姊':['#E7DDF2','#6A4D95','#9A7FBF'], '弟弟':['#D8E8F6','#2D6396','#5A93C8'] };
+const EV_RED = ['#F6D8D4','#AE3A32','#D9645B'], EV_GRAY = ['#ECE9E2','#6D685E','#A39E92'];
+function evColor(e){
+  const a = EV_MEM.filter(x => (e.members || []).includes(x));
+  let c;
+  if (!a.length) c = EV_GRAY;
+  else if (a.length === EV_MEM.length || (a.length === 2 && a.includes('姊姊') && a.includes('弟弟'))) c = EV_RED;
+  else if (a.length === 1) c = EV_C[a[0]];
+  else c = EV_GRAY;
+  return { bg: c[0], fg: c[1], solid: c[2], bar: c[2] };
+}
+const evWho = e => { const a = (e.members || []).filter(x => EV_MEM.includes(x)); return !a.length ? '其他' : a.length >= EV_MEM.length ? '' : a.join('、'); };
+function evChips(){
+  $('evWho').innerHTML = `<button type="button" data-w="全家" aria-pressed="${EV_MEM.every(m => evSel.has(m))}">全家</button>` + EV_MEM.map(m => `<button type="button" data-w="${m}" aria-pressed="${evSel.has(m)}">${m}</button>`).join('');
+}
+$('evWho').addEventListener('click', e => {
+  const b = e.target.closest('[data-w]'); if (!b) return;
+  if (b.dataset.w === '全家') evSel = EV_MEM.every(m => evSel.has(m)) ? new Set() : new Set(EV_MEM);
+  else evSel.has(b.dataset.w) ? evSel.delete(b.dataset.w) : evSel.add(b.dataset.w);
+  evChips();
+});
+let tEv = [], tEvErr = '', evMonth = {}, evEditing = null;
+const evTime = t => t ? String(t).slice(0, 5) : '';
+const evSort = (a, b) => (a.start_time || '') < (b.start_time || '') ? -1 : (a.start_time || '') > (b.start_time || '') ? 1 : (a.id < b.id ? -1 : 1);
+const evSpan = e => e.start_time ? evTime(e.start_time) + (e.end_time ? '–' + evTime(e.end_time) : '') : '';
+const evRow = e => `<button type="button" class="evr" data-eid="${e.id}"><i class="em" style="background:${evColor(e).bar}"></i><span class="t">${e.start_time ? evTime(e.start_time) + (e.end_time ? `<small>- ${evTime(e.end_time)}</small>` : '') : '全天'}</span><span class="n">${esc(e.title)}</span>${evWho(e) ? `<span class="w">${esc(evWho(e))}</span>` : ''}</button>`;
+function openEv(e, ds){
+  evEditing = e || null;
+  $('evErr').textContent = '';
+  $('evSheetTitle').textContent = e ? '編輯行程' : '新增行程';
+  $('evTitle').value = e ? e.title : '';
+  $('evDate').value = e ? e.event_date : ds;
+  $('evTime').value = e ? evTime(e.start_time) : '';
+  $('evEnd').value = e ? evTime(e.end_time) : '';
+  tpShow();
+  evSel = new Set(e ? (e.members || []).filter(x => EV_MEM.includes(x)) : EV_MEM);
+  evChips();
+  $('evDelW').hidden = !e;
+  $('evSheet').showModal();
+}
+/* 時間選擇（取代瀏覽器內建選單，24 小時制） */
+const p2 = n => String(n).padStart(2, '0');
+let tpTarget = null, tpH = null, tpM = null;
+const tpShow = () => { ['evTime','evEnd'].forEach(id => { $(id + 'B').textContent = $(id).value; }); };
+function tpDraw(){
+  $('tpH').innerHTML = Array.from({ length: 24 }, (_, h) => `<button type="button" data-h="${h}" aria-pressed="${tpH === h}">${p2(h)}</button>`).join('');
+  $('tpM').innerHTML = Array.from({ length: 12 }, (_, i) => `<button type="button" data-m="${i * 5}" aria-pressed="${tpM === i * 5}">${p2(i * 5)}</button>`).join('');
+  const v = $('tpVal'); v.textContent = tpH === null ? '--:--' : p2(tpH) + ':' + p2(tpM ?? 0); v.classList.toggle('e', tpH === null);
+}
+function openTp(id){
+  tpTarget = id;
+  const cur = $(id).value;
+  if (cur) { tpH = Number(cur.slice(0, 2)); tpM = Number(cur.slice(3, 5)); }
+  else if (id === 'evEnd' && $('evTime').value) { tpH = Math.min(23, Number($('evTime').value.slice(0, 2)) + 1); tpM = Number($('evTime').value.slice(3, 5)); }
+  else { tpH = null; tpM = 0; }
+  $('tpTitle').textContent = id === 'evTime' ? '開始時間' : '結束時間';
+  tpDraw();
+  $('tpSheet').showModal();
+}
+document.querySelectorAll('.tbtn').forEach(b => b.addEventListener('click', () => openTp(b.dataset.t)));
+$('tpH').addEventListener('click', e => { const b = e.target.closest('[data-h]'); if (b){ tpH = Number(b.dataset.h); tpDraw(); } });
+$('tpM').addEventListener('click', e => { const b = e.target.closest('[data-m]'); if (b){ tpM = Number(b.dataset.m); if (tpH === null) tpH = 9; tpDraw(); } });
+$('tpCancel').addEventListener('click', () => $('tpSheet').close());
+$('tpClr').addEventListener('click', () => { $(tpTarget).value = ''; tpShow(); $('tpSheet').close(); });
+$('tpOk').addEventListener('click', () => { if (tpH !== null) $(tpTarget).value = p2(tpH) + ':' + p2(tpM ?? 0); tpShow(); $('tpSheet').close(); });
+/* 日期選擇（取代瀏覽器內建日曆） */
+const DP_WD = '日一二三四五六';
+const dpLabel = v => /^\d{4}-\d{2}-\d{2}$/.test(v || '') ? `${v.slice(0, 4)}/${v.slice(5, 7)}/${v.slice(8, 10)}（${DP_WD[new Date(+v.slice(0, 4), +v.slice(5, 7) - 1, +v.slice(8, 10)).getDay()]}）` : '';
+const dpYmd = (y, m, d) => { const t = new Date(y, m, d); return `${t.getFullYear()}-${p2(t.getMonth() + 1)}-${p2(t.getDate())}`; };
+let dpInp = null, dpY = 0, dpM = 0;
+function dpDraw(){
+  const sel = dpInp.value, now = new Date(), today = dpYmd(now.getFullYear(), now.getMonth(), now.getDate());
+  $('dpMon').textContent = `${dpY} 年 ${dpM + 1} 月`;
+  $('dpVal').textContent = dpLabel(sel) || '--'; $('dpVal').classList.toggle('e', !sel);
+  const first = new Date(dpY, dpM, 1), lead = (first.getDay() + 6) % 7;
+  let h = '';
+  for (let i = 0; i < 42; i++){
+    const ds = dpYmd(dpY, dpM, 1 - lead + i), d = new Date(+ds.slice(0, 4), +ds.slice(5, 7) - 1, +ds.slice(8, 10));
+    h += `<button type="button" data-d="${ds}" class="${d.getMonth() !== dpM ? 'o ' : ''}${ds === today ? 't' : ''}" aria-pressed="${ds === sel}">${d.getDate()}</button>`;
+  }
+  $('dpGrid').innerHTML = h;
+}
+function openDp(inp, title){
+  dpInp = inp;
+  const v = /^\d{4}-\d{2}-\d{2}$/.test(inp.value) ? inp.value : null, n = new Date();
+  dpY = v ? +v.slice(0, 4) : n.getFullYear(); dpM = v ? +v.slice(5, 7) - 1 : n.getMonth();
+  $('dpTitle').textContent = title || '日期';
+  dpDraw(); $('dpSheet').showModal();
+}
+function dpSet(v){ dpInp.value = v; dpInp.dispatchEvent(new Event('change', { bubbles: true })); $('dpSheet').close(); }
+document.querySelectorAll('input[type=date]').forEach(inp => {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'inp tbtn dpb';
+  const desc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value'), v0 = inp.value;
+  inp.type = 'hidden';
+  Object.defineProperty(inp, 'value', { get(){ return desc.get.call(this); }, set(x){ desc.set.call(this, x); b.textContent = dpLabel(x); } });
+  inp.after(b); b.textContent = dpLabel(v0);
+  const lab = inp.closest('label') ? inp.closest('label').firstChild.textContent.trim() : (document.querySelector(`label[for="${inp.id}"]`)?.textContent || '日期');
+  b.addEventListener('click', () => openDp(inp, lab));
+});
+$('dpCancel').addEventListener('click', () => $('dpSheet').close());
+$('dpPrev').addEventListener('click', () => { dpM--; if (dpM < 0){ dpM = 11; dpY--; } dpDraw(); });
+$('dpNext').addEventListener('click', () => { dpM++; if (dpM > 11){ dpM = 0; dpY++; } dpDraw(); });
+$('dpGrid').addEventListener('click', e => { const b = e.target.closest('[data-d]'); if (b) dpSet(b.dataset.d); });
+$('dpToday').addEventListener('click', () => { const n = new Date(); dpSet(dpYmd(n.getFullYear(), n.getMonth(), n.getDate())); });
+$('dpClr').addEventListener('click', () => dpSet(''));
+const closeEv = () => { if ($('evSheet').open) $('evSheet').close(); evEditing = null; };
+async function refreshEv(){
+  if (view === 'shift') await renderShift();
+  if (view === 'week') await renderWeek();
+  if (view === 'month') await renderMonth();
+  if (view === 'today') await renderToday();
+}
+async function saveEv(){
+  const title = $('evTitle').value.trim(), date = $('evDate').value;
+  if (!title){ $('evErr').textContent = '請輸入要做什麼'; return; }
+  if (!date){ $('evErr').textContent = '請選擇日期'; return; }
+  const st = $('evTime').value || null, en = $('evEnd').value || null;
+  if (en && !st){ $('evErr').textContent = '有結束時間時，請填開始時間'; return; }
+  if (en && en <= st){ $('evErr').textContent = '結束時間要晚於開始時間'; return; }
+  const row = { title, event_date: date, start_time: st, end_time: en, members: EV_MEM.filter(m => evSel.has(m)) };
+  $('evSave').disabled = true;
+  const r = evEditing ? await db.from('events').update(row).eq('id', evEditing.id)
+                      : await db.from('events').insert({ ...row, source: '手動' });
+  $('evSave').disabled = false;
+  if (r.error){ $('evErr').textContent = '儲存失敗：' + r.error.message; return; }
+  closeEv(); await refreshEv();
+}
+async function delEv(){
+  if (!evEditing) return;
+  const e = evEditing;
+  if (!(await ask('刪除這個行程？', `${md(e.event_date)}　${e.title}`, '刪除', true))) return;
+  const r = await db.from('events').delete().eq('id', e.id);
+  if (r.error){ $('evErr').textContent = '刪除失敗：' + r.error.message; return; }
+  closeEv(); await refreshEv();
+}
+$('evCancel').addEventListener('click', closeEv);
+$('evSave').addEventListener('click', saveEv);
+$('evDel').addEventListener('click', delEv);
+$('evSheet').addEventListener('click', e => { if (e.target === $('evSheet')) closeEv(); });
+$('evAdd').addEventListener('click', () => openEv(null, fmt(tDay)));
+$('tEvents').addEventListener('click', e => { const b = e.target.closest('[data-eid]'); if (b) openEv(tEv.find(x => String(x.id) === b.dataset.eid)); });
+
+/* ---------- 行事曆：本週 ---------- */
+let calWeek = mondayOf(new Date()), evWeek = [], shiftOf = {};
+async function renderWeek(){
+  const gs = calWeek, ge = addDays(gs, 6);
+  $('wkLabel').textContent = `${md(fmt(gs))} – ${md(fmt(ge))}`;
+  const [sr, er] = await Promise.all([
+    db.from('shifts').select('*').gte('shift_date', fmt(gs)).lte('shift_date', fmt(ge)),
+    db.from('events').select('*').gte('event_date', fmt(gs)).lte('event_date', fmt(ge))
+  ]);
+  if (sr.error) toast('班表讀取失敗：' + sr.error.message, true);
+  if (er.error) toast('行事曆讀取失敗：' + er.error.message, true);
+  const sh = Object.fromEntries((sr.data || []).map(x => [x.shift_date, x.shift]));
+  Object.assign(shiftOf, sh);
+  evWeek = (er.data || []).slice().sort(evSort);
+  const today = fmt(new Date());
+  $('wkMeta').textContent = `本週共 ${evWeek.length} 個行程`;
+  let h = '';
+  for (let i = 0; i < 7; i++){
+    const d = addDays(gs, i), ds = fmt(d), evs = evWeek.filter(x => x.event_date === ds);
+    const body = evs.length ? evs.map(x => `<span style="border-left-color:${evColor(x).solid}">${x.start_time ? evTime(x.start_time) + '　' : ''}${esc(x.title)}${evWho(x) ? `<small>${esc(evWho(x))}</small>` : ''}</span>`).join('') : '<span class="emp">無</span>';
+    h += `<button type="button" class="cw${ds === today ? ' now' : ''}" data-cd="${ds}"><span class="dc"><b>週${WD[d.getDay()]}</b><span class="d1">${md(ds)}</span>${sh[ds] ? `<span class="d2"><span class="sq">${sh[ds] === '休假' ? '休' : esc(sh[ds])}</span></span>` : ''}</span><span class="cl">${body}</span></button>`;
+  }
+  $('wkBody').innerHTML = h + '<p class="note">點日期可新增行程、修改行程或設定班別。</p>';
+}
+$('wkPrev').addEventListener('click', () => { calWeek = addDays(calWeek, -7); renderWeek(); });
+$('wkNext').addEventListener('click', () => { calWeek = addDays(calWeek, 7); renderWeek(); });
+$('wkBody').addEventListener('click', e => { const b = e.target.closest('[data-cd]'); if (b) dayPanel(b.dataset.cd, evWeek.filter(x => x.event_date === b.dataset.cd)); });
+$('wkAdd').addEventListener('click', () => { const t = fmt(new Date()); openEv(null, t >= fmt(calWeek) && t <= fmt(addDays(calWeek, 6)) ? t : fmt(calWeek)); });
+
+/* ---------- 行事曆：月曆 ---------- */
+let mcMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1), mcSel = fmt(new Date()), mcEv = {}, mcList = [];
+async function renderMonth(){
+  const gs = mondayOf(mcMonth), ge = addDays(gs, 41);
+  $('mcLabel').textContent = `${mcMonth.getFullYear()} 年 ${mcMonth.getMonth() + 1} 月`;
+  const [sr, er] = await Promise.all([
+    db.from('shifts').select('*').gte('shift_date', fmt(gs)).lte('shift_date', fmt(ge)),
+    db.from('events').select('*').gte('event_date', fmt(gs)).lte('event_date', fmt(ge))
+  ]);
+  if (sr.error) toast('班表讀取失敗：' + sr.error.message, true);
+  if (er.error) toast('行事曆讀取失敗：' + er.error.message, true);
+  const sh = Object.fromEntries((sr.data || []).map(x => [x.shift_date, x.shift]));
+  Object.assign(shiftOf, sh);
+  mcList = (er.data || []).slice().sort(evSort); mcEv = {};
+  mcList.forEach(x => (mcEv[x.event_date] = mcEv[x.event_date] || []).push(x));
+  const today = fmt(new Date());
+  const isoWeek = d => { const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); const dn = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - dn); const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1)); return Math.ceil(((t - y0) / 864e5 + 1) / 7); };
+  let h = '<div></div>' + ['一','二','三','四','五','六','日'].map(x => `<div class="h">${x}</div>`).join('');
+  for (let i = 0; i < 42; i++){
+    const d = addDays(gs, i), ds = fmt(d), evs = mcEv[ds] || [];
+    if (i % 7 === 0) h += `<div class="wk">${isoWeek(d)}</div>`;
+    const chips = evs.slice(0, 3).map(x => { const c = evColor(x); return `<span class="chip" style="background:${c.bg};color:${c.fg}">${esc(x.title)}</span>`; }).join('');
+    h += `<button type="button" class="mc${d.getMonth() !== mcMonth.getMonth() ? ' out' : ''}${ds === mcSel ? ' on' : ''}${ds === today ? ' now' : ''}" data-mc="${ds}">` +
+      `<span class="top2"><b>${d.getDate()}</b>${sh[ds] ? `<i class="mcs">${sh[ds] === '休假' ? '休' : esc(sh[ds])}</i>` : ''}</span>${chips}${evs.length > 3 ? `<span class="more">+${evs.length - 3}</span>` : ''}</button>`;
+  }
+  $('mcGrid').innerHTML = h;
+  $('mcLeg').innerHTML = [['爸爸', EV_C['爸爸'][2]], ['媽媽', EV_C['媽媽'][2]], ['姊姊', EV_C['姊姊'][2]], ['弟弟', EV_C['弟弟'][2]], ['小孩・全家', EV_RED[2]], ['其他', EV_GRAY[2]]]
+    .map(([n, c]) => `<span><i class="dot" style="--kd:${c}"></i>${n}</span>`).join('');
+  drawMcDay();
+}
+function drawMcDay(){
+  const evs = mcEv[mcSel] || [], d = parse(mcSel), sh = shiftOf[mcSel];
+  $('mcDay').innerHTML = `<div class="sech"><h2>${md(mcSel)}　週${WD[d.getDay()]}</h2><span class="meta">${sh ? `<span class="sq">${sh === '休假' ? '休' : esc(sh)}</span>` : ''}<button id="mcAdd" class="plus" type="button" aria-label="新增行程">＋</button></span></div>` +
+    (evs.length ? evs.map(evRow).join('') : '<p class="note">這天沒有行程</p>');
+}
+$('mcPrev').addEventListener('click', () => { mcMonth = new Date(mcMonth.getFullYear(), mcMonth.getMonth() - 1, 1); mcSel = fmt(mcMonth); renderMonth(); });
+$('mcNext').addEventListener('click', () => { mcMonth = new Date(mcMonth.getFullYear(), mcMonth.getMonth() + 1, 1); mcSel = fmt(mcMonth); renderMonth(); });
+$('mcGrid').addEventListener('click', e => {
+  const b = e.target.closest('[data-mc]'); if (!b) return;
+  mcSel = b.dataset.mc; const d = parse(mcSel);
+  if (d.getMonth() !== mcMonth.getMonth()) mcMonth = new Date(d.getFullYear(), d.getMonth(), 1);
+  renderMonth();
+});
+$('mcDay').addEventListener('click', e => {
+  if (e.target.closest('#mcAdd')) return openEv(null, mcSel);
+  const b = e.target.closest('[data-eid]'); if (b) openEv(mcList.find(x => String(x.id) === b.dataset.eid));
+});
+
 /* ---------- 班別 ---------- */
 async function renderShift(){
   const gs = mondayOf(monthStart), ge = addDays(gs, 41);
   $('monthLabel').textContent = `${monthStart.getFullYear()} 年 ${monthStart.getMonth()+1} 月`;
-  const r = await db.from('shifts').select('*').gte('shift_date', fmt(gs)).lte('shift_date', fmt(ge));
+  const [r, er] = await Promise.all([
+    db.from('shifts').select('*').gte('shift_date', fmt(gs)).lte('shift_date', fmt(ge)),
+    db.from('events').select('*').gte('event_date', fmt(gs)).lte('event_date', fmt(ge))
+  ]);
   if (r.error) return toast('讀取失敗：' + r.error.message, true);
+  evMonth = {};
+  if (er.error) toast('行事曆讀取失敗：' + er.error.message, true);
+  else er.data.forEach(x => (evMonth[x.event_date] = evMonth[x.event_date] || []).push(x));
   const map = Object.fromEntries(r.data.map(x => [x.shift_date, x.shift]));
+  Object.assign(shiftOf, map);
   const today = fmt(new Date());
   let h = ['一','二','三','四','五','六','日'].map(x => `<div class="h">${x}</div>`).join('');
   for (let i = 0; i < 42; i++){
     const d = addDays(gs, i), ds = fmt(d), sh = map[ds];
-    h += `<button type="button" class="c${sh ? ' s-' + esc(sh) : ''}${d.getMonth() !== monthStart.getMonth() ? ' out' : ''}" data-d="${ds}"><b${ds === today ? ' class="today"' : ''}>${d.getDate()}</b><span>${sh ? esc(sh) : '·'}</span></button>`;
+    h += `<button type="button" class="c${sh ? ' s-' + esc(sh) : ''}${d.getMonth() !== monthStart.getMonth() ? ' out' : ''}" data-d="${ds}"><b${ds === today ? ' class="today"' : ''}>${d.getDate()}</b><span>${sh ? esc(sh) : '·'}</span>${evMonth[ds] ? '<i class="ev"></i>' : ''}</button>`;
   }
   $('cal').innerHTML = h;
   if (!$('cycTo').value) $('cycTo').value = fmt(new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0));
@@ -814,12 +1297,27 @@ async function saveShift(dates, s){
   if (r.error) return toast('儲存失敗：' + r.error.message, true);
   await renderShift();
 }
-$('cal').addEventListener('click', e => {
-  const b = e.target.closest('.c'); if (!b) return;
-  const ds = b.dataset.d;
+function shiftPick(ds){
   openPick(`${md(ds)} 的班別`,
     SHIFTS.map(s => `<button data-s="${s}"><b>${s === '休假' ? '休假' : s + '班'}</b></button>`).join('') + `<button data-s="">清除這天</button>`,
     async btn => { closePick(); await saveShift([ds], btn.dataset.s || null); });
+}
+function dayPanel(ds, list){
+  const evs = list.slice().sort(evSort);
+  const cur = shiftOf[ds];
+  openPick(`${md(ds)}（${WD[parse(ds).getDay()]}）`,
+    evs.map(x => `<button data-e="${x.id}"><b>${x.start_time ? evSpan(x) + '　' : ''}${esc(x.title)}</b>${evWho(x) ? `<small>${esc(evWho(x))}</small>` : ''}</button>`).join('') +
+    `<button data-add="1"><b>＋ 新增行程</b></button><button data-sh="1"><b>設定班別</b><small>${cur ? esc(cur) : '未設定'}</small></button>`,
+    btn => {
+      closePick();
+      if (btn.dataset.e) openEv(evs.find(x => String(x.id) === btn.dataset.e));
+      else if (btn.dataset.add) openEv(null, ds);
+      else if (btn.dataset.sh) shiftPick(ds);
+    });
+}
+$('cal').addEventListener('click', e => {
+  const b = e.target.closest('.c'); if (!b) return;
+  dayPanel(b.dataset.d, evMonth[b.dataset.d] || []);
 });
 $('rGo').addEventListener('click', async () => {
   const a = $('rFrom').value, b = $('rTo').value;
@@ -1214,22 +1712,30 @@ async function chLoad(){
 /* ---------- Today ---------- */
 async function renderToday(){
   const ds = fmt(tDay), isT = ds === fmt(new Date());
-  $('tLabel').textContent = `${md(ds)}（${WD[tDay.getDay()]}）`;
-  $('tBack').hidden = isT;
+  const tws = mondayOf(tDay);
+  $('tLabel').textContent = `${md(fmt(tws))}–${md(fmt(addDays(tws, 6)))}`;
+  $('tdNum').textContent = tDay.getDate(); $('tdMon').textContent = `${tDay.getMonth() + 1} 月`; $('tdWd').textContent = `週${WD[tDay.getDay()]}`;
+  $('tdStamp').hidden = !isT; $('tBack').hidden = isT;
+  $('tStrip').innerHTML = ['一','二','三','四','五','六','日'].map((w, i) => { const d = addDays(tws, i), x = fmt(d);
+    return `<button type="button" data-td="${x}" class="${x === ds ? 'on' : ''}${x === fmt(new Date()) ? ' now' : ''}"><span>${w}</span><b>${d.getDate()}</b></button>`; }).join('');
   const rs = await Promise.all([
     db.from('shifts').select('*').eq('shift_date', ds),
     db.from('meals').select('*').eq('meal_date', ds),
     db.from('meal_items').select('*').eq('meal_date', ds),
     db.from('chore_done').select('key').eq('log_date', ds),
     isT ? db.from('chore_extras').select('*').or(`log_date.eq.${ds},and(done.eq.false,log_date.lt.${ds})`)
-        : db.from('chore_extras').select('*').eq('log_date', ds)
+        : db.from('chore_extras').select('*').eq('log_date', ds),
+    db.from('events').select('*').eq('event_date', ds)
   ]);
+  tEv = rs[5].error ? null : (rs[5].data || []).slice().sort(evSort);
+  if (rs[5].error) tEvErr = rs[5].error.message;
   if (rs.slice(0, 3).some(x => x.error)) toast('讀取晚餐失敗：' + rs.find(x => x.error).error.message, true);
   tMealData = { sh: rs[0].data && rs[0].data[0] && rs[0].data[0].shift, m: rs[1].data && rs[1].data[0], items: rs[2].data || [] };
   if (rs[3].error || rs[4].error){ chErr = chErr || (rs[3].error || rs[4].error).message; tDone = new Set(); tExtras = []; }
   else { tDone = new Set(rs[3].data.map(x => x.key)); tExtras = rs[4].data; }
   drawToday();
 }
+const isTodayDs = ds => ds === fmt(new Date());
 function drawToday(){
   const ds = fmt(tDay), { sh, m, items } = tMealData, cfg = shiftSet[sh];
   const type = m ? m.day_type : weekdaySet[isoWd(tDay)];
@@ -1240,6 +1746,8 @@ function drawToday(){
     : !its.length ? '<p class="note">尚未排餐</p>'
     : its.map(it => { const r = byId[it.recipe_id]; return `<span class="tile k-${kindOf(r)}">${esc(r ? r.name : '（已刪除）')}</span>`; }).join('');
 
+  $('tEvents').innerHTML = tEv === null ? `<p class="note">行事曆尚未啟用（${esc(tEvErr)}）</p>`
+    : tEv.length ? tEv.map(evRow).join('') : `<p class="note">${isTodayDs(ds) ? '今天' : '這天'}沒有行程</p>`;
   $('tAdd').classList.toggle('open', tForm);
   $('tForm').innerHTML = tForm ? tFormHtml() : '';
   if (tForm) tFormSync(true);
@@ -1249,7 +1757,7 @@ function drawToday(){
   if (!list.length){ $('tLeft').textContent = ''; $('tChores').innerHTML = `<p class="note">${tDay.getDay() === 6 ? '週六不排家務' : '今天沒有家務'}</p>`; return; }
   const total = list.reduce((a, t) => a + t.min, 0), left = list.filter(t => !t.done).reduce((a, t) => a + t.min, 0), n = list.filter(t => t.done).length;
   $('tLeft').innerHTML = left ? `<span class="${total > CH_LIMIT ? 'over' : ''}">剩 ${left} 分</span>` : '全部完成';
-  $('tChores').innerHTML = `<div class="prog"><i style="width:${n / list.length * 100}%"></i></div>` + chGroup(list).map(([a, ts]) =>
+  $('tChores').innerHTML = `<div class="pgrow"><span class="pg">${n} / ${list.length}</span><span class="pct">${Math.round(n / list.length * 100)}%</span></div><div class="prog"><i style="width:${n / list.length * 100}%"></i></div>` + chGroup(list).map(([a, ts]) =>
     `<div class="gh"><span>${esc(a)}</span></div>` + ts.map(t => {
       const bd = t.carry ? `順延 ${md(t.carry)}` : t.once ? '單次' : t.freq === 'quarterly' ? '季' : t.freq === 'halfyear' ? '半年' : '';
       return `<div class="it chit${t.done ? ' done' : ''}"><button type="button" class="ck" data-k="${esc(t.key)}" aria-pressed="${!!t.done}" aria-label="${t.done ? '取消完成' : '完成'}「${esc(t.name)}」"></button><button type="button" class="in" data-k="${esc(t.key)}"><span class="nm">${esc(t.name)}</span></button><small class="mn">${bd ? `<span class="bd">${esc(bd)}</span>` : ''}${t.min} 分</small></div>`;
@@ -1301,8 +1809,9 @@ $('tChores').addEventListener('click', async e => {
     : await db.from('chore_done').insert({ key, log_date: ds, chore_id: t.id, name: t.name, area: t.area, min: t.min });
   if (r.error){ was ? tDone.add(key) : tDone.delete(key); drawToday(); toast('更新失敗：' + r.error.message, true); }
 });
-$('tPrev').addEventListener('click', () => { tDay = addDays(tDay, -1); tForm = false; renderToday(); });
-$('tNext').addEventListener('click', () => { tDay = addDays(tDay, 1); tForm = false; renderToday(); });
+$('tPrev').addEventListener('click', () => { tDay = addDays(tDay, -7); tForm = false; renderToday(); });
+$('tStrip').addEventListener('click', e => { const b = e.target.closest('[data-td]'); if (b){ tDay = parse(b.dataset.td); tForm = false; renderToday(); } });
+$('tNext').addEventListener('click', () => { tDay = addDays(tDay, 7); tForm = false; renderToday(); });
 $('tBack').addEventListener('click', () => { tDay = parse(fmt(new Date())); tForm = false; renderToday(); });
 
 /* ---------- Chores ---------- */
@@ -1326,7 +1835,7 @@ async function drawChWeek(){
       : chGroup(list).map(([a, ts]) => `<span>${esc(a)}<small>${ts.length} 項</small></span>`).join('');
     h += `<button type="button" class="cw${ds === today ? ' now' : ''}" data-day="${ds}"><span class="dc"><b>週${WD[d.getDay()]}</b><span class="d1">${md(ds)}</span>${list.length ? `<span class="d2${tot > CH_LIMIT ? ' warn' : ''}">${tot}分</span>` : ''}</span><span class="cl">${body}</span></button>`;
   }
-  $('chBody').innerHTML = h + '<p class="note">點日期可切換到該天的 Today。</p>';
+  $('chBody').innerHTML = h + '<p class="note">點日期可切換到該天的「今天」頁。</p>';
 }
 function drawChLib(){
   let h = `<div class="sech" style="margin-top:4px"><span class="meta">共 ${chTasks.length} 項・新增會自動排進最空的日子</span><button id="chAdd" class="plus${chLibForm ? ' open' : ''}" type="button" aria-label="增加家務">＋</button></div>`;
@@ -1397,6 +1906,192 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) roll
 window.addEventListener('pageshow', rollDay);
 window.addEventListener('focus', rollDay);
 setInterval(rollDay, 60000);   // app 一直開著時，跨過午夜也會更新
+
+/* ===== 記帳（透過 ledger-api，以家庭密碼存取）===== */
+(() => {
+  const API = SUPABASE_URL + '/functions/v1/ledger-api';
+  const TZ = 'Asia/Taipei';
+  const COLORS = ['#8a9a5b','#c0705a','#9a8c7a','#d08a4e','#b5724a','#6f8fa3','#b79a5b','#7d6b8f','#5f8f86','#a86f82','#8f8f6b','#6b7f5e','#7f7f7f'];
+  let pin = ''; try { pin = localStorage.getItem('ledger_pin') || ''; } catch (e) {}
+  const todayStr = () => new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(new Date());
+  let month = todayStr().slice(0, 7), D = null, editing = null, rowMap = new Map(), mode = 'month', year = todayStr().slice(0, 4);
+  const money = n => '$' + Number(n).toLocaleString('en-US');
+  const shiftM = (m, d) => { const [y, mo] = m.split('-').map(Number); const t = new Date(Date.UTC(y, mo - 1 + d, 1)); return t.getUTCFullYear() + '-' + pad(t.getUTCMonth() + 1); };
+
+  async function api(action, body){
+    const r = await fetch(API, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify({ pin, action, ...(body || {}) }) });
+    if (r.status === 401){ gate('密碼不正確'); throw new Error('401'); }
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || r.status);
+    return j;
+  }
+  function gate(msg){
+    pin = ''; try { localStorage.removeItem('ledger_pin'); } catch (e) {}
+    $('lgMain').hidden = true; $('lgPin').hidden = false;
+    $('lgPinErr').textContent = msg || ''; $('lgPinIn').value = '';
+  }
+  async function load(){
+    try {
+      D = mode === 'year' ? await api('year', { year }) : await api('month', { month });
+      $('lgPin').hidden = true; $('lgMain').hidden = false;
+      try { localStorage.setItem('ledger_pin', pin); } catch (e) {}
+      mode === 'year' ? renderYear() : render();
+    } catch (e) {
+      if (e.message !== '401'){ $('lgPin').hidden = true; $('lgMain').hidden = false; $('lgList').innerHTML = '<p class="empty">讀取失敗（' + esc(e.message || '無法連線') + '）</p>'; }
+    }
+  }
+  function catsHtml(exp, total, catById, memById){
+    const byCat = new Map();
+    exp.forEach(r => byCat.set(r.category_id, (byCat.get(r.category_id) || 0) + r.amount));
+    let ch = '<div class="h2">分類</div>';
+    [...byCat.entries()].sort((a, b) => b[1] - a[1]).forEach(([id, v]) => {
+      const c = catById.get(id), pct = total ? Math.round(v / total * 100) : 0;
+      ch += `<div class="lgcat"><div class="l"><span>${c ? esc(c.name) : '未分類'}</span><span>${money(v)}　${pct}%</span></div>` +
+        `<div class="lgtrack"><i style="width:${pct}%;background:${c ? c.color : '#bbb'}"></i></div></div>`;
+    });
+    return byCat.size ? ch : '';
+  }
+  function renderYear(){
+    const { rows, cats, members } = D;
+    const catById = new Map(cats.map((c, i) => [c.id, { ...c, color: COLORS[i % COLORS.length] }]));
+    const memById = new Map(members.map(m => [m.id, m.name]));
+    $('lgMonth').textContent = `${year} 年`;
+    $('lgList').hidden = true; $('lgAdd').closest('.sech').hidden = true; $('lgYear').hidden = false;
+    const exp = rows.filter(r => r.kind === 'expense'), inc = rows.filter(r => r.kind === 'income');
+    const sum = a => a.reduce((s, r) => s + r.amount, 0);
+    const total = sum(exp), incT = sum(inc);
+    const nowY = todayStr().slice(0, 4), nowM = +todayStr().slice(5, 7);
+    const months = year === nowY ? nowM : (year < nowY ? 12 : 0);
+    const avg = months ? Math.round(total / months) : 0;
+    $('lgSum').innerHTML = `<div class="h2" style="margin-top:8px">全年支出</div><div class="lgbig">${money(total)}</div><div class="lgsub">${exp.length} 筆` +
+      (incT ? ` ・ 收入 ${money(incT)} ・ 結餘 ${money(incT - total)}` : '') + (avg ? ` ・ 月均支出 ${money(avg)}` : '') + '</div>';
+    const per = Array(12).fill(0);
+    exp.forEach(r => { per[+r.spent_on.slice(5, 7) - 1] += r.amount; });
+    const max = Math.max(...per, 1);
+    let mh = '<div class="h2">每月支出</div>';
+    per.forEach((v, i) => {
+      const cur = year === nowY && i + 1 === nowM;
+      mh += `<button type="button" class="lgmo${cur ? ' cur' : ''}" data-m="${i + 1}"><span class="n">${i + 1} 月</span><span class="b"><i style="width:${Math.round(v / max * 100)}%"></i></span><span class="v">${v ? money(v) : '–'}</span></button>`;
+    });
+    $('lgYear').innerHTML = mh;
+    $('lgCats').innerHTML = catsHtml(exp, total, catById, memById);
+  }
+  function render(){
+    $('lgList').hidden = false; $('lgAdd').closest('.sech').hidden = false; $('lgYear').hidden = true;
+    const { rows, cats, members } = D;
+    const catById = new Map(cats.map((c, i) => [c.id, { ...c, color: COLORS[i % COLORS.length] }]));
+    const memById = new Map(members.map(m => [m.id, m.name]));
+    const [y, mo] = month.split('-');
+    $('lgMonth').textContent = `${y} 年 ${+mo} 月`;
+    const exp = rows.filter(r => r.kind === 'expense'), inc = rows.filter(r => r.kind === 'income');
+    const sum = a => a.reduce((s, r) => s + r.amount, 0);
+    const total = sum(exp), incT = sum(inc);
+    $('lgSum').innerHTML = `<div class="h2" style="margin-top:8px">支出</div><div class="lgbig">${money(total)}</div><div class="lgsub">${exp.length} 筆` +
+      (incT ? ` ・ 收入 ${money(incT)} ・ 結餘 ${money(incT - total)}` : '') + '</div>';
+
+    $('lgCats').innerHTML = catsHtml(exp, total, catById, memById);
+
+    rowMap = new Map(rows.map(r => [String(r.id), r]));
+    if (!rows.length){ $('lgList').innerHTML = '<p class="empty">這個月還沒有帳目</p>'; return; }
+    const groups = new Map();
+    rows.forEach(r => { if (!groups.has(r.spent_on)) groups.set(r.spent_on, []); groups.get(r.spent_on).push(r); });
+    let out = '';
+    for (const [date, rs] of groups){
+      const dayExp = sum(rs.filter(r => r.kind === 'expense'));
+      out += `<div class="lgday"><span>${+date.slice(5, 7)}/${+date.slice(8, 10)}　週${WD[new Date(date + 'T00:00:00Z').getUTCDay()]}</span><span>${dayExp ? money(dayExp) : ''}</span></div>`;
+      rs.forEach(r => {
+        const c = catById.get(r.category_id);
+        const meta = [c ? c.name : '未分類', r.pay_method, r.note].filter(Boolean).join(' ・ ');
+        out += `<button type="button" class="lgrow" data-id="${r.id}"><i class="mk" style="background:${c ? c.color : '#ccc'}"></i>` +
+          `<span class="mid"><div class="t">${esc(r.item)}</div><div class="m">${esc(meta)}</div></span>` +
+          `<span class="a">${r.kind === 'income' ? '+' : ''}${money(r.amount)}</span></button>`;
+      });
+    }
+    $('lgList').innerHTML = out;
+  }
+
+  let lgKindV = 'expense', lgCatV = null, lgPayV = '現金';
+  const segHtml = (items, cur, attr) => items.map(([v, t]) => `<button type="button" ${attr}="${v}" aria-pressed="${String(cur) === String(v)}">${esc(t)}</button>`).join('');
+  function drawSegs(){
+    $('lgKindSeg').innerHTML = segHtml([['expense', '支出'], ['income', '收入']], lgKindV, 'data-k');
+    $('lgCatSeg').innerHTML = segHtml([['', '未分類']].concat(D.cats.filter(c => c.kind === lgKindV).map(c => [c.id, c.name])), lgCatV === null ? '' : lgCatV, 'data-c');
+    $('lgPayW').hidden = lgKindV === 'income';
+    $('lgPaySeg').innerHTML = segHtml([['現金', '現金'], ['信用卡', '信用卡']], lgPayV, 'data-p');
+  }
+  function openSheet(r){
+    editing = r || null;
+    $('lgErr').textContent = '';
+    $('lgSheetTitle').textContent = r ? '編輯' : '新增一筆';
+    $('lgDelW').hidden = !r; $('lgKindW').hidden = !!r;
+    lgKindV = r ? r.kind : 'expense';
+    lgCatV = r ? r.category_id : null;
+    let last = null; try { last = localStorage.getItem('ledger_pay'); } catch (e) {}
+    lgPayV = r ? (r.pay_method || '') : (last === '信用卡' ? '信用卡' : '現金');
+    $('lgItem').value = r ? r.item : '';
+    $('lgAmount').value = r ? r.amount : '';
+    $('lgDate').value = r ? r.spent_on : todayStr();
+    $('lgNote').value = r && r.note ? r.note : '';
+    drawSegs();
+    $('lgSheet').showModal();
+  }
+  const closeLg = () => { if ($('lgSheet').open) $('lgSheet').close(); editing = null; };
+
+  async function save(){
+    const item = $('lgItem').value.trim(), amount = parseInt($('lgAmount').value, 10);
+    if (!item){ $('lgErr').textContent = '請輸入項目'; return; }
+    if (!(amount > 0)){ $('lgErr').textContent = '請輸入金額'; return; }
+    const row = { item, amount, category_id: lgCatV, spent_on: $('lgDate').value || todayStr(), note: $('lgNote').value.trim() || null, pay_method: lgKindV === 'income' ? null : (lgPayV || null) };
+    $('lgSave').disabled = true;
+    try {
+      if (editing) await api('update', { id: editing.id, patch: row });
+      else await api('add', { row: { ...row, kind: lgKindV } });
+      try { if (lgPayV) localStorage.setItem('ledger_pay', lgPayV); } catch (e) {}
+      closeLg(); await load();
+    } catch (e) { if (e.message !== '401') $('lgErr').textContent = '儲存失敗，請稍後再試'; else closeLg(); }
+    $('lgSave').disabled = false;
+  }
+  async function del(){
+    if (!editing) return;
+    const r = editing;
+    if (!(await ask('刪除這筆？', `${r.item}　${money(r.amount)}`, '刪除', true))) return;
+    try { await api('delete', { id: r.id }); closeLg(); await load(); }
+    catch (e) { if (e.message !== '401') $('lgErr').textContent = '刪除失敗'; else closeLg(); }
+  }
+
+  const step = d => { if (mode === 'year') year = String(+year + d); else month = shiftM(month, d); load(); };
+  const setMode = m => {
+    mode = m;
+    document.querySelectorAll('#lgMode [data-lm]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.lm === m)));
+  };
+  $('lgPrev').addEventListener('click', () => step(-1));
+  $('lgNext').addEventListener('click', () => step(1));
+  $('lgMode').addEventListener('click', e => {
+    const b = e.target.closest('[data-lm]'); if (!b || b.dataset.lm === mode) return;
+    if (b.dataset.lm === 'year') year = month.slice(0, 4); else if (year !== month.slice(0, 4)) month = year + '-' + month.slice(5, 7);
+    setMode(b.dataset.lm); load();
+  });
+  $('lgYear').addEventListener('click', e => {
+    const b = e.target.closest('.lgmo'); if (!b) return;
+    month = year + '-' + pad(+b.dataset.m); setMode('month'); load();
+  });
+  $('lgAdd').addEventListener('click', () => openSheet(null));
+  $('lgList').addEventListener('click', e => { const b = e.target.closest('.lgrow'); if (b) openSheet(rowMap.get(b.dataset.id)); });
+  $('lgCancel').addEventListener('click', closeLg);
+  $('lgSave').addEventListener('click', save);
+  $('lgDel').addEventListener('click', del);
+  $('lgSheet').addEventListener('click', e => {
+    const k = e.target.closest('[data-k]'), c = e.target.closest('[data-c]'), p = e.target.closest('[data-p]');
+    if (k){ lgKindV = k.dataset.k; lgCatV = null; drawSegs(); }
+    else if (c){ lgCatV = c.dataset.c === '' ? null : Number(c.dataset.c); drawSegs(); }
+    else if (p){ lgPayV = p.dataset.p; drawSegs(); }
+  });
+  $('lgSheet').addEventListener('click', e => { if (e.target === $('lgSheet')) closeLg(); });
+  $('lgPinOk').addEventListener('click', () => { pin = $('lgPinIn').value; if (pin) load(); });
+  $('lgPinIn').addEventListener('keydown', e => { if (e.key === 'Enter') $('lgPinOk').click(); });
+  $('lgLock').addEventListener('click', () => gate(''));
+  setMode('month');
+  window.ledgerShow = async () => { if (pin) await load(); else gate(''); };
+})();
 
 renderLegends();
 init();
