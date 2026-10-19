@@ -189,6 +189,9 @@ button:disabled{opacity:.45}
 .k-none{--kd:#CFC9BC}
 .rm{flex:none;width:36px;height:36px;border:0;background:none;color:var(--sub);font-size:28px;font-weight:300;line-height:1;padding:0}
 .rm:active{color:var(--red)}
+.bdel{flex:none;border:0;background:none;color:var(--line2);padding:8px;margin-right:-8px;line-height:0;cursor:pointer}
+.bdel:active{color:var(--red)}
+.buy.done .nm{color:var(--sub)}
 #toast button{margin-left:14px;border:0;background:none;color:#fff;font:inherit;text-decoration:underline;padding:0}
 .bar{align-items:stretch}
 .ib{flex:none;width:46px;display:grid;place-items:center;padding:0;border:1px solid var(--ink);border-radius:2px;background:none;color:var(--ink)}
@@ -205,6 +208,7 @@ button:disabled{opacity:.45}
 .subnav{padding:0 0 12px}
 .sech{display:flex;align-items:center;justify-content:space-between;margin:22px 0 8px;min-height:34px}
 .sech h2{margin:0;font-size:21px;font-weight:600;letter-spacing:.08em}
+.sech h2 .si{width:20px;height:20px;margin:0 9px 0 0;vertical-align:-3px;fill:none;stroke:var(--sub);stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
 .sech .meta{display:flex;align-items:center;gap:10px;color:var(--sub);font-size:16px}
 .sech .meta .over{color:var(--red)}
 .tback{display:block;margin:-4px auto 6px;border:0;background:none;color:var(--sub);font-size:14px;text-decoration:underline;text-underline-offset:3px}
@@ -427,13 +431,16 @@ select.inp{border-radius:0;-webkit-appearance:none;appearance:none}
     </div>
     <div class="wnav"><button id="tPrev" type="button" aria-label="上一週">‹</button><b id="tLabel"></b><button id="tNext" type="button" aria-label="下一週">›</button></div>
     <div id="tStrip" class="wstrip"></div>
-    <div class="sech"><h2>晚餐</h2><span id="tMeta" class="tmeta"></span></div>
+    <div class="sech"><h2><svg class="si" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16a8 8 0 0 1-16 0z"/><path d="M9 20.5h6M9 3.5c0 1.5 1.5 1.5 1.5 3M13.5 3.5c0 1.5 1.5 1.5 1.5 3"/></svg>晚餐</h2><span id="tMeta" class="tmeta"></span></div>
     <div id="tMeal" class="tonight"></div>
-    <div class="sech"><h2>行程</h2><span class="meta"><button id="evAdd" class="plus" type="button" aria-label="新增行程">＋</button></span></div>
+    <div class="sech"><h2><svg class="si" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="1.5"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>行程</h2><span class="meta"><button id="evAdd" class="plus" type="button" aria-label="新增行程">＋</button></span></div>
     <div id="tEvents"></div>
-    <div class="sech"><h2>家務</h2><span class="meta"><span id="tLeft"></span><button id="tAdd" class="plus" type="button" aria-label="增加今天的項目">＋</button></span></div>
+    <div class="sech"><h2><svg class="si" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 7.5l1.5 1.5 2.5-2.5M4.5 15l1.5 1.5 2.5-2.5M12 7.5h7.5M12 15h7.5"/></svg>家務</h2><span class="meta"><span id="tLeft"></span><button id="tAdd" class="plus" type="button" aria-label="增加今天的項目">＋</button></span></div>
     <div id="tForm"></div>
     <div id="tChores"></div>
+    <div class="sech"><h2><svg class="si" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5h14l-1 11.5H6L5 8.5z"/><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"/></svg>待買</h2><span class="meta"><span id="bLeft"></span><button id="bAdd" class="plus" type="button" aria-label="新增待買項目">＋</button></span></div>
+    <div id="bForm"></div>
+    <div id="tBuy"></div>
   </section>
 
   <section id="vChores" hidden>
@@ -1731,8 +1738,10 @@ async function renderToday(){
     db.from('chore_done').select('key').eq('log_date', ds),
     isT ? db.from('chore_extras').select('*').or(`log_date.eq.${ds},and(done.eq.false,log_date.lt.${ds})`)
         : db.from('chore_extras').select('*').eq('log_date', ds),
-    db.from('events').select('*').eq('event_date', ds)
+    db.from('events').select('*').eq('event_date', ds),
+    db.from('buy_list').select('*').order('created_at')
   ]);
+  buyErr = rs[6].error ? rs[6].error.message : null; buy = rs[6].error ? [] : (rs[6].data || []);
   tEv = rs[5].error ? null : (rs[5].data || []).slice().sort(evSort);
   if (rs[5].error) tEvErr = rs[5].error.message;
   if (rs.slice(0, 3).some(x => x.error)) toast('讀取晚餐失敗：' + rs.find(x => x.error).error.message, true);
@@ -1744,6 +1753,7 @@ async function renderToday(){
 const isTodayDs = ds => ds === fmt(new Date());
 function drawToday(){
   const ds = fmt(tDay), { sh, m, items } = tMealData, cfg = shiftSet[sh];
+  drawBuy();
   const type = m ? m.day_type : weekdaySet[isoWd(tDay)];
   const hc = type === '公休' ? '' : (m && m.headcount ? m.headcount : (cfg ? cfg.headcount : 4));
   $('tMeta').innerHTML = (sh ? `<span class="sq">${sh === '休假' ? '休' : esc(sh)}</span>` : '<span class="no">班別未輸入</span>') + (hc ? `${hc}人` : '');
@@ -1769,6 +1779,51 @@ function drawToday(){
       return `<div class="it chit${t.done ? ' done' : ''}"><button type="button" class="ck" data-k="${esc(t.key)}" aria-pressed="${!!t.done}" aria-label="${t.done ? '取消完成' : '完成'}「${esc(t.name)}」"></button><button type="button" class="in" data-k="${esc(t.key)}"><span class="nm">${esc(t.name)}</span></button><small class="mn">${bd ? `<span class="bd">${esc(bd)}</span>` : ''}${t.min} 分</small></div>`;
     }).join('')).join('');
 }
+/* ---------- 待買（獨立於菜單的採買清單；Molly 說「買○○」也會加進來）---------- */
+let buy = [], buyErr = null, buyForm = false;
+const TRASH_SVG = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-12M9 7V4h6v3"/></svg>';
+function drawBuy(){
+  $('bAdd').classList.toggle('open', buyForm);
+  if ($('bForm').dataset.open !== String(buyForm)){
+    $('bForm').dataset.open = String(buyForm);
+    $('bForm').innerHTML = buyForm ? '<div class="addrow"><input id="bName" class="inp" placeholder="要買什麼" autocomplete="off" aria-label="待買項目"><button type="button" class="btn primary" id="bSave">加入</button></div>' : '';
+    if (buyForm) setTimeout(() => { const i = $('bName'); if (i) i.focus(); }, 0);
+  }
+  if (buyErr){ $('bLeft').textContent = ''; $('tBuy').innerHTML = `<p class="note">待買清單尚未啟用（${esc(buyErr)}）</p>`; return; }
+  const left = buy.filter(x => !x.done).length;
+  $('bLeft').textContent = left ? `${left} 項` : buy.length ? '全部買齊' : '';
+  const xs = buy.slice().sort((a, b) => (a.done ? 1 : 0) - (b.done ? 1 : 0) || String(a.created_at).localeCompare(String(b.created_at)));
+  $('tBuy').innerHTML = xs.length ? xs.map(x =>
+    `<div class="it chit buy${x.done ? ' done' : ''}"><button type="button" class="ck" data-b="${esc(x.id)}" aria-pressed="${!!x.done}" aria-label="${x.done ? '取消已買' : '標示已買'}「${esc(x.name)}」"></button><button type="button" class="in" data-b="${esc(x.id)}"><span class="nm">${esc(x.name)}</span></button><button type="button" class="bdel" data-bd="${esc(x.id)}" aria-label="刪除「${esc(x.name)}」">${TRASH_SVG}</button></div>`).join('')
+    : '<p class="note">沒有待買的東西</p>';
+}
+async function buySave(){
+  const el = $('bName'), name = el.value.trim();
+  if (!name) return el.focus();
+  $('bSave').disabled = true;
+  const r = await db.from('buy_list').insert({ name: name.slice(0, 60), source: '手動' }).select().single();
+  if ($('bSave')) $('bSave').disabled = false;
+  if (r.error) return toast('新增失敗：' + r.error.message, true);
+  buy.push(r.data); el.value = ''; drawBuy(); el.focus();
+}
+$('bAdd').addEventListener('click', () => { if (buyErr) return toast('請先建立待買資料表', true); buyForm = !buyForm; drawBuy(); });
+$('bForm').addEventListener('click', e => { if (e.target.id === 'bSave') buySave(); });
+$('bForm').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'bName'){ e.preventDefault(); buySave(); } });
+$('tBuy').addEventListener('click', async e => {
+  const d = e.target.closest('[data-bd]');
+  if (d){
+    const k = buy.findIndex(y => String(y.id) === d.dataset.bd); if (k < 0) return;
+    const x = buy[k]; buy.splice(k, 1); drawBuy();
+    const r = await db.from('buy_list').delete().eq('id', x.id);
+    if (r.error){ buy.splice(k, 0, x); drawBuy(); toast('刪除失敗：' + r.error.message, true); }
+    return;
+  }
+  const b = e.target.closest('[data-b]'); if (!b) return;
+  const x = buy.find(y => String(y.id) === b.dataset.b); if (!x) return;
+  x.done = !x.done; drawBuy();
+  const r = await db.from('buy_list').update({ done: x.done, done_at: x.done ? new Date().toISOString() : null }).eq('id', x.id);
+  if (r.error){ x.done = !x.done; drawBuy(); toast('更新失敗：' + r.error.message, true); }
+});
 function tFormHtml(){
   return `<div class="chform">
     <label>區域<select id="tfArea" class="inp">${CH_AREAS.map(a => `<option>${a}</option>`).join('')}<option>其他</option></select></label>
