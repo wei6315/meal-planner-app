@@ -468,14 +468,14 @@ select.inp{border-radius:0;-webkit-appearance:none;appearance:none}
   </section>
 
   <section id="vWeek" hidden>
-    <nav class="pills subnav" aria-label="行事曆頁籤"><button type="button" class="pill" data-sv="week">本週</button><button type="button" class="pill" data-sv="month">月曆</button><button type="button" class="pill" data-sv="shift">班表</button></nav>
+    <nav class="pills subnav" aria-label="行事曆頁籤"><button type="button" class="pill" data-sv="month">月曆</button><button type="button" class="pill" data-sv="week">本週</button><button type="button" class="pill" data-sv="shift">班表</button></nav>
     <div class="wnav"><button id="wkPrev" type="button" aria-label="上一週">‹</button><b id="wkLabel"></b><button id="wkNext" type="button" aria-label="下一週">›</button></div>
     <div class="sech" style="margin-top:4px"><span id="wkMeta" class="meta"></span><button id="wkAdd" class="plus" type="button" aria-label="新增行程">＋</button></div>
     <div id="wkBody"></div>
   </section>
 
   <section id="vMonth" hidden>
-    <nav class="pills subnav" aria-label="行事曆頁籤"><button type="button" class="pill" data-sv="week">本週</button><button type="button" class="pill" data-sv="month">月曆</button><button type="button" class="pill" data-sv="shift">班表</button></nav>
+    <nav class="pills subnav" aria-label="行事曆頁籤"><button type="button" class="pill" data-sv="month">月曆</button><button type="button" class="pill" data-sv="week">本週</button><button type="button" class="pill" data-sv="shift">班表</button></nav>
     <div class="wnav"><button id="mcPrev" type="button" aria-label="上個月">‹</button><b id="mcLabel"></b><button id="mcNext" type="button" aria-label="下個月">›</button></div>
     <div id="mcGrid" class="mcg"></div>
     <div id="mcLeg" class="legend"></div>
@@ -483,7 +483,7 @@ select.inp{border-radius:0;-webkit-appearance:none;appearance:none}
   </section>
 
   <section id="vShift" hidden>
-    <nav class="pills subnav" aria-label="行事曆頁籤"><button type="button" class="pill" data-sv="week">本週</button><button type="button" class="pill" data-sv="month">月曆</button><button type="button" class="pill" data-sv="shift">班表</button></nav>
+    <nav class="pills subnav" aria-label="行事曆頁籤"><button type="button" class="pill" data-sv="month">月曆</button><button type="button" class="pill" data-sv="week">本週</button><button type="button" class="pill" data-sv="shift">班表</button></nav>
     <div class="wnav"><button id="mPrev" type="button" aria-label="上個月">‹</button><b id="monthLabel"></b><button id="mNext" type="button" aria-label="下個月">›</button></div>
     <div id="cal" class="cal"></div>
     <p class="note">點日期可新增行程或設定班別。日期下的細線代表當天有行程。早＝黃、中＝粉紅、夜＝藍，與「班表小幫手」相同。</p>
@@ -732,7 +732,7 @@ async function show(v){
   if (v === 'recipes') renderRecipes();
   if (v === 'ledger') await window.ledgerShow();
 }
-$('tabbar').addEventListener('click', e => { const b = e.target.closest('button'); if (b){ window.scrollTo(0, 0); show(b.dataset.v); } });
+$('tabbar').addEventListener('click', e => { const b = e.target.closest('button'); if (b){ window.scrollTo(0, 0); show(b.dataset.v === 'week' ? 'month' : b.dataset.v); } });   // 底部「行事曆」預設先開月曆
 document.addEventListener('click', e => { const b = e.target.closest('[data-sv]'); if (b) show(b.dataset.sv); });
 
 /* ---------- 通用選單面板 ---------- */
@@ -1808,7 +1808,7 @@ async function buySave(){
 }
 let lastTouch = 0;
 /* ---------- 自動檢查新版：開啟／回到前景時比對網站上的版本號，不同就自動重新載入（每次改版我會更新這個編號）---------- */
-const APP_BUILD = '20261019-1410';
+const APP_BUILD = '20261019-1840';
 async function checkUpdate(){
   try{
     if (document.hidden || document.querySelector('dialog[open]') || buyForm || tForm) return;
