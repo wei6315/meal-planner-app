@@ -1806,6 +1806,45 @@ async function buySave(){
   if (r.error) return toast('新增失敗：' + r.error.message, true);
   buy.push(r.data); el.value = ''; drawBuy(); el.focus();
 }
+let lastTouch = 0;
+/* ---------- 自動檢查新版：開啟／回到前景時比對網站上的版本號，不同就自動重新載入（每次改版我會更新這個編號）---------- */
+const APP_BUILD = '20261019-1410';
+async function checkUpdate(){
+  try{
+    if (document.hidden || document.querySelector('dialog[open]') || buyForm || tForm) return;
+    if (Date.now() - lastTouch < 4000) return;
+    const r = await fetch(location.pathname + '?chk=' + Date.now(), { cache: 'no-store' });
+    if (!r.ok) return;
+    const m = (await r.text()).match(/APP_BUILD\s*=\s*'([^']+)'/);
+    if (!m || m[1] === APP_BUILD) return;
+    let last = 0; try { last = Number(sessionStorage.getItem('upd_at') || 0); } catch (e) {}
+    if (Date.now() - last < 60000) return;            // 防止重載迴圈
+    try { sessionStorage.setItem('upd_at', String(Date.now())); } catch (e) {}
+    toast('有新版本，更新中…');
+    setTimeout(() => location.replace(location.pathname + '?v=' + encodeURIComponent(m[1])), 900);
+  }catch(e){}
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) checkUpdate(); });
+setTimeout(checkUpdate, 3000);
+setInterval(checkUpdate, 5 * 60 * 1000);
+
+/* 自動同步：回到畫面時、停留時每 30 秒更新一次（Molly 在 LINE 新增的待買／行程會自動出現，不用關掉重開） */
+document.addEventListener('pointerdown', () => { lastTouch = Date.now(); }, true);
+document.addEventListener('keydown', () => { lastTouch = Date.now(); }, true);
+async function autoSync(){
+  if (document.hidden || view !== 'today' || Date.now() - lastTouch < 4000) return;
+  if (document.querySelector('dialog[open]')) return;
+  if (buyForm || tForm){            // 正在輸入：只更新待買清單，不動輸入框
+    if (buyErr) return;
+    const r = await db.from('buy_list').select('*').order('created_at');
+    if (!r.error && Date.now() - lastTouch >= 4000){ buy = r.data || []; drawBuy(); }
+    return;
+  }
+  await renderToday();
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) autoSync(); });
+window.addEventListener('focus', autoSync);
+setInterval(autoSync, 30000);
 $('bAdd').addEventListener('click', () => { if (buyErr) return toast('請先建立待買資料表', true); buyForm = !buyForm; drawBuy(); });
 $('bForm').addEventListener('click', e => { if (e.target.id === 'bSave') buySave(); });
 $('bForm').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'bName'){ e.preventDefault(); buySave(); } });
