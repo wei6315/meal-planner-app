@@ -1188,10 +1188,31 @@ async function saveEv(){
 async function delEv(){
   if (!evEditing) return;
   const e = evEditing;
-  if (!(await ask('刪除這個行程？', `${md(e.event_date)}　${e.title}`, '刪除', true))) return;
-  const r = await db.from('events').delete().eq('id', e.id);
+  // 找之後的同名同時間行程（例如每週的家教）
+  let q = db.from('events').select('id,event_date').eq('title', e.title).gt('event_date', e.event_date).order('event_date');
+  q = e.start_time ? q.eq('start_time', e.start_time) : q.is('start_time', null);
+  const later = (await q).data || [];
+  let ids = [e.id];
+  if (!later.length){
+    if (!(await ask('刪除這個行程？', `${md(e.event_date)}　${e.title}`, '刪除', true))) return;
+  } else {
+    const mode = await new Promise(res => {
+      let c = '';
+      openPick('刪除這個行程？',
+        `<p class="askmsg">${esc(md(e.event_date) + '　' + e.title)}\n之後還有 ${later.length} 筆同名行程（${esc(md(later[0].event_date))} – ${esc(md(later[later.length - 1].event_date))}）</p>` +
+        `<button type="button" class="okbtn danger" data-m="one">只刪這一筆</button>` +
+        `<button type="button" class="okbtn danger" data-m="after">這筆起全部刪除（共 ${later.length + 1} 筆）</button>`,
+        b => { c = b.dataset.m || ''; closePick(); });
+      const onClose = () => { if ($('pick').open) return; $('pick').removeEventListener('close', onClose); res(c); };
+      $('pick').addEventListener('close', onClose);
+    });
+    if (!mode) return;
+    if (mode === 'after') ids = [e.id, ...later.map(x => x.id)];
+  }
+  const r = await db.from('events').delete().in('id', ids);
   if (r.error){ $('evErr').textContent = '刪除失敗：' + r.error.message; return; }
   closeEv(); await refreshEv();
+  if (ids.length > 1) toast(`已刪除 ${ids.length} 筆`);
 }
 $('evCancel').addEventListener('click', closeEv);
 $('evSave').addEventListener('click', saveEv);
@@ -1808,7 +1829,7 @@ async function buySave(){
 }
 let lastTouch = 0;
 /* ---------- 自動檢查新版：開啟／回到前景時比對網站上的版本號，不同就自動重新載入（每次改版我會更新這個編號）---------- */
-const APP_BUILD = '20261019-1840';
+const APP_BUILD = '20261020-1140';
 async function checkUpdate(){
   try{
     if (document.hidden || document.querySelector('dialog[open]') || buyForm || tForm) return;
