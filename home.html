@@ -1733,7 +1733,8 @@ function chHits(t, c, w, wd){
   if (t.freq === 'quarterly') return w === s[t.v] && c === t.c;
   return false;
 }
-const chLoadAt = (c, w, wd) => chTasks.reduce((a, t) => a + (chHits(t, c, w, wd) ? t.min : 0), 0);
+const chMin = t => t.extra ? 0 : (t.min || 0);   // 「額外」項目（例：咖啡機清洗）不算進每日清掃時間
+const chLoadAt = (c, w, wd) => chTasks.reduce((a, t) => a + (chHits(t, c, w, wd) ? chMin(t) : 0), 0);
 const chWorst = (w, wd) => Math.max(...[0, 1, 2].map(c => chLoadAt(c, w, wd)));
 const chHy = new Map();
 function chHalfDay(t, y, m){            // 每半年項目：該月負荷最低的一天
@@ -1839,11 +1840,11 @@ function drawToday(){
   const list = chOn(tDay).map(t => ({ ...t, key: ds + '|' + t.id, done: tDone.has(ds + '|' + t.id) }))
     .concat(tExtras.map(x => ({ id: x.id, area: x.area, name: x.name, min: x.min, once: true, carry: x.log_date < ds ? x.log_date : null, key: 'x|' + x.id, done: x.done })));
   if (!list.length){ $('tLeft').textContent = ''; $('tChores').innerHTML = `<p class="note">${tDay.getDay() === 6 ? '週六不排家務' : '今天沒有家務'}</p>`; return; }
-  const total = list.reduce((a, t) => a + t.min, 0), left = list.filter(t => !t.done).reduce((a, t) => a + t.min, 0), n = list.filter(t => t.done).length;
+  const total = list.reduce((a, t) => a + chMin(t), 0), left = list.filter(t => !t.done).reduce((a, t) => a + chMin(t), 0), n = list.filter(t => t.done).length;
   $('tLeft').innerHTML = left ? `<span class="${total > CH_LIMIT ? 'over' : ''}">剩 ${left} 分</span>` : '全部完成';
   $('tChores').innerHTML = `<div class="pgrow"><span class="pg">${n} / ${list.length}</span><span class="pct">${Math.round(n / list.length * 100)}%</span></div><div class="prog"><i style="width:${n / list.length * 100}%"></i></div>` + chGroup(list).map(([a, ts]) =>
     `<div class="gh"><span>${esc(a)}</span></div>` + ts.map(t => {
-      const bd = t.carry ? `順延 ${md(t.carry)}` : t.once ? '單次' : t.freq === 'quarterly' ? '季' : t.freq === 'halfyear' ? '半年' : '';
+      const bd = t.carry ? `順延 ${md(t.carry)}` : t.once ? '單次' : t.extra ? '額外' : t.freq === 'quarterly' ? '季' : t.freq === 'halfyear' ? '半年' : '';
       return `<div class="it chit${t.done ? ' done' : ''}"><button type="button" class="ck" data-k="${esc(t.key)}" aria-pressed="${!!t.done}" aria-label="${t.done ? '取消完成' : '完成'}「${esc(t.name)}」"></button><button type="button" class="in" data-k="${esc(t.key)}"><span class="nm">${esc(t.name)}</span></button><small class="mn">${bd ? `<span class="bd">${esc(bd)}</span>` : ''}${t.min} 分</small></div>`;
     }).join('')).join('');
 }
@@ -1998,7 +1999,7 @@ async function drawChWeek(){
   for (let i = 0; i < 7; i++){
     const d = addDays(chWeek, i), ds = fmt(d);
     const list = chOn(d).concat(ex.filter(x => x.log_date === ds));
-    const tot = list.reduce((a, t) => a + t.min, 0);
+    const tot = list.reduce((a, t) => a + chMin(t), 0);
     const body = !list.length ? `<span class="emp">${d.getDay() === 6 ? '公休' : '無'}</span>`
       : chGroup(list).map(([a, ts]) => `<span>${esc(a)}<small>${ts.length} 項</small></span>`).join('');
     h += `<button type="button" class="cw${ds === today ? ' now' : ''}" data-day="${ds}"><span class="dc"><b>週${WD[d.getDay()]}</b><span class="d1">${md(ds)}</span>${list.length ? `<span class="d2${tot > CH_LIMIT ? ' warn' : ''}">${tot}分</span>` : ''}</span><span class="cl">${body}</span></button>`;
@@ -2017,7 +2018,7 @@ function drawChLib(){
   CH_AREAS.forEach(a => {
     const ts = chTasks.filter(t => t.area === a);
     h += `<div class="ahd">${a}<small>${ts.length} 項</small></div>` + ts.map(t =>
-      `<div class="lr"><span class="n">${esc(t.name)}</span><span class="f">${CH_FREQ[t.freq]}・${t.min} 分<br>${chWhere(t)}</span><button type="button" class="rm" data-del="${esc(t.id)}" aria-label="刪減「${esc(t.name)}」">×</button></div>`).join('');
+      `<div class="lr"><span class="n">${esc(t.name)}</span><span class="f">${CH_FREQ[t.freq]}・${t.min} 分${t.extra ? '・額外' : ''}<br>${chWhere(t)}</span><button type="button" class="rm" data-del="${esc(t.id)}" aria-label="刪減「${esc(t.name)}」">×</button></div>`).join('');
   });
   $('chBody').innerHTML = h;
 }
