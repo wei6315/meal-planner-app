@@ -434,6 +434,7 @@ select.inp{border-radius:0;-webkit-appearance:none;appearance:none}
     </div>
     <div class="wnav"><button id="tPrev" type="button" aria-label="上一週">‹</button><b id="tLabel"></b><button id="tNext" type="button" aria-label="下一週">›</button></div>
     <div id="tStrip" class="wstrip"></div>
+    <div id="tBody" style="min-height:62vh">
     <div class="sech"><h2><svg class="si" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16a8 8 0 0 1-16 0z"/><path d="M9 20.5h6M9 3.5c0 1.5 1.5 1.5 1.5 3M13.5 3.5c0 1.5 1.5 1.5 1.5 3"/></svg>晚餐</h2><span id="tMeta" class="tmeta"></span></div>
     <div id="tMeal" class="tonight"></div>
     <div class="sech"><h2><svg class="si" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="1.5"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>行程</h2><span class="meta"><button id="evAdd" class="plus" type="button" aria-label="新增行程">＋</button></span></div>
@@ -444,6 +445,7 @@ select.inp{border-radius:0;-webkit-appearance:none;appearance:none}
     <div class="sech"><h2><svg class="si" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5h14l-1 11.5H6L5 8.5z"/><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"/></svg>待買</h2><span class="meta"><span id="bLeft"></span><button id="bAdd" class="plus" type="button" aria-label="新增待買項目">＋</button></span></div>
     <div id="bForm"></div>
     <div id="tBuy"></div>
+    </div>
   </section>
 
   <section id="vChores" hidden>
@@ -1733,8 +1735,7 @@ function chHits(t, c, w, wd){
   if (t.freq === 'quarterly') return w === s[t.v] && c === t.c;
   return false;
 }
-const chMin = t => t.extra ? 0 : (t.min || 0);   // 「額外」項目（例：咖啡機清洗）不算進每日清掃時間
-const chLoadAt = (c, w, wd) => chTasks.reduce((a, t) => a + (chHits(t, c, w, wd) ? chMin(t) : 0), 0);
+const chLoadAt = (c, w, wd) => chTasks.reduce((a, t) => a + (chHits(t, c, w, wd) ? t.min : 0), 0);
 const chWorst = (w, wd) => Math.max(...[0, 1, 2].map(c => chLoadAt(c, w, wd)));
 const chHy = new Map();
 function chHalfDay(t, y, m){            // 每半年項目：該月負荷最低的一天
@@ -1840,11 +1841,11 @@ function drawToday(){
   const list = chOn(tDay).map(t => ({ ...t, key: ds + '|' + t.id, done: tDone.has(ds + '|' + t.id) }))
     .concat(tExtras.map(x => ({ id: x.id, area: x.area, name: x.name, min: x.min, once: true, carry: x.log_date < ds ? x.log_date : null, key: 'x|' + x.id, done: x.done })));
   if (!list.length){ $('tLeft').textContent = ''; $('tChores').innerHTML = `<p class="note">${tDay.getDay() === 6 ? '週六不排家務' : '今天沒有家務'}</p>`; return; }
-  const total = list.reduce((a, t) => a + chMin(t), 0), left = list.filter(t => !t.done).reduce((a, t) => a + chMin(t), 0), n = list.filter(t => t.done).length;
+  const total = list.reduce((a, t) => a + t.min, 0), left = list.filter(t => !t.done).reduce((a, t) => a + t.min, 0), n = list.filter(t => t.done).length;
   $('tLeft').innerHTML = left ? `<span class="${total > CH_LIMIT ? 'over' : ''}">剩 ${left} 分</span>` : '全部完成';
   $('tChores').innerHTML = `<div class="pgrow"><span class="pg">${n} / ${list.length}</span><span class="pct">${Math.round(n / list.length * 100)}%</span></div><div class="prog"><i style="width:${n / list.length * 100}%"></i></div>` + chGroup(list).map(([a, ts]) =>
     `<div class="gh"><span>${esc(a)}</span></div>` + ts.map(t => {
-      const bd = t.carry ? `順延 ${md(t.carry)}` : t.once ? '單次' : t.extra ? '額外' : t.freq === 'quarterly' ? '季' : t.freq === 'halfyear' ? '半年' : '';
+      const bd = t.carry ? `順延 ${md(t.carry)}` : t.once ? '單次' : t.freq === 'quarterly' ? '季' : t.freq === 'halfyear' ? '半年' : '';
       return `<div class="it chit${t.done ? ' done' : ''}"><button type="button" class="ck" data-k="${esc(t.key)}" aria-pressed="${!!t.done}" aria-label="${t.done ? '取消完成' : '完成'}「${esc(t.name)}」"></button><button type="button" class="in" data-k="${esc(t.key)}"><span class="nm">${esc(t.name)}</span></button><small class="mn">${bd ? `<span class="bd">${esc(bd)}</span>` : ''}${t.min} 分</small></div>`;
     }).join('')).join('');
 }
@@ -1877,7 +1878,7 @@ async function buySave(){
 }
 let lastTouch = 0;
 /* ---------- 自動檢查新版：開啟／回到前景時比對網站上的版本號，不同就自動重新載入（每次改版我會更新這個編號）---------- */
-const APP_BUILD = '20261024-1030';
+const APP_BUILD = '20261027-1200';
 async function checkUpdate(){
   try{
     if (document.hidden || document.querySelector('dialog[open]') || buyForm || tForm) return;
@@ -1982,6 +1983,46 @@ $('tPrev').addEventListener('click', () => { tDay = addDays(tDay, -7); tForm = f
 $('tStrip').addEventListener('click', e => { const b = e.target.closest('[data-td]'); if (b){ tDay = parse(b.dataset.td); tForm = false; renderToday(); } });
 $('tNext').addEventListener('click', () => { tDay = addDays(tDay, 7); tForm = false; renderToday(); });
 $('tBack').addEventListener('click', () => { tDay = parse(fmt(new Date())); tForm = false; renderToday(); });
+// 今天頁：往右滑＝下一天、往左滑＝前一天（內容跟著手指走，放開後滑出、新的一天從另一側滑入）
+(() => {
+  const el = $('tBody'); el.style.touchAction = 'pan-y';
+  let sx = 0, sy = 0, t0 = 0, ok = false, lock = '', busy = false;
+  const W = () => Math.min(window.innerWidth, 500);
+  el.addEventListener('touchstart', e => {
+    if (busy) return;
+    const t = e.touches[0]; sx = t.clientX; sy = t.clientY; t0 = Date.now(); lock = '';
+    ok = e.touches.length === 1 && !e.target.closest('input,textarea,select');
+  }, { passive: true });
+  el.addEventListener('touchmove', e => {
+    if (!ok || busy) return;
+    const t = e.touches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+    if (!lock) { if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return; lock = Math.abs(dx) > Math.abs(dy) * 1.4 ? 'x' : 'y'; }
+    if (lock !== 'x') return;
+    el.style.transition = 'none';
+    el.style.transform = `translateX(${dx * 0.55}px)`;
+    el.style.opacity = String(1 - Math.min(Math.abs(dx) / W(), 0.6) * 0.8);
+  }, { passive: true });
+  el.addEventListener('touchend', e => {
+    if (!ok) return; ok = false;
+    if (lock !== 'x') return;
+    const t = e.changedTouches[0], dx = t.clientX - sx, fast = Date.now() - t0 < 300 && Math.abs(dx) > 40;
+    if (Math.abs(dx) < W() * 0.2 && !fast) { // 沒滑夠：彈回
+      el.style.transition = 'transform .2s ease, opacity .2s ease'; el.style.transform = ''; el.style.opacity = '';
+      return;
+    }
+    busy = true;
+    const dir = dx > 0 ? 1 : -1;
+    el.style.transition = 'transform .14s ease-in, opacity .14s ease-in';
+    el.style.transform = `translateX(${dir * W() * 0.45}px)`; el.style.opacity = '0';
+    setTimeout(() => {
+      tDay = addDays(tDay, dir); tForm = false; renderToday();
+      el.style.transition = 'none'; el.style.transform = `translateX(${-dir * W() * 0.25}px)`; el.style.opacity = '0';
+      void el.offsetWidth;
+      el.style.transition = 'transform .22s ease-out, opacity .22s ease-out'; el.style.transform = ''; el.style.opacity = '';
+      setTimeout(() => { el.style.transition = ''; busy = false; }, 240);
+    }, 140);
+  }, { passive: true });
+})();
 
 /* ---------- Chores ---------- */
 async function renderChores(){
@@ -1999,7 +2040,7 @@ async function drawChWeek(){
   for (let i = 0; i < 7; i++){
     const d = addDays(chWeek, i), ds = fmt(d);
     const list = chOn(d).concat(ex.filter(x => x.log_date === ds));
-    const tot = list.reduce((a, t) => a + chMin(t), 0);
+    const tot = list.reduce((a, t) => a + t.min, 0);
     const body = !list.length ? `<span class="emp">${d.getDay() === 6 ? '公休' : '無'}</span>`
       : chGroup(list).map(([a, ts]) => `<span>${esc(a)}<small>${ts.length} 項</small></span>`).join('');
     h += `<button type="button" class="cw${ds === today ? ' now' : ''}" data-day="${ds}"><span class="dc"><b>週${WD[d.getDay()]}</b><span class="d1">${md(ds)}</span>${list.length ? `<span class="d2${tot > CH_LIMIT ? ' warn' : ''}">${tot}分</span>` : ''}</span><span class="cl">${body}</span></button>`;
@@ -2018,7 +2059,7 @@ function drawChLib(){
   CH_AREAS.forEach(a => {
     const ts = chTasks.filter(t => t.area === a);
     h += `<div class="ahd">${a}<small>${ts.length} 項</small></div>` + ts.map(t =>
-      `<div class="lr"><span class="n">${esc(t.name)}</span><span class="f">${CH_FREQ[t.freq]}・${t.min} 分${t.extra ? '・額外' : ''}<br>${chWhere(t)}</span><button type="button" class="rm" data-del="${esc(t.id)}" aria-label="刪減「${esc(t.name)}」">×</button></div>`).join('');
+      `<div class="lr"><span class="n">${esc(t.name)}</span><span class="f">${CH_FREQ[t.freq]}・${t.min} 分<br>${chWhere(t)}</span><button type="button" class="rm" data-del="${esc(t.id)}" aria-label="刪減「${esc(t.name)}」">×</button></div>`).join('');
   });
   $('chBody').innerHTML = h;
 }
