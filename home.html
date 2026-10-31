@@ -1925,7 +1925,7 @@ async function todoSave(){
 }
 let lastTouch = 0;
 /* ---------- 自動檢查新版：開啟／回到前景時比對網站上的版本號，不同就自動重新載入（每次改版我會更新這個編號）---------- */
-const APP_BUILD = '20261031-1900';
+const APP_BUILD = '20261031-1930';
 async function checkUpdate(){
   try{
     if (document.hidden || document.querySelector('dialog[open]') || buyForm || tForm || todoForm) return;
@@ -2318,7 +2318,7 @@ setInterval(rollDay, 60000);   // app 一直開著時，跨過午夜也會更新
     $('lgMonth').textContent = `${y} 年 ${+mo} 月`;
     $('lgSum').innerHTML = '';   // 繳費只記錄，不算總金額
     rowMap = new Map(rows.map(r => [String(r.id), r]));
-    if (!rows.length){ $('lgList').innerHTML = '<p class="empty">這個月還沒有繳費紀錄<br>跟 Molly 說「11/1 繳富邦 2300」就會記在這裡</p>'; return; }
+    if (!rows.length){ $('lgList').innerHTML = ''; return; }
     let out = '', last = '';
     rows.forEach(r => {
       if (r.paid_on !== last){ last = r.paid_on; out += `<div class="lgday"><span>${+r.paid_on.slice(5, 7)}/${+r.paid_on.slice(8, 10)}　週${WD[new Date(r.paid_on + 'T00:00:00Z').getUTCDay()]}</span><span></span></div>`; }
