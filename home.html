@@ -1878,7 +1878,7 @@ async function buySave(){
 }
 let lastTouch = 0;
 /* ---------- 自動檢查新版：開啟／回到前景時比對網站上的版本號，不同就自動重新載入（每次改版我會更新這個編號）---------- */
-const APP_BUILD = '20261027-1200';
+const APP_BUILD = '20261031-1300';
 async function checkUpdate(){
   try{
     if (document.hidden || document.querySelector('dialog[open]') || buyForm || tForm) return;
@@ -1983,7 +1983,7 @@ $('tPrev').addEventListener('click', () => { tDay = addDays(tDay, -7); tForm = f
 $('tStrip').addEventListener('click', e => { const b = e.target.closest('[data-td]'); if (b){ tDay = parse(b.dataset.td); tForm = false; renderToday(); } });
 $('tNext').addEventListener('click', () => { tDay = addDays(tDay, 7); tForm = false; renderToday(); });
 $('tBack').addEventListener('click', () => { tDay = parse(fmt(new Date())); tForm = false; renderToday(); });
-// 今天頁：往右滑＝下一天、往左滑＝前一天（內容跟著手指走，放開後滑出、新的一天從另一側滑入）
+// 今天頁：往左滑＝下一天、往右滑＝前一天（內容跟著手指走，放開後滑出、新的一天從另一側滑入）
 (() => {
   const el = $('tBody'); el.style.touchAction = 'pan-y';
   let sx = 0, sy = 0, t0 = 0, ok = false, lock = '', busy = false;
@@ -2011,11 +2011,11 @@ $('tBack').addEventListener('click', () => { tDay = parse(fmt(new Date())); tFor
       return;
     }
     busy = true;
-    const dir = dx > 0 ? 1 : -1;
+    const dir = dx > 0 ? 1 : -1; // 手指方向（內容跟著滑出）
     el.style.transition = 'transform .14s ease-in, opacity .14s ease-in';
     el.style.transform = `translateX(${dir * W() * 0.45}px)`; el.style.opacity = '0';
     setTimeout(() => {
-      tDay = addDays(tDay, dir); tForm = false; renderToday();
+      tDay = addDays(tDay, -dir); tForm = false; renderToday();
       el.style.transition = 'none'; el.style.transform = `translateX(${-dir * W() * 0.25}px)`; el.style.opacity = '0';
       void el.offsetWidth;
       el.style.transition = 'transform .22s ease-out, opacity .22s ease-out'; el.style.transform = ''; el.style.opacity = '';
