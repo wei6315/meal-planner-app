@@ -218,6 +218,7 @@ button:disabled{opacity:.45}
 .prog{height:2px;background:var(--line);margin:0 0 2px}
 .prog i{display:block;height:100%;background:var(--ink);transition:width .25s}
 .chit .in{border-left:0;padding-left:0}
+.chit .mn.warn{color:var(--red)}
 .chit .mn{flex:none;font-size:13px;color:var(--sub);white-space:nowrap}
 .chit .bd{display:inline-block;margin-right:6px;padding:0 5px;border:1px solid var(--line2);border-radius:2px;font-size:12px}
 .plus.open{transform:rotate(45deg)}
@@ -442,6 +443,9 @@ select.inp{border-radius:0;-webkit-appearance:none;appearance:none}
     <div class="sech"><h2><svg class="si" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 7.5l1.5 1.5 2.5-2.5M4.5 15l1.5 1.5 2.5-2.5M12 7.5h7.5M12 15h7.5"/></svg>家務</h2><span class="meta"><span id="tLeft"></span><button id="tAdd" class="plus" type="button" aria-label="增加今天的項目">＋</button></span></div>
     <div id="tForm"></div>
     <div id="tChores"></div>
+    <div class="sech"><h2><svg class="si" viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="4.5" width="15" height="15" rx="2"/><path d="M8.5 12.2l2.3 2.3 4.7-4.9"/></svg>待辦</h2><span class="meta"><span id="dLeft"></span><button id="dAdd" class="plus" type="button" aria-label="新增待辦事項">＋</button></span></div>
+    <div id="dForm"></div>
+    <div id="tTodo"></div>
     <div class="sech"><h2><svg class="si" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8.5h14l-1 11.5H6L5 8.5z"/><path d="M9 8.5V7a3 3 0 0 1 6 0v1.5"/></svg>待買</h2><span class="meta"><span id="bLeft"></span><button id="bAdd" class="plus" type="button" aria-label="新增待買項目">＋</button></span></div>
     <div id="bForm"></div>
     <div id="tBuy"></div>
@@ -526,13 +530,13 @@ select.inp{border-radius:0;-webkit-appearance:none;appearance:none}
       <button id="lgPinOk" class="btn primary wide" type="button">進入</button>
     </div>
     <div id="lgMain" hidden>
-      <nav class="pills subnav" id="lgMode" aria-label="記帳檢視"><button type="button" class="pill" data-lm="month">月</button><button type="button" class="pill" data-lm="year">年</button></nav>
+      <nav class="pills subnav" id="lgMode" aria-label="記帳檢視"><button type="button" class="pill" data-lm="month">月</button><button type="button" class="pill" data-lm="year">年</button><button type="button" class="pill" data-lm="bills">繳費</button></nav>
       <div class="wnav"><button id="lgPrev" type="button" aria-label="上個月">‹</button><b id="lgMonth"></b><button id="lgNext" type="button" aria-label="下個月">›</button></div>
       <div id="lgPayF" class="seg lgpf" aria-label="付款方式"></div>
       <div id="lgSum"></div>
       <div id="lgYear"></div>
       <div id="lgCats"></div>
-      <div class="sech"><h2>明細</h2><span class="meta"><button id="lgAdd" class="plus" type="button" aria-label="新增一筆">＋</button></span></div>
+      <div class="sech"><h2 id="lgListH">明細</h2><span class="meta"><button id="lgAdd" class="plus" type="button" aria-label="新增一筆">＋</button></span></div>
       <div id="lgList"></div>
       <button id="lgLock" class="logout" type="button">鎖定記帳</button>
     </div>
@@ -611,7 +615,7 @@ select.inp{border-radius:0;-webkit-appearance:none;appearance:none}
     <div class="grp" id="lgKindW"><span class="lab">類型</span><div id="lgKindSeg" class="seg"></div></div>
     <div class="grp"><label class="lab" for="lgAmount">金額</label><input id="lgAmount" class="inp" type="number" inputmode="numeric" min="1" placeholder="0"></div>
     <div class="grp"><label class="lab" for="lgItem">項目</label><input id="lgItem" class="inp" maxlength="40" autocomplete="off" placeholder="例：午餐、全聯"></div>
-    <div class="grp"><span class="lab">分類</span><div id="lgCatSeg" class="seg"></div></div>
+    <div class="grp" id="lgCatW"><span class="lab">分類</span><div id="lgCatSeg" class="seg"></div></div>
     <div class="grp" id="lgPayW"><span class="lab">付款方式</span><div id="lgPaySeg" class="seg"></div></div>
     <div class="grp"><label class="lab" for="lgDate">日期</label><input id="lgDate" class="inp" type="date"></div>
     <div class="grp"><label class="lab" for="lgNote">說明</label><input id="lgNote" class="inp" maxlength="100" autocomplete="off" placeholder="可留空"></div>
@@ -1809,8 +1813,10 @@ async function renderToday(){
     isT ? db.from('chore_extras').select('*').or(`log_date.eq.${ds},and(done.eq.false,log_date.lt.${ds})`)
         : db.from('chore_extras').select('*').eq('log_date', ds),
     db.from('events').select('*').eq('event_date', ds),
-    db.from('buy_list').select('*').order('created_at')
+    db.from('buy_list').select('*').order('created_at'),
+    db.from('todos').select('*').order('created_at')
   ]);
+  todoErr = rs[7].error ? rs[7].error.message : null; todos = rs[7].error ? [] : (rs[7].data || []);
   buyErr = rs[6].error ? rs[6].error.message : null; buy = rs[6].error ? [] : (rs[6].data || []);
   tEv = rs[5].error ? null : (rs[5].data || []).slice().sort(evSort);
   if (rs[5].error) tEvErr = rs[5].error.message;
@@ -1823,7 +1829,7 @@ async function renderToday(){
 const isTodayDs = ds => ds === fmt(new Date());
 function drawToday(){
   const ds = fmt(tDay), { sh, m, items } = tMealData, cfg = shiftSet[sh];
-  drawBuy();
+  drawBuy(); drawTodo();
   const type = m ? m.day_type : weekdaySet[isoWd(tDay)];
   const hc = type === '公休' ? '' : (m && m.headcount ? m.headcount : (cfg ? cfg.headcount : 4));
   $('tMeta').innerHTML = (sh ? `<span class="sq">${sh === '休假' ? '休' : esc(sh)}</span>` : '<span class="no">班別未輸入</span>') + (hc ? `${hc}人` : '');
@@ -1876,12 +1882,53 @@ async function buySave(){
   if (r.error) return toast('新增失敗：' + r.error.message, true);
   buy.push(r.data); el.value = ''; drawBuy(); el.focus();
 }
+/* ---------- 待辦事項（不綁日期的清單，可設期限；逾期會標紅） ---------- */
+let todos = [], todoErr = null, todoForm = false, todoAll = false; const todoTimers = {};
+const dueLabel = (d) => {
+  if (!d) return '';
+  const t = fmt(new Date()), diff = Math.round((parse(d) - parse(t)) / 864e5);
+  return diff === 0 ? '今天' : diff === 1 ? '明天' : diff === -1 ? '昨天' : md(d);
+};
+function drawTodo(){
+  $('dAdd').classList.toggle('open', todoForm);
+  if ($('dForm').dataset.open !== String(todoForm)){
+    $('dForm').dataset.open = String(todoForm);
+    $('dForm').innerHTML = todoForm ? '<div class="addrow"><input id="dName" class="inp" placeholder="要做什麼" autocomplete="off" aria-label="待辦事項"><input id="dDue" class="inp" type="date" aria-label="期限（可不填）" style="max-width:150px"><button type="button" class="btn primary" id="dSave">加入</button></div>' : '';
+    if (todoForm) setTimeout(() => { const i = $('dName'); if (i) i.focus(); }, 0);
+  }
+  if (todoErr){ $('dLeft').textContent = ''; $('tTodo').innerHTML = `<p class="note">待辦清單尚未啟用（${esc(todoErr)}）</p>`; return; }
+  const today = fmt(new Date());
+  // 有期限的待辦，到期當天才出現（逾期未完成會一直留著）；可按「尚未到期」展開查看
+  const future = todos.filter(x => !x.done && x.due_date && x.due_date > today);
+  const vis = todoAll ? todos : todos.filter(x => x.done || !x.due_date || x.due_date <= today);
+  const left = vis.filter(x => !x.done).length;
+  $('dLeft').textContent = left ? `${left} 項` : vis.length ? '全部完成' : '';
+  const xs = vis.slice().sort((a, b) => (a.done ? 1 : 0) - (b.done ? 1 : 0) || (a.due_date || '9999').localeCompare(b.due_date || '9999') || String(a.created_at).localeCompare(String(b.created_at)));
+  const doneN = vis.filter(x => x.done).length;
+  $('tTodo').innerHTML = xs.length ? xs.map(x => {
+    const od = !x.done && x.due_date && x.due_date < today;
+    return `<div class="it chit buy${x.done ? ' done' : ''}"><button type="button" class="ck" data-d="${esc(x.id)}" aria-pressed="${!!x.done}" aria-label="${x.done ? '取消完成' : '標示完成'}「${esc(x.title)}」"></button><button type="button" class="in" data-d="${esc(x.id)}"><span class="nm">${esc(x.title)}</span></button>${x.due_date ? `<span class="mn${od ? ' warn' : ''}">${od ? '逾期 ' : ''}${dueLabel(x.due_date)}</span>` : ''}<button type="button" class="bdel" data-dd="${esc(x.id)}" aria-label="刪除「${esc(x.title)}」">${TRASH_SVG}</button></div>`;
+  }).join('') + (doneN ? `<p class="note"><button type="button" id="dClear" class="linkbtn" style="background:none;border:0;padding:0;color:var(--sub);text-decoration:underline;font:inherit">清除已完成（${doneN}）</button></p>` : '')
+    : `<p class="note">${future.length && !todoAll ? '今天沒有待辦事項' : '沒有待辦事項'}</p>`;
+  if (future.length || todoAll) $('tTodo').innerHTML += `<p class="note"><button type="button" id="dAll" style="background:none;border:0;padding:0;color:var(--sub);text-decoration:underline;font:inherit">${todoAll ? '只看今天要做的' : `還有 ${future.length} 項尚未到期（顯示）`}</button></p>`;
+}
+async function todoSave(){
+  const el = $('dName'), title = el.value.trim();
+  if (!title) return el.focus();
+  const due = $('dDue').value || null;
+  $('dSave').disabled = true;
+  const r = await db.from('todos').insert({ title: title.slice(0, 80), due_date: due, source: '手動' }).select().single();
+  if ($('dSave')) $('dSave').disabled = false;
+  if (r.error) return toast('新增失敗：' + r.error.message, true);
+  todos.push(r.data); el.value = ''; $('dDue').value = ''; drawTodo(); el.focus();
+  if (due && due > fmt(new Date()) && !todoAll) toast(`已加入，${md(due)} 當天才會出現在清單`);
+}
 let lastTouch = 0;
 /* ---------- 自動檢查新版：開啟／回到前景時比對網站上的版本號，不同就自動重新載入（每次改版我會更新這個編號）---------- */
-const APP_BUILD = '20261031-1300';
+const APP_BUILD = '20261031-1900';
 async function checkUpdate(){
   try{
-    if (document.hidden || document.querySelector('dialog[open]') || buyForm || tForm) return;
+    if (document.hidden || document.querySelector('dialog[open]') || buyForm || tForm || todoForm) return;
     if (Date.now() - lastTouch < 4000) return;
     const r = await fetch(location.pathname + '?chk=' + Date.now(), { cache: 'no-store' });
     if (!r.ok) return;
@@ -1904,7 +1951,7 @@ document.addEventListener('keydown', () => { lastTouch = Date.now(); }, true);
 async function autoSync(){
   if (document.hidden || view !== 'today' || Date.now() - lastTouch < 4000) return;
   if (document.querySelector('dialog[open]')) return;
-  if (buyForm || tForm){            // 正在輸入：只更新待買清單，不動輸入框
+  if (buyForm || tForm || todoForm){            // 正在輸入：只更新待買清單，不動輸入框
     if (buyErr) return;
     const r = await db.from('buy_list').select('*').order('created_at');
     if (!r.error && Date.now() - lastTouch >= 4000){ buy = r.data || []; drawBuy(); }
@@ -1932,6 +1979,41 @@ $('tBuy').addEventListener('click', async e => {
   x.done = !x.done; drawBuy();
   const r = await db.from('buy_list').update({ done: x.done, done_at: x.done ? new Date().toISOString() : null }).eq('id', x.id);
   if (r.error){ x.done = !x.done; drawBuy(); toast('更新失敗：' + r.error.message, true); }
+});
+$('dAdd').addEventListener('click', () => { if (todoErr) return toast('請先建立待辦資料表', true); todoForm = !todoForm; drawTodo(); });
+$('dForm').addEventListener('click', e => { if (e.target.id === 'dSave') todoSave(); });
+$('dForm').addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.id === 'dName'){ e.preventDefault(); todoSave(); } });
+$('tTodo').addEventListener('click', async e => {
+  if (e.target.closest('#dAll')){ todoAll = !todoAll; drawTodo(); return; }
+  if (e.target.closest('#dClear')){
+    const ids = todos.filter(x => x.done).map(x => x.id); if (!ids.length) return;
+    const old = todos; todos = todos.filter(x => !x.done); drawTodo();
+    const r = await db.from('todos').delete().in('id', ids);
+    if (r.error){ todos = old; drawTodo(); toast('清除失敗：' + r.error.message, true); }
+    return;
+  }
+  const d = e.target.closest('[data-dd]');
+  if (d){
+    const k = todos.findIndex(y => String(y.id) === d.dataset.dd); if (k < 0) return;
+    const x = todos[k]; todos.splice(k, 1); drawTodo();
+    const r = await db.from('todos').delete().eq('id', x.id);
+    if (r.error){ todos.splice(k, 0, x); drawTodo(); toast('刪除失敗：' + r.error.message, true); }
+    return;
+  }
+  const b = e.target.closest('[data-d]'); if (!b) return;
+  const x = todos.find(y => String(y.id) === b.dataset.d); if (!x) return;
+  x.done = !x.done; drawTodo();
+  const r = await db.from('todos').update({ done: x.done, done_at: x.done ? new Date().toISOString() : null }).eq('id', x.id);
+  if (r.error){ x.done = !x.done; drawTodo(); toast('更新失敗：' + r.error.message, true); return; }
+  // 打勾後保留 3 秒（可再點一次復原），時間到就刪除這筆待辦
+  clearTimeout(todoTimers[x.id]);
+  if (x.done) todoTimers[x.id] = setTimeout(async () => {
+    delete todoTimers[x.id];
+    const cur = todos.find(y => y.id === x.id); if (!cur || !cur.done) return;
+    const d = await db.from('todos').delete().eq('id', x.id).eq('done', true);
+    if (d.error) return;
+    todos = todos.filter(y => y.id !== x.id); drawTodo();
+  }, 3000);
 });
 function tFormHtml(){
   return `<div class="chform">
@@ -2142,10 +2224,10 @@ setInterval(rollDay, 60000);   // app 一直開著時，跨過午夜也會更新
   }
   async function load(){
     try {
-      D = mode === 'year' ? await api('year', { year }) : await api('month', { month });
+      D = mode === 'year' ? await api('year', { year }) : mode === 'bills' ? await api('bills_month', { month }) : await api('month', { month });
       $('lgPin').hidden = true; $('lgMain').hidden = false;
       try { localStorage.setItem('ledger_pin', pin); } catch (e) {}
-      mode === 'year' ? renderYear() : render();
+      mode === 'year' ? renderYear() : mode === 'bills' ? renderBills() : render();
     } catch (e) {
       if (e.message !== '401'){ $('lgPin').hidden = true; $('lgMain').hidden = false; $('lgList').innerHTML = '<p class="empty">讀取失敗（' + esc(e.message || '無法連線') + '）</p>'; }
     }
@@ -2172,7 +2254,7 @@ setInterval(rollDay, 60000);   // app 一直開著時，跨過午夜也會更新
     const catById = new Map(cats.map((c, i) => [c.id, { ...c, color: COLORS[i % COLORS.length] }]));
     const memById = new Map(members.map(m => [m.id, m.name]));
     $('lgMonth').textContent = `${year} 年`;
-    $('lgList').hidden = true; $('lgAdd').closest('.sech').hidden = true; $('lgYear').hidden = false;
+    $('lgList').hidden = true; $('lgAdd').closest('.sech').hidden = true; $('lgYear').hidden = false; $('lgPayF').hidden = false;
     const expAll = rows.filter(r => r.kind === 'expense'), exp = payF ? expAll.filter(r => r.pay_method === payF) : expAll, inc = payF ? [] : rows.filter(r => r.kind === 'income');
     const sum = a => a.reduce((s, r) => s + r.amount, 0);
     const total = sum(exp), incT = sum(inc);
@@ -2193,7 +2275,7 @@ setInterval(rollDay, 60000);   // app 一直開著時，跨過午夜也會更新
     $('lgCats').innerHTML = catsHtml(exp, total, catById, memById);
   }
   function render(){
-    $('lgList').hidden = false; $('lgAdd').closest('.sech').hidden = false; $('lgYear').hidden = true;
+    $('lgList').hidden = false; $('lgAdd').closest('.sech').hidden = false; $('lgYear').hidden = true; $('lgPayF').hidden = false; $('lgListH').textContent = '明細';
     const { rows, cats, members } = D;
     const catById = new Map(cats.map((c, i) => [c.id, { ...c, color: COLORS[i % COLORS.length] }]));
     const memById = new Map(members.map(m => [m.id, m.name]));
@@ -2227,6 +2309,24 @@ setInterval(rollDay, 60000);   // app 一直開著時，跨過午夜也會更新
     $('lgList').innerHTML = out;
   }
 
+  // ---- 繳費紀錄（信用卡帳單、電費、保費…；另外記錄，不計入上面的月／年支出，避免重複計算）----
+  function renderBills(){
+    const rows = D.rows || [];
+    $('lgList').hidden = false; $('lgAdd').closest('.sech').hidden = false; $('lgYear').hidden = true; $('lgCats').innerHTML = ''; $('lgPayF').hidden = true;
+    $('lgListH').textContent = '繳費明細';
+    const [y, mo] = month.split('-');
+    $('lgMonth').textContent = `${y} 年 ${+mo} 月`;
+    $('lgSum').innerHTML = '';   // 繳費只記錄，不算總金額
+    rowMap = new Map(rows.map(r => [String(r.id), r]));
+    if (!rows.length){ $('lgList').innerHTML = '<p class="empty">這個月還沒有繳費紀錄<br>跟 Molly 說「11/1 繳富邦 2300」就會記在這裡</p>'; return; }
+    let out = '', last = '';
+    rows.forEach(r => {
+      if (r.paid_on !== last){ last = r.paid_on; out += `<div class="lgday"><span>${+r.paid_on.slice(5, 7)}/${+r.paid_on.slice(8, 10)}　週${WD[new Date(r.paid_on + 'T00:00:00Z').getUTCDay()]}</span><span></span></div>`; }
+      out += `<button type="button" class="lgrow" data-id="${r.id}"><i class="mk" style="background:#9a8c7a"></i><span class="mid"><div class="t">${esc(r.item)}</div>${r.note ? `<div class="m">${esc(r.note)}</div>` : ''}</span><span class="a">${money(r.amount)}</span></button>`;
+    });
+    $('lgList').innerHTML = out;
+  }
+
   let lgKindV = 'expense', lgCatV = null, lgPayV = '現金';
   const segHtml = (items, cur, attr) => items.map(([v, t]) => `<button type="button" ${attr}="${v}" aria-pressed="${String(cur) === String(v)}">${esc(t)}</button>`).join('');
   function drawSegs(){
@@ -2239,7 +2339,15 @@ setInterval(rollDay, 60000);   // app 一直開著時，跨過午夜也會更新
     editing = r || null;
     $('lgErr').textContent = '';
     $('lgSheetTitle').textContent = r ? '編輯' : '新增一筆';
-    $('lgDelW').hidden = !r; $('lgKindW').hidden = !!r;
+    $('lgDelW').hidden = !r; $('lgKindW').hidden = !!r || mode === 'bills';
+    $('lgCatW').hidden = mode === 'bills'; if (mode === 'bills') $('lgPayW').hidden = true;
+    if (mode === 'bills') $('lgSheetTitle').textContent = r ? '編輯繳費' : '新增繳費';
+    $('lgItem').placeholder = mode === 'bills' ? '例：富邦、電費、保險' : '例：午餐、全聯';
+    if (mode === 'bills'){
+      $('lgItem').value = r ? r.item : ''; $('lgAmount').value = r ? r.amount : '';
+      $('lgDate').value = r ? r.paid_on : todayStr(); $('lgNote').value = r && r.note ? r.note : '';
+      $('lgSheet').showModal(); return;
+    }
     lgKindV = r ? r.kind : 'expense';
     lgCatV = r ? r.category_id : null;
     let last = null; try { last = localStorage.getItem('ledger_pay'); } catch (e) {}
@@ -2257,6 +2365,13 @@ setInterval(rollDay, 60000);   // app 一直開著時，跨過午夜也會更新
     const item = $('lgItem').value.trim(), amount = parseInt($('lgAmount').value, 10);
     if (!item){ $('lgErr').textContent = '請輸入項目'; return; }
     if (!(amount > 0)){ $('lgErr').textContent = '請輸入金額'; return; }
+    if (mode === 'bills'){
+      const b = { item, amount, paid_on: $('lgDate').value || todayStr(), note: $('lgNote').value.trim() || null };
+      $('lgSave').disabled = true;
+      try { if (editing) await api('bills_update', { id: editing.id, patch: b }); else await api('bills_add', { row: b }); closeLg(); await load(); }
+      catch (e) { if (e.message !== '401') $('lgErr').textContent = '儲存失敗，請稍後再試'; else closeLg(); }
+      $('lgSave').disabled = false; return;
+    }
     const row = { item, amount, category_id: lgCatV, spent_on: $('lgDate').value || todayStr(), note: $('lgNote').value.trim() || null, pay_method: lgKindV === 'income' ? null : (lgPayV || null) };
     $('lgSave').disabled = true;
     try {
@@ -2271,7 +2386,7 @@ setInterval(rollDay, 60000);   // app 一直開著時，跨過午夜也會更新
     if (!editing) return;
     const r = editing;
     if (!(await ask('刪除這筆？', `${r.item}　${money(r.amount)}`, '刪除', true))) return;
-    try { await api('delete', { id: r.id }); closeLg(); await load(); }
+    try { await api(mode === 'bills' ? 'bills_delete' : 'delete', { id: r.id }); closeLg(); await load(); }
     catch (e) { if (e.message !== '401') $('lgErr').textContent = '刪除失敗'; else closeLg(); }
   }
 
