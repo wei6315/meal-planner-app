@@ -1071,8 +1071,8 @@ const EV_C = { '爸爸':['#DCEED7','#3D7A38','#6FAE68'], '媽媽':['#F8EDC4','#8
 const EV_RED = ['#F6D8D4','#AE3A32','#D9645B'], EV_GRAY = ['#ECE9E2','#6D685E','#A39E92'];
 const FEST_RE = /生日|過年|除夕|春節|初[一二三四五六七八九]|元宵|清明|端午|中秋|重陽|冬至|聖誕|平安夜|跨年|元旦|光復|和平|母親節|父親節|情人節|萬聖節|兒童節|婦女節|教師節|國慶|勞動節|七夕|紀念日|節日|節慶/;
 /* ---------- 內建節日（不存資料庫；固定日期＋農曆節日對照表，表外的年份用瀏覽器曆法估算） ---------- */
-// 各年 [春節初一, 端午, 中秋]（依天文朔望＋節氣計算，已對照 2025～2030 官方日期）
-const HOL_LUN = {2025:['01-29','05-31','10-06'],2026:['02-17','06-19','09-25'],2027:['02-06','06-09','09-15'],2028:['01-26','05-28','10-03'],2029:['02-13','06-16','09-22'],2030:['02-03','06-05','09-12'],2031:['01-23','06-24','10-01'],2032:['02-11','06-12','09-19'],2033:['01-31','06-01','10-07'],2034:['01-20','06-20','09-27'],2035:['02-08','06-10','09-16'],2036:['01-28','05-30','10-04']};
+// 各年 [春節初一, 端午, 中秋, 七夕]（依天文朔望＋節氣計算，已對照 2025～2030 官方日期）
+const HOL_LUN = {2025:['01-29','05-31','10-06','08-29'],2026:['02-17','06-19','09-25','08-19'],2027:['02-06','06-09','09-15','08-08'],2028:['01-26','05-28','10-03','08-26'],2029:['02-13','06-16','09-22','08-16'],2030:['02-03','06-05','09-12','08-05'],2031:['01-23','06-24','10-01','08-24'],2032:['02-11','06-12','09-19','08-12'],2033:['01-31','06-01','10-07','08-01'],2034:['01-20','06-20','09-27','08-20'],2035:['02-08','06-10','09-16','08-10'],2036:['01-28','05-30','10-04','08-28']};
 const _LUN = new Intl.DateTimeFormat('en-u-ca-chinese', { timeZone: 'Asia/Taipei', month: 'numeric', day: 'numeric' });
 function lunarOf(d){ const o = {}; for (const p of _LUN.formatToParts(d)) o[p.type] = p.value; return { m: o.month, d: Number(o.day) }; }
 function lunHolidays(y){ // 回傳 { 'MM-DD': 名稱 }
@@ -1080,15 +1080,16 @@ function lunHolidays(y){ // 回傳 { 'MM-DD': 名稱 }
   const addDay = (md, n) => { const t = new Date(`${y}-${md}T12:00:00+08:00`).getTime() + n * 864e5, q = new Date(t + 8 * 36e5); return `${pad(q.getUTCMonth() + 1)}-${pad(q.getUTCDate())}`; };
   let t3 = HOL_LUN[y];
   if (!t3){ // 表外：掃整年，用內建農曆估算
-    t3 = [null, null, null];
+    t3 = [null, null, null, null];
     for (let t = new Date(`${y}-01-01T12:00:00+08:00`).getTime(); t < new Date(`${y + 1}-01-01T12:00:00+08:00`).getTime(); t += 864e5){
       const L = lunarOf(new Date(t)), q = new Date(t + 8 * 36e5), k = `${pad(q.getUTCMonth() + 1)}-${pad(q.getUTCDate())}`;
-      if (L.m === '1' && L.d === 1 && !t3[0]) t3[0] = k; else if (L.m === '5' && L.d === 5) t3[1] = k; else if (L.m === '8' && L.d === 15) t3[2] = k;
+      if (L.m === '1' && L.d === 1 && !t3[0]) t3[0] = k; else if (L.m === '5' && L.d === 5) t3[1] = k; else if (L.m === '8' && L.d === 15) t3[2] = k; else if (L.m === '7' && L.d === 7) t3[3] = k;
     }
   }
   if (t3[0]){ add(addDay(t3[0], -1), '除夕'); add(t3[0], '春節（初一）'); ['初二', '初三', '初四', '初五'].forEach((n, i) => add(addDay(t3[0], i + 1), n)); }
   if (t3[1]) add(t3[1], '端午節');
   if (t3[2]) add(t3[2], '中秋節');
+  if (t3[3]) add(t3[3], '七夕');
   return out;
 }
 function qingmingDay(y){ // 太陽黃經 15°（台灣時間的日期）
@@ -1104,7 +1105,7 @@ const HOL_YEAR = {};
 function holYear(y){ // { 'MM-DD': 名稱 }
   if (HOL_YEAR[y]) return HOL_YEAR[y];
   const m = lunHolidays(y), add = (k, n) => { m[k] = m[k] ? m[k] + '・' + n : n; };
-  add('01-01', '元旦'); add('02-28', '和平紀念日'); add('04-04', '兒童節'); add(`04-${pad(qingmingDay(y))}`, '清明節');
+  add('01-01', '元旦'); add('02-14', '情人節'); add('02-28', '和平紀念日'); add('04-04', '兒童節'); add(`04-${pad(qingmingDay(y))}`, '清明節');
   add('05-01', '勞動節'); add('09-28', '教師節'); add('10-10', '國慶日'); add('10-25', '光復節'); add('12-25', '聖誕節'); add('12-25', '行憲紀念日');
   return (HOL_YEAR[y] = m);
 }
@@ -1119,7 +1120,7 @@ function holidaysIn(from, to){
 const holAdd = (rows, from, to) => (rows || []).concat(holidaysIn(from, to));
 const EV_FEST = ['#FDEBD9','#A9540F','#F6C89C'];
 const isFest = e => e.hol || FEST_RE.test(e.title || '');
-const evTitle = e => (isFest(e) ? '🎉 ' : '') + esc(e.title);
+const evTitle = e => esc(e.title);
 function evColor(e){
   if (isFest(e)) return { bg: EV_FEST[0], fg: EV_FEST[1], solid: EV_FEST[2], bar: '#F0A560', light: true };
   const a = EV_MEM.filter(x => (e.members || []).includes(x));
@@ -1382,7 +1383,7 @@ async function renderMonth(){
       `<span class="top2"><b>${d.getDate()}</b>${sh[ds] ? `<i class="mcs">${sh[ds] === '休假' ? '休' : esc(sh[ds])}</i>` : ''}</span>${chips}${rest > 0 ? `<span class="more">+${rest}</span>` : ''}</button>`;
   }
   $('mcGrid').innerHTML = h;
-  $('mcLeg').innerHTML = [['爸爸', EV_C['爸爸'][2]], ['媽媽', EV_C['媽媽'][2]], ['姊姊', EV_C['姊姊'][2]], ['弟弟', EV_C['弟弟'][2]], ['小孩・全家', EV_RED[2]], ['其他', EV_GRAY[2]], ['🎉 節慶', EV_FEST[2]]]
+  $('mcLeg').innerHTML = [['爸爸', EV_C['爸爸'][2]], ['媽媽', EV_C['媽媽'][2]], ['姊姊', EV_C['姊姊'][2]], ['弟弟', EV_C['弟弟'][2]], ['小孩・全家', EV_RED[2]], ['其他', EV_GRAY[2]], ['節慶', EV_FEST[2]]]
     .map(([n, c]) => `<span><i class="dot" style="--kd:${c}"></i>${n}</span>`).join('');
   drawMcDay();
 }
@@ -1978,7 +1979,7 @@ async function todoSave(){
 }
 let lastTouch = 0;
 /* ---------- 自動檢查新版：開啟／回到前景時比對網站上的版本號，不同就自動重新載入（每次改版我會更新這個編號）---------- */
-const APP_BUILD = '20261101-1600';
+const APP_BUILD = '20261101-1645';
 async function checkUpdate(){
   try{
     if (document.hidden || document.querySelector('dialog[open]') || buyForm || tForm || todoForm) return;
