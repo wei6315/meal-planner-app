@@ -451,10 +451,12 @@ select.inp{border-radius:0;-webkit-appearance:none;appearance:none}
     <div id="bForm"></div>
     <div id="tBuy"></div>
     </div>
+    <p id="verTag" class="note" style="text-align:center;opacity:.55;margin:18px 0 6px"></p>
   </section>
 
   <section id="vChores" hidden>
     <nav class="pills subnav" aria-label="家務頁籤"><button type="button" class="pill" data-cs="week">本週</button><button type="button" class="pill" data-cs="lib">家務庫<small id="chCount"></small></button></nav>
+    <div id="chNav"></div>
     <div id="chBody"></div>
   </section>
 
@@ -1980,7 +1982,9 @@ async function todoSave(){
 }
 let lastTouch = 0;
 /* ---------- 自動檢查新版：開啟／回到前景時比對網站上的版本號，不同就自動重新載入（每次改版我會更新這個編號）---------- */
-const APP_BUILD = '20261101-1720';
+const APP_BUILD = '20261101-2245';
+try { document.getElementById('verTag').textContent = '版本 ' + APP_BUILD; } catch (e) {}
+window.addEventListener('error', ev => { try { toast('程式錯誤：' + (ev.message || '') + ' @' + (ev.lineno || ''), true); } catch (e) {} });
 async function checkUpdate(){
   try{
     if (document.hidden || document.querySelector('dialog[open]') || buyForm || tForm || todoForm) return;
@@ -2168,7 +2172,7 @@ $('tBack').addEventListener('click', () => { tDay = parse(fmt(new Date())); tFor
   function wrapFrom(startSel, root){ // 把 startSel 之後（含）的內容包成可滑動的區塊
     const st = (root || document).querySelector(startSel); if (!st) return null;
     const w = document.createElement('div'); w.className = 'swp';
-    const kids = []; for (let n = st; n; n = n.nextElementSibling) kids.push(n);
+    const kids = []; for (let n = st.nextElementSibling; n; n = n.nextElementSibling) kids.push(n); // 週／月的 ‹ › 那一列固定不動
     st.parentNode.appendChild(w); kids.forEach(k => w.appendChild(k)); return w;
   }
   function slideNav(el, btns){ // btns() → { prev, next }（按鈕元素，可為 null）
@@ -2221,14 +2225,15 @@ $('tBack').addEventListener('click', () => { tDay = parse(fmt(new Date())); tFor
     const w = wrapFrom('.wnav', g(sec)); if (w) slideNav(w, fixed(p, n));
   });
   const lg = wrapFrom('.wnav', g('lgMain')); if (lg) slideNav(lg, fixed('lgPrev', 'lgNext'));
-  const ch = g('chBody'); if (ch) slideNav(ch, () => ({ prev: ch.querySelector('[data-cw="-1"]'), next: ch.querySelector('[data-cw="1"]') }));
+  const ch = g('chBody'); if (ch) slideNav(ch, () => ({ prev: g('chNav').querySelector('[data-cw="-1"]'), next: g('chNav').querySelector('[data-cw="1"]') }));
 })();
 
 /* ---------- Chores ---------- */
 async function renderChores(){
   document.querySelectorAll('[data-cs]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.cs === chSub)));
   $('chCount').textContent = chTasks.length ? chTasks.length : '';
-  if (chErr && !(await chLoad())) return $('chBody').innerHTML = chSetupMsg();
+  if (chSub !== 'week') $('chNav').innerHTML = '';
+  if (chErr && !(await chLoad())) { $('chNav').innerHTML = ''; return $('chBody').innerHTML = chSetupMsg(); }
   if (chSub === 'week') return drawChWeek();
   drawChLib();
 }
@@ -2236,7 +2241,8 @@ async function drawChWeek(){
   const s = fmt(chWeek), e = fmt(addDays(chWeek, 6)), today = fmt(new Date());
   const r = await db.from('chore_extras').select('*').gte('log_date', s).lte('log_date', e);
   const ex = r.error ? [] : r.data;
-  let h = `<div class="wnav"><button type="button" data-cw="-1" aria-label="上一週">‹</button><b>${md(s)} – ${md(e)}</b><button type="button" data-cw="1" aria-label="下一週">›</button></div>`;
+  $('chNav').innerHTML = `<div class="wnav"><button type="button" data-cw="-1" aria-label="上一週">‹</button><b>${md(s)} – ${md(e)}</b><button type="button" data-cw="1" aria-label="下一週">›</button></div>`;
+  let h = '';
   for (let i = 0; i < 7; i++){
     const d = addDays(chWeek, i), ds = fmt(d);
     const list = chOn(d).concat(ex.filter(x => x.log_date === ds));
