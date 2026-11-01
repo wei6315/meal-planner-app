@@ -1956,8 +1956,8 @@ function drawTodo(){
   if (todoErr){ $('dLeft').textContent = ''; $('tTodo').innerHTML = `<p class="note">待辦清單尚未啟用（${esc(todoErr)}）</p>`; return; }
   const today = fmt(new Date());
   // 有期限的待辦，到期當天才出現（逾期未完成會一直留著）；可按「尚未到期」展開查看
-  const future = todos.filter(x => !x.done && x.due_date && x.due_date > today);
-  const rem0 = x => x.source === '提醒' && x.due_date && x.due_date < today; // 「提醒」類的待辦只在當天出現，過了就不顯示
+  const rem0 = x => x.source === '提醒' && x.due_date && x.due_date !== today; // 「提醒」類的待辦只在當天出現（過了或還沒到都不顯示，展開也不列）
+  const future = todos.filter(x => !x.done && x.due_date && x.due_date > today && !rem0(x));
   const vis = (todoAll ? todos : todos.filter(x => x.done || !x.due_date || x.due_date <= today)).filter(x => !rem0(x));
   const left = vis.filter(x => !x.done).length;
   $('dLeft').textContent = left ? `${left} 項` : vis.length ? '全部完成' : '';
@@ -1983,7 +1983,7 @@ async function todoSave(){
 }
 let lastTouch = 0;
 /* ---------- 自動檢查新版：開啟／回到前景時比對網站上的版本號，不同就自動重新載入（每次改版我會更新這個編號）---------- */
-const APP_BUILD = '20261101-2350';
+const APP_BUILD = '20261102-0010';
 try { document.getElementById('verTag').textContent = '版本 ' + APP_BUILD; } catch (e) {}
 window.addEventListener('error', ev => { try { toast('程式錯誤：' + (ev.message || '') + ' @' + (ev.lineno || ''), true); } catch (e) {} });
 async function checkUpdate(){
