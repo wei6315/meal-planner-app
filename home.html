@@ -407,6 +407,7 @@ select.inp{border-radius:0;-webkit-appearance:none;appearance:none}
 .evr .n{font-size:17px}
 /* ===== ＋ 按鈕統一縮小 ===== */
 .plus,.plus.sm,.sech .plus,.wkh .plus{width:24px;height:24px;font-size:18px;padding:0 0 1px;border-width:1px}
+.swp{min-height:58vh}
 </style>
 </head>
 <body>
@@ -1979,7 +1980,7 @@ async function todoSave(){
 }
 let lastTouch = 0;
 /* ---------- 自動檢查新版：開啟／回到前景時比對網站上的版本號，不同就自動重新載入（每次改版我會更新這個編號）---------- */
-const APP_BUILD = '20261101-1645';
+const APP_BUILD = '20261101-1720';
 async function checkUpdate(){
   try{
     if (document.hidden || document.querySelector('dialog[open]') || buyForm || tForm || todoForm) return;
@@ -2158,6 +2159,69 @@ $('tBack').addEventListener('click', () => { tDay = parse(fmt(new Date())); tFor
       setTimeout(() => { el.style.transition = ''; busy = false; }, 240);
     }, 140);
   }, { passive: true });
+})();
+
+// 其他分頁：內容區左右滑動＝下一期／上一期（沿用「今天」頁的跟手滑動；上方標題與頁籤固定不動）
+// 往左滑＝下一個（週／月），往右滑＝上一個；實際換期直接按該頁原本的 ‹ › 按鈕
+(() => {
+  const W = () => Math.min(window.innerWidth, 500);
+  function wrapFrom(startSel, root){ // 把 startSel 之後（含）的內容包成可滑動的區塊
+    const st = (root || document).querySelector(startSel); if (!st) return null;
+    const w = document.createElement('div'); w.className = 'swp';
+    const kids = []; for (let n = st; n; n = n.nextElementSibling) kids.push(n);
+    st.parentNode.appendChild(w); kids.forEach(k => w.appendChild(k)); return w;
+  }
+  function slideNav(el, btns){ // btns() → { prev, next }（按鈕元素，可為 null）
+    el.style.touchAction = 'pan-y';
+    let sx = 0, sy = 0, t0 = 0, ok = false, lock = '', busy = false;
+    el.addEventListener('touchstart', e => {
+      if (busy) return;
+      const t = e.touches[0]; sx = t.clientX; sy = t.clientY; t0 = Date.now(); lock = '';
+      ok = e.touches.length === 1 && !e.target.closest('input,textarea,select,dialog');
+    }, { passive: true });
+    el.addEventListener('touchmove', e => {
+      if (!ok || busy) return;
+      const t = e.touches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+      if (!lock) { if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return; lock = Math.abs(dx) > Math.abs(dy) * 1.4 ? 'x' : 'y'; }
+      if (lock !== 'x') return;
+      el.style.transition = 'none';
+      el.style.transform = `translateX(${dx * 0.55}px)`;
+      el.style.opacity = String(1 - Math.min(Math.abs(dx) / W(), 0.6) * 0.8);
+    }, { passive: true });
+    el.addEventListener('touchend', e => {
+      if (!ok) return; ok = false;
+      if (lock !== 'x') return;
+      const t = e.changedTouches[0], dx = t.clientX - sx, fast = Date.now() - t0 < 300 && Math.abs(dx) > 40;
+      const b = btns(), btn = dx > 0 ? b.prev : b.next;
+      const back = () => { el.style.transition = 'transform .2s ease, opacity .2s ease'; el.style.transform = ''; el.style.opacity = ''; };
+      if ((Math.abs(dx) < W() * 0.2 && !fast) || !btn || btn.disabled) return back(); // 沒滑夠或沒有下一頁：彈回
+      busy = true;
+      const dir = dx > 0 ? 1 : -1;
+      el.style.transition = 'transform .14s ease-in, opacity .14s ease-in';
+      el.style.transform = `translateX(${dir * W() * 0.45}px)`; el.style.opacity = '0';
+      setTimeout(() => {
+        let done = false;
+        const slideIn = () => {
+          if (done) return; done = true; mo.disconnect();
+          el.style.transition = 'none'; el.style.transform = `translateX(${-dir * W() * 0.25}px)`; el.style.opacity = '0';
+          void el.offsetWidth;
+          el.style.transition = 'transform .22s ease-out, opacity .22s ease-out'; el.style.transform = ''; el.style.opacity = '';
+          setTimeout(() => { el.style.transition = ''; busy = false; }, 240);
+        };
+        const mo = new MutationObserver(() => setTimeout(slideIn, 30)); // 新內容換上去後再滑入
+        mo.observe(el, { childList: true, subtree: true });
+        btn.click();
+        setTimeout(slideIn, 450); // 內容沒變（或很慢）也要收尾
+      }, 140);
+    }, { passive: true });
+  }
+  const g = id => document.getElementById(id);
+  const fixed = (p, n) => () => ({ prev: g(p), next: g(n) });
+  [['vMenu', 'wPrev', 'wNext'], ['vWeek', 'wkPrev', 'wkNext'], ['vMonth', 'mcPrev', 'mcNext'], ['vShift', 'mPrev', 'mNext']].forEach(([sec, p, n]) => {
+    const w = wrapFrom('.wnav', g(sec)); if (w) slideNav(w, fixed(p, n));
+  });
+  const lg = wrapFrom('.wnav', g('lgMain')); if (lg) slideNav(lg, fixed('lgPrev', 'lgNext'));
+  const ch = g('chBody'); if (ch) slideNav(ch, () => ({ prev: ch.querySelector('[data-cw="-1"]'), next: ch.querySelector('[data-cw="1"]') }));
 })();
 
 /* ---------- Chores ---------- */
