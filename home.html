@@ -1069,7 +1069,59 @@ const EV_MEM = ['爸爸','媽媽','姊姊','弟弟'];
 let evSel = new Set();
 const EV_C = { '爸爸':['#DCEED7','#3D7A38','#6FAE68'], '媽媽':['#F8EDC4','#86680F','#E3B93C'], '姊姊':['#E7DDF2','#6A4D95','#9A7FBF'], '弟弟':['#D8E8F6','#2D6396','#5A93C8'] };
 const EV_RED = ['#F6D8D4','#AE3A32','#D9645B'], EV_GRAY = ['#ECE9E2','#6D685E','#A39E92'];
+const FEST_RE = /生日|過年|除夕|春節|初[一二三四五六七八九]|元宵|清明|端午|中秋|重陽|冬至|聖誕|平安夜|跨年|元旦|光復|和平|母親節|父親節|情人節|萬聖節|兒童節|婦女節|教師節|國慶|勞動節|七夕|紀念日|節日|節慶/;
+/* ---------- 內建節日（不存資料庫；固定日期＋農曆節日對照表，表外的年份用瀏覽器曆法估算） ---------- */
+// 各年 [春節初一, 端午, 中秋]（依天文朔望＋節氣計算，已對照 2025～2030 官方日期）
+const HOL_LUN = {2025:['01-29','05-31','10-06'],2026:['02-17','06-19','09-25'],2027:['02-06','06-09','09-15'],2028:['01-26','05-28','10-03'],2029:['02-13','06-16','09-22'],2030:['02-03','06-05','09-12'],2031:['01-23','06-24','10-01'],2032:['02-11','06-12','09-19'],2033:['01-31','06-01','10-07'],2034:['01-20','06-20','09-27'],2035:['02-08','06-10','09-16'],2036:['01-28','05-30','10-04']};
+const _LUN = new Intl.DateTimeFormat('en-u-ca-chinese', { timeZone: 'Asia/Taipei', month: 'numeric', day: 'numeric' });
+function lunarOf(d){ const o = {}; for (const p of _LUN.formatToParts(d)) o[p.type] = p.value; return { m: o.month, d: Number(o.day) }; }
+function lunHolidays(y){ // 回傳 { 'MM-DD': 名稱 }
+  const out = {}, add = (k, n) => { out[k] = out[k] ? out[k] + '・' + n : n; };
+  const addDay = (md, n) => { const t = new Date(`${y}-${md}T12:00:00+08:00`).getTime() + n * 864e5, q = new Date(t + 8 * 36e5); return `${pad(q.getUTCMonth() + 1)}-${pad(q.getUTCDate())}`; };
+  let t3 = HOL_LUN[y];
+  if (!t3){ // 表外：掃整年，用內建農曆估算
+    t3 = [null, null, null];
+    for (let t = new Date(`${y}-01-01T12:00:00+08:00`).getTime(); t < new Date(`${y + 1}-01-01T12:00:00+08:00`).getTime(); t += 864e5){
+      const L = lunarOf(new Date(t)), q = new Date(t + 8 * 36e5), k = `${pad(q.getUTCMonth() + 1)}-${pad(q.getUTCDate())}`;
+      if (L.m === '1' && L.d === 1 && !t3[0]) t3[0] = k; else if (L.m === '5' && L.d === 5) t3[1] = k; else if (L.m === '8' && L.d === 15) t3[2] = k;
+    }
+  }
+  if (t3[0]){ add(addDay(t3[0], -1), '除夕'); add(t3[0], '春節（初一）'); ['初二', '初三', '初四', '初五'].forEach((n, i) => add(addDay(t3[0], i + 1), n)); }
+  if (t3[1]) add(t3[1], '端午節');
+  if (t3[2]) add(t3[2], '中秋節');
+  return out;
+}
+function qingmingDay(y){ // 太陽黃經 15°（台灣時間的日期）
+  const lon = jd => { const T = (jd - 2451545) / 36525, r = Math.PI / 180;
+    const L0 = 280.46646 + 36000.76983 * T, M = (357.52911 + 35999.05029 * T) * r;
+    const C = (1.914602 - 0.004817 * T) * Math.sin(M) + 0.019993 * Math.sin(2 * M) + 0.000289 * Math.sin(3 * M);
+    const om = (125.04 - 1934.136 * T) * r; return (((L0 + C - 0.00569 - 0.00478 * Math.sin(om)) % 360) + 360) % 360; };
+  let a = Date.UTC(y, 3, 3) / 864e5 + 2440587.5, b = a + 4;
+  for (let i = 0; i < 40; i++){ const m = (a + b) / 2; if (lon(m) < 15) a = m; else b = m; }
+  const t = new Date(((a + b) / 2 - 2440587.5) * 864e5 + 8 * 36e5); return t.getUTCDate();
+}
+const HOL_YEAR = {};
+function holYear(y){ // { 'MM-DD': 名稱 }
+  if (HOL_YEAR[y]) return HOL_YEAR[y];
+  const m = lunHolidays(y), add = (k, n) => { m[k] = m[k] ? m[k] + '・' + n : n; };
+  add('01-01', '元旦'); add('02-28', '和平紀念日'); add('04-04', '兒童節'); add(`04-${pad(qingmingDay(y))}`, '清明節');
+  add('05-01', '勞動節'); add('09-28', '教師節'); add('10-10', '國慶日'); add('10-25', '光復節'); add('12-25', '聖誕節'); add('12-25', '行憲紀念日');
+  return (HOL_YEAR[y] = m);
+}
+function holidaysIn(from, to){
+  const out = [], s = new Date(from + 'T12:00:00+08:00'), e = new Date(to + 'T12:00:00+08:00');
+  for (let t = s.getTime(); t <= e.getTime(); t += 864e5){
+    const q = new Date(t + 8 * 36e5), y = q.getUTCFullYear(), k = `${pad(q.getUTCMonth() + 1)}-${pad(q.getUTCDate())}`, n = holYear(y)[k];
+    if (n) out.push({ id: 'hol-' + y + '-' + k, title: n, event_date: `${y}-${k}`, start_time: null, end_time: null, members: [], hol: true });
+  }
+  return out;
+}
+const holAdd = (rows, from, to) => (rows || []).concat(holidaysIn(from, to));
+const EV_FEST = ['#FDEBD9','#A9540F','#F6C89C'];
+const isFest = e => e.hol || FEST_RE.test(e.title || '');
+const evTitle = e => (isFest(e) ? '🎉 ' : '') + esc(e.title);
 function evColor(e){
+  if (isFest(e)) return { bg: EV_FEST[0], fg: EV_FEST[1], solid: EV_FEST[2], bar: '#F0A560', light: true };
   const a = EV_MEM.filter(x => (e.members || []).includes(x));
   let c;
   if (!a.length) c = EV_GRAY;
@@ -1092,8 +1144,9 @@ let tEv = [], tEvErr = '', evMonth = {}, evEditing = null;
 const evTime = t => t ? String(t).slice(0, 5) : '';
 const evSort = (a, b) => (a.start_time || '') < (b.start_time || '') ? -1 : (a.start_time || '') > (b.start_time || '') ? 1 : (a.id < b.id ? -1 : 1);
 const evSpan = e => e.start_time ? evTime(e.start_time) + (e.end_time ? '–' + evTime(e.end_time) : '') : '';
-const evRow = e => `<button type="button" class="evr" data-eid="${e.id}"><i class="em" style="background:${evColor(e).bar}"></i><span class="t">${e.start_time ? evTime(e.start_time) + (e.end_time ? `<small>- ${evTime(e.end_time)}</small>` : '') : '全天'}</span><span class="n">${esc(e.title)}</span>${evWho(e) ? `<span class="w">${esc(evWho(e))}</span>` : ''}</button>`;
+const evRow = e => `<button type="button" class="evr" data-eid="${e.id}"><i class="em" style="background:${evColor(e).bar}"></i><span class="t">${e.start_time ? evTime(e.start_time) + (e.end_time ? `<small>- ${evTime(e.end_time)}</small>` : '') : '全天'}</span><span class="n">${evTitle(e)}</span>${evWho(e) ? `<span class="w">${esc(evWho(e))}</span>` : ''}</button>`;
 function openEv(e, ds){
+  if (e && e.hol) return; // 內建節日不可編輯
   evEditing = e || null;
   $('evErr').textContent = '';
   $('evSheetTitle').textContent = e ? '編輯行程' : '新增行程';
@@ -1243,13 +1296,13 @@ async function renderWeek(){
   if (er.error) toast('行事曆讀取失敗：' + er.error.message, true);
   const sh = Object.fromEntries((sr.data || []).map(x => [x.shift_date, x.shift]));
   Object.assign(shiftOf, sh);
-  evWeek = (er.data || []).slice().sort(evSort);
+  evWeek = holAdd(er.data, fmt(gs), fmt(ge)).sort(evSort);
   const today = fmt(new Date());
   $('wkMeta').textContent = `本週共 ${evWeek.length} 個行程`;
   let h = '';
   for (let i = 0; i < 7; i++){
     const d = addDays(gs, i), ds = fmt(d), evs = evWeek.filter(x => x.event_date === ds);
-    const body = evs.length ? evs.map(x => `<span style="border-left-color:${evColor(x).solid}">${x.start_time ? evTime(x.start_time) + '　' : ''}${esc(x.title)}${evWho(x) ? `<small>${esc(evWho(x))}</small>` : ''}</span>`).join('') : '<span class="emp">無</span>';
+    const body = evs.length ? evs.map(x => `<span style="border-left-color:${evColor(x).solid}">${x.start_time ? evTime(x.start_time) + '　' : ''}${evTitle(x)}${evWho(x) ? `<small>${esc(evWho(x))}</small>` : ''}</span>`).join('') : '<span class="emp">無</span>';
     h += `<button type="button" class="cw${ds === today ? ' now' : ''}" data-cd="${ds}"><span class="dc"><b>週${WD[d.getDay()]}</b><span class="d1">${md(ds)}</span>${sh[ds] ? `<span class="d2"><span class="sq">${sh[ds] === '休假' ? '休' : esc(sh[ds])}</span></span>` : ''}</span><span class="cl">${body}</span></button>`;
   }
   $('wkBody').innerHTML = h + '<p class="note">點日期可新增行程、修改行程或設定班別。</p>';
@@ -1272,7 +1325,7 @@ async function renderMonth(){
   if (er.error) toast('行事曆讀取失敗：' + er.error.message, true);
   const sh = Object.fromEntries((sr.data || []).map(x => [x.shift_date, x.shift]));
   Object.assign(shiftOf, sh);
-  mcList = (er.data || []).slice().sort(evSort); mcEv = {};
+  mcList = holAdd(er.data, fmt(gs), fmt(ge)).sort(evSort); mcEv = {};
   mcList.forEach(x => (mcEv[x.event_date] = mcEv[x.event_date] || []).push(x));
   const today = fmt(new Date());
   const isoWeek = d => { const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())); const dn = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - dn); const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1)); return Math.ceil(((t - y0) / 864e5 + 1) / 7); };
@@ -1319,17 +1372,17 @@ async function renderMonth(){
       if (!o) { chips += '<span class="chip gh">&nbsp;</span>'; continue; }
       const c = evColor(o.sg.ev), left = o.k === 0;
       chips += left
-        ? `<span class="chip sp${o.sg.first ? ' s' : ''}${o.sg.last ? ' e' : ''}" style="width:calc(${o.sg.len * 100}% + ${(o.sg.len - 1) * 2 + 2}px);background:${c.solid};color:#fff;font-weight:600">${esc(o.sg.ev.title)}</span>`
+        ? `<span class="chip sp${o.sg.first ? ' s' : ''}${o.sg.last ? ' e' : ''}" style="width:calc(${o.sg.len * 100}% + ${(o.sg.len - 1) * 2 + 2}px);background:${c.solid};color:${c.light ? c.fg : '#fff'};font-weight:600">${evTitle(o.sg.ev)}</span>`
         : '<span class="chip gh">&nbsp;</span>';
     }
     const room = Math.max(0, 3 - used), shown = evs.slice(0, room);
-    chips += shown.map(x => { const c = evColor(x); const ad = !x.start_time; return `<span class="chip" style="background:${ad ? c.solid : c.bg};color:${ad ? '#fff' : c.fg}${ad ? ';font-weight:600' : ''}">${esc(x.title)}</span>`; }).join('');
+    chips += shown.map(x => { const c = evColor(x); const ad = !x.start_time; return `<span class="chip" style="background:${ad ? c.solid : c.bg};color:${ad && !c.light ? '#fff' : c.fg}${ad ? ';font-weight:600' : ''}">${evTitle(x)}</span>`; }).join('');
     const rest = evs.length - shown.length + Math.max(0, nl - used);
     h += `<button type="button" class="mc${d.getMonth() !== mcMonth.getMonth() ? ' out' : ''}${ds === mcSel ? ' on' : ''}${ds === today ? ' now' : ''}" data-mc="${ds}">` +
       `<span class="top2"><b>${d.getDate()}</b>${sh[ds] ? `<i class="mcs">${sh[ds] === '休假' ? '休' : esc(sh[ds])}</i>` : ''}</span>${chips}${rest > 0 ? `<span class="more">+${rest}</span>` : ''}</button>`;
   }
   $('mcGrid').innerHTML = h;
-  $('mcLeg').innerHTML = [['爸爸', EV_C['爸爸'][2]], ['媽媽', EV_C['媽媽'][2]], ['姊姊', EV_C['姊姊'][2]], ['弟弟', EV_C['弟弟'][2]], ['小孩・全家', EV_RED[2]], ['其他', EV_GRAY[2]]]
+  $('mcLeg').innerHTML = [['爸爸', EV_C['爸爸'][2]], ['媽媽', EV_C['媽媽'][2]], ['姊姊', EV_C['姊姊'][2]], ['弟弟', EV_C['弟弟'][2]], ['小孩・全家', EV_RED[2]], ['其他', EV_GRAY[2]], ['🎉 節慶', EV_FEST[2]]]
     .map(([n, c]) => `<span><i class="dot" style="--kd:${c}"></i>${n}</span>`).join('');
   drawMcDay();
 }
@@ -1362,7 +1415,7 @@ async function renderShift(){
   if (r.error) return toast('讀取失敗：' + r.error.message, true);
   evMonth = {};
   if (er.error) toast('行事曆讀取失敗：' + er.error.message, true);
-  else er.data.forEach(x => (evMonth[x.event_date] = evMonth[x.event_date] || []).push(x));
+  else holAdd(er.data, fmt(gs), fmt(ge)).forEach(x => (evMonth[x.event_date] = evMonth[x.event_date] || []).push(x));
   const map = Object.fromEntries(r.data.map(x => [x.shift_date, x.shift]));
   Object.assign(shiftOf, map);
   const today = fmt(new Date());
@@ -1393,7 +1446,7 @@ function dayPanel(ds, list){
   const evs = list.slice().sort(evSort);
   const cur = shiftOf[ds];
   openPick(`${md(ds)}（${WD[parse(ds).getDay()]}）`,
-    evs.map(x => `<button data-e="${x.id}"><b>${x.start_time ? evSpan(x) + '　' : ''}${esc(x.title)}</b>${evWho(x) ? `<small>${esc(evWho(x))}</small>` : ''}</button>`).join('') +
+    evs.map(x => `<button data-e="${x.id}"><b>${x.start_time ? evSpan(x) + '　' : ''}${evTitle(x)}</b>${evWho(x) ? `<small>${esc(evWho(x))}</small>` : ''}</button>`).join('') +
     `<button data-add="1"><b>＋ 新增行程</b></button><button data-sh="1"><b>設定班別</b><small>${cur ? esc(cur) : '未設定'}</small></button>`,
     btn => {
       closePick();
@@ -1818,7 +1871,7 @@ async function renderToday(){
   ]);
   todoErr = rs[7].error ? rs[7].error.message : null; todos = rs[7].error ? [] : (rs[7].data || []);
   buyErr = rs[6].error ? rs[6].error.message : null; buy = rs[6].error ? [] : (rs[6].data || []);
-  tEv = rs[5].error ? null : (rs[5].data || []).slice().sort(evSort);
+  tEv = rs[5].error ? null : holAdd(rs[5].data, ds, ds).sort(evSort);
   if (rs[5].error) tEvErr = rs[5].error.message;
   if (rs.slice(0, 3).some(x => x.error)) toast('讀取晚餐失敗：' + rs.find(x => x.error).error.message, true);
   tMealData = { sh: rs[0].data && rs[0].data[0] && rs[0].data[0].shift, m: rs[1].data && rs[1].data[0], items: rs[2].data || [] };
@@ -1925,7 +1978,7 @@ async function todoSave(){
 }
 let lastTouch = 0;
 /* ---------- 自動檢查新版：開啟／回到前景時比對網站上的版本號，不同就自動重新載入（每次改版我會更新這個編號）---------- */
-const APP_BUILD = '20261031-1930';
+const APP_BUILD = '20261101-1600';
 async function checkUpdate(){
   try{
     if (document.hidden || document.querySelector('dialog[open]') || buyForm || tForm || todoForm) return;
