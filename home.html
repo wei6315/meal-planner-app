@@ -451,7 +451,6 @@ select.inp{border-radius:0;-webkit-appearance:none;appearance:none}
     <div id="bForm"></div>
     <div id="tBuy"></div>
     </div>
-    <p id="verTag" class="note" style="text-align:center;opacity:.55;margin:18px 0 6px"></p>
   </section>
 
   <section id="vChores" hidden>
@@ -1981,9 +1980,7 @@ async function todoSave(){
 }
 let lastTouch = 0;
 /* ---------- 自動檢查新版：開啟／回到前景時比對網站上的版本號，不同就自動重新載入（每次改版我會更新這個編號）---------- */
-const APP_BUILD = '20261101-1745';
-try { document.getElementById('verTag').textContent = '版本 ' + APP_BUILD; } catch (e) {}
-window.addEventListener('error', ev => { try { toast('程式錯誤：' + (ev.message || '') + ' @' + (ev.lineno || ''), true); } catch (e) {} });
+const APP_BUILD = '20261101-1720';
 async function checkUpdate(){
   try{
     if (document.hidden || document.querySelector('dialog[open]') || buyForm || tForm || todoForm) return;
